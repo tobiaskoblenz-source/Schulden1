@@ -1,6 +1,6 @@
 {
-  "name": "schulden-v19",
-  "version": "19.0.0",
+  "name": "schulden-v20",
+  "version": "20.0.0",
   "private": true,
   "description": "Schulden Manager PWA Dark Mode - Railway Version",
   "scripts": {

@@ -12,7 +12,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="assets/icons/icon-192.png">
 <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
-<title>Schulden Manager – Dashboard Dark v19</title>
+<title>Schulden Manager – Dashboard Dark v20</title>
 
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
@@ -2637,6 +2637,96 @@ body.force-mobile-view .dashboardShell{
 }
 </style>
 
+
+<style id="v20-tablet-width-no-bottom-nav">
+/* v20 – Tablet breiter, unteres Menü raus, Info-Dialog fix */
+@media (max-width:1180px){
+  body.dark .container{
+    max-width:1040px !important;
+    width:100% !important;
+  }
+
+  .mobileBottomNav,
+  #fabAdd{
+    display:none !important;
+  }
+
+  body{
+    padding-bottom:0 !important;
+  }
+
+  body.dark .container{
+    padding-bottom:24px !important;
+  }
+
+  .v19MobileHeader,
+  .v19MobileRow{
+    grid-template-columns:minmax(180px,1.2fr) minmax(150px,.95fr) minmax(130px,.8fr) minmax(100px,.6fr) minmax(260px,1.35fr) !important;
+  }
+
+  .v19MobileHeader,
+  .v19MobileRow{
+    min-width:860px !important;
+  }
+
+  .v19MobileTable{
+    overflow-x:auto !important;
+  }
+
+  .v19Actions{
+    grid-template-columns:repeat(3,minmax(78px,1fr)) !important;
+  }
+
+  .v19Actions button{
+    min-height:40px !important;
+    font-size:12px !important;
+  }
+}
+
+/* Tablet quer noch breiter nutzen */
+@media (min-width:769px) and (max-width:1180px){
+  body.dark .container{
+    max-width:1080px !important;
+    padding-left:18px !important;
+    padding-right:18px !important;
+  }
+
+  .dashboardStats{
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  }
+
+  .actionToolbarGrid{
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  }
+
+  .v19MobileHeader,
+  .v19MobileRow{
+    min-width:900px !important;
+  }
+}
+
+/* Handy bleibt passend, aber ohne untere Menüleiste */
+@media (max-width:640px){
+  body.dark .container{
+    max-width:100% !important;
+    padding-bottom:20px !important;
+  }
+
+  .v19MobileHeader,
+  .v19MobileRow{
+    min-width:0 !important;
+  }
+
+  .v19MobileTable{
+    overflow-x:visible !important;
+  }
+
+  .v19Actions{
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  }
+}
+</style>
+
 </head>
 <body class="dark">
 <div class="container">
@@ -2677,7 +2767,7 @@ body.force-mobile-view .dashboardShell{
     <section class="hero heroDashboard">
       <div class="heroMain dashboardHeader">
         <div class="dashboardGreetingWrap">
-          <div class="eyebrow">Dark Dashboard · v19</div>
+          <div class="eyebrow">Dark Dashboard · v20</div>
           <h1 id="greetingTitle">Guten Abend!</h1>
           <p id="greetingText">Hier ist die Übersicht deiner Schulden.</p>
         </div>
@@ -5067,6 +5157,98 @@ if ('serviceWorker' in navigator) {
   window.addEventListener("orientationchange", () => setTimeout(()=>applyView(manualView), 250));
 
   applyView(manualView);
+})();
+</script>
+
+
+<script id="v20-info-mobile-fix">
+(function(){
+  function infoTextForDebt(d){
+    const paidSum = (typeof sumHistory === "function") ? sumHistory(d) : 0;
+    const remaining = Number(d.betrag) || 0;
+    const original = paidSum + remaining;
+    const count = (d.history && Array.isArray(d.history)) ? d.history.length : 0;
+    const lastDate = (typeof lastPaymentDate === "function") ? lastPaymentDate(d) : "–";
+    const contact = (typeof normalizeContactData === "function") ? normalizeContactData(d) : {};
+    const contactLines = [
+      contact.representative ? "Name/Vertreter: " + contact.representative : "",
+      contact.address ? "Anschrift: " + contact.address : "",
+      contact.email ? "E-Mail: " + contact.email : "",
+      contact.phone ? "Telefon: " + contact.phone : ""
+    ].filter(Boolean).join("\n") || "–";
+    const notes = (typeof notesText === "function") ? notesText(d) : (d.notes || "Keine Notizen vorhanden.");
+
+    return "Name: " + (d.name || "–") + "\n" +
+      "Ansprechpartner:\n" + contactLines + "\n\n" +
+      "Grund: " + (d.grund || "–") + "\n" +
+      "Ursprünglich: " + original.toFixed(2) + " €\n" +
+      "Bereits abgebaut: " + paidSum.toFixed(2) + " €\n" +
+      "Restschuld: " + remaining.toFixed(2) + " €\n" +
+      "Status: " + (d.status || "–") + "\n" +
+      "Anzahl Zahlungen: " + count + "\n" +
+      "Letzte Zahlung: " + lastDate + "\n\n" +
+      "Notiz-Historie:\n" + notes;
+  }
+
+  window.showInfoMobileFixed = function(i){
+    const d = debts[i];
+    if(!d) return;
+
+    if(typeof openActionModal === "function"){
+      openActionModal({
+        title:"Info",
+        body:infoTextForDebt(d),
+        confirmText:"Neue Notiz speichern",
+        textareaLabel:"Neue Notiz",
+        textareaPlaceholder:"Neue Notiz eintragen...",
+        textareaValue:"",
+        onTextareaConfirm:(value)=>{
+          const text = String(value || "").trim();
+          if(!text){
+            if(typeof showToast === "function") showToast("Bitte erst eine Notiz eintragen.");
+            return;
+          }
+          if(!Array.isArray(debts[i].notesHistory)) debts[i].notesHistory = [];
+          debts[i].notesHistory.push({at:new Date().toISOString(), text});
+          if(typeof notesText === "function") debts[i].notes = notesText(debts[i]);
+          if(typeof save === "function") save();
+          if(typeof render === "function") render();
+          if(typeof closeActionModal === "function") closeActionModal();
+          if(typeof showToast === "function") showToast("Neue Notiz gespeichert ✅");
+        }
+      });
+    }else{
+      alert(infoTextForDebt(d));
+    }
+  };
+
+  const previousRender = window.render;
+  window.render = function(){
+    if(typeof previousRender === "function") previousRender();
+
+    document.querySelectorAll(".v19MobileRow").forEach(row=>{
+      const i = Number(row.dataset.index);
+      const oldInfo = row.querySelector("[data-action='info']");
+      if(oldInfo && !oldInfo.dataset.v20Fixed){
+        const fixedInfo = oldInfo.cloneNode(true);
+        fixedInfo.dataset.v20Fixed = "1";
+        fixedInfo.addEventListener("click", (e)=>{
+          e.preventDefault();
+          e.stopPropagation();
+          window.showInfoMobileFixed(i);
+        });
+        oldInfo.replaceWith(fixedInfo);
+      }
+    });
+
+    const nav = document.querySelector(".mobileBottomNav");
+    if(nav) nav.style.display = "none";
+    const fab = document.getElementById("fabAdd");
+    if(fab) fab.style.display = "none";
+  };
+
+  window.addEventListener("resize", ()=>setTimeout(()=>{ if(typeof render === "function") render(); }, 50));
+  setTimeout(()=>{ if(typeof render === "function") render(); }, 50);
 })();
 </script>
 

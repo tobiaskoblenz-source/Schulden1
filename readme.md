@@ -1,3 +1,3 @@
-# Schulden v19
+# Schulden v20
 
-Handy- und Tablet-Seite neu gebaut: kompakter Listen-/Tabellenlook wie v6 Desktop, große Desktop-Ansicht bleibt erhalten.
+Info-Button auf Handy/Tablet repariert, unteres Menü entfernt, Tablet-Ansicht breiter gemacht.
