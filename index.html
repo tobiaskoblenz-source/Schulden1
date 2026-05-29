@@ -12,7 +12,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="assets/icons/icon-192.png">
 <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
-<title>Schulden Manager – Dark Mode v7</title>
+<title>Schulden Manager – Dark Mode v8</title>
 
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
@@ -877,11 +877,11 @@ body.softlight #actionConfirm{
 }
 </style>
 
-<style id="v7-ergonomie-overrides">
+<style id="v8-compact-buttons-overrides">
 
-/* v7 – bessere Lesbarkeit, größere Buttons und scrollbare Fenster */
+/* v8 – kompaktere Buttons, Lesbarkeit und scrollbare Fenster bleiben erhalten */
 html{
-  font-size:16.5px;
+  font-size:16px;
 }
 body{
   -webkit-text-size-adjust:100%;
@@ -896,31 +896,31 @@ input,
 button,
 select,
 textarea{
-  min-height:54px;
-  font-size:16px;
-  border-radius:18px;
+  min-height:50px;
+  font-size:15.5px;
+  border-radius:16px;
 }
 button{
-  padding:0 18px;
+  padding:0 14px;
 }
 .actionRow{
-  grid-template-columns:repeat(3,minmax(128px,1fr));
-  gap:12px;
+  grid-template-columns:repeat(4,minmax(104px,1fr));
+  gap:9px;
   align-items:stretch;
 }
 .actionBtn,
 .actionRow button{
-  min-height:64px;
-  padding:12px 14px;
-  font-size:15px;
-  line-height:1.15;
-  border-radius:18px;
+  min-height:50px;
+  padding:8px 10px;
+  font-size:13.5px;
+  line-height:1.1;
+  border-radius:15px;
   white-space:normal;
 }
 .actionBtn .ico{
-  font-size:18px;
-  min-width:28px;
-  min-height:28px;
+  font-size:15px;
+  min-width:20px;
+  min-height:20px;
   display:inline-flex;
   align-items:center;
   justify-content:center;
@@ -929,23 +929,24 @@ button{
   overflow-wrap:anywhere;
 }
 td:last-child{
-  min-width:430px;
+  min-width:360px;
 }
 .mobileRow{
-  gap:12px;
+  gap:9px;
 }
 .mobileRow .actionBtn{
-  min-height:66px;
-  font-size:15px;
+  min-height:54px;
+  font-size:13.5px;
+  padding:8px 9px;
 }
 .sectionTitle h2,
 .card h2{
-  font-size:24px;
+  font-size:23px;
 }
 .hero p,
 .smallMuted,
 .sectionTitle span{
-  font-size:15.5px;
+  font-size:15px;
 }
 .stat .num,
 .mobileCard .amount strong{
@@ -961,20 +962,20 @@ td:last-child{
   max-height:calc(100dvh - 36px);
   overflow-y:auto;
   margin:18px auto;
-  padding:26px;
+  padding:24px;
   scrollbar-width:thin;
   -webkit-overflow-scrolling:touch;
 }
 .modalBox h3{
-  font-size:26px;
+  font-size:24px;
   line-height:1.15;
 }
 #actionBody{
   max-height:42dvh;
   overflow:auto;
   padding-right:6px;
-  line-height:1.7 !important;
-  font-size:16px;
+  line-height:1.65 !important;
+  font-size:15.5px;
   word-break:break-word;
 }
 #actionTextareaWrap,
@@ -983,23 +984,23 @@ td:last-child{
   max-height:none;
 }
 .noteBox{
-  min-height:150px;
-  font-size:16px;
-  line-height:1.55;
+  min-height:140px;
+  font-size:15.5px;
+  line-height:1.5;
 }
 .contactAddressBox{
-  min-height:110px;
+  min-height:100px;
 }
 .contactForm{
-  gap:12px;
+  gap:10px;
 }
 .infoNoteLabel{
-  font-size:13.5px;
+  font-size:13px;
 }
 .modalActions{
   position:sticky;
-  bottom:-26px;
-  padding-top:14px;
+  bottom:-24px;
+  padding-top:12px;
   padding-bottom:4px;
   background:linear-gradient(180deg, rgba(14,25,43,0), rgba(14,25,43,.96) 35%, rgba(8,16,29,.98));
   z-index:2;
@@ -1008,16 +1009,20 @@ body.dark .modalActions{
   background:linear-gradient(180deg, rgba(14,25,43,0), rgba(18,28,44,.96) 35%, rgba(14,22,36,.98));
 }
 .modalActions button{
-  flex:1 1 180px;
-  min-height:56px;
-  font-size:16px;
+  flex:1 1 150px;
+  min-height:50px;
+  font-size:15px;
+}
+@media (max-width:900px){
+  .actionRow{grid-template-columns:repeat(3,minmax(0,1fr));}
+  td:last-child{min-width:320px;}
 }
 @media (max-width:768px){
   html{font-size:16px;}
   .container{padding:14px 12px 122px;}
-  .actionRow{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}
+  .actionRow{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;}
   .actionBtn,
-  .actionRow button{min-height:68px;font-size:15px;padding:12px 10px;}
+  .actionRow button{min-height:54px;font-size:13.5px;padding:8px 9px;}
   td:last-child{min-width:unset;}
   .modalOverlay{padding:10px;}
   .modalBox{
@@ -1027,14 +1032,14 @@ body.dark .modalActions{
     padding:20px;
     border-radius:24px;
   }
-  .modalBox h3{font-size:24px;}
+  .modalBox h3{font-size:23px;}
   #actionBody{max-height:40dvh;font-size:15.5px;}
   .modalActions{bottom:-20px;}
-  .modalActions button{flex:1 1 140px;min-height:56px;}
+  .modalActions button{flex:1 1 130px;min-height:50px;}
 }
 @media (max-width:420px){
   .actionBtn,
-  .actionRow button{font-size:14px;min-height:64px;}
+  .actionRow button{font-size:13px;min-height:52px;}
   .actionBtn .ico{display:none;}
 }
 
@@ -1046,7 +1051,7 @@ body.dark .modalActions{
 
   <section class="hero">
     <div class="heroMain">
-      <div class="eyebrow">✦ Dark iPad Edition · v7</div>
+      <div class="eyebrow">✦ Dark iPad Edition · v8</div>
       <h1>Schulden Manager<br>mit mehr iPad-Feeling</h1>
       <p>Mehr Dashboard, weniger Handy-App: großzügige Flächen, dunkle Glas-Panels und ein ruhiger Tablet-Look für bessere Übersicht beim Verwalten deiner offenen und bezahlten Beträge.</p>
       <div class="heroMeta">
@@ -1223,7 +1228,7 @@ try {
 
 let currentView = (localStorage.getItem("godmode_view") || "desktop");
 if(currentView !== "desktop" && currentView !== "mobile") currentView = "desktop";
-// Dark-only Version v7: alte Light/Soft-Light-Einstellungen werden überschrieben.
+// Dark-only Version v8: alte Light/Soft-Light-Einstellungen werden überschrieben.
 document.body.classList.remove("softlight");
 document.body.classList.add("dark");
 localStorage.setItem("godmode_dark", "1");
