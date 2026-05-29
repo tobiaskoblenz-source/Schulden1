@@ -1,3 +1,3 @@
-# Schulden v15
+# Schulden v16
 
-Railway-Version. Desktop und Tablet sind jetzt als feste Ein-Seiten-Dashboard-Ansicht aufgebaut. Tabelle und rechte Detailseite scrollen intern.
+Desktop basiert wieder auf v13. Die Handy-Ansicht ist wieder klassischer wie vor dem großen Dashboard-Bild.
