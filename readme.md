@@ -1,3 +1,3 @@
-# Schulden v18
+# Schulden v19
 
-Handy-Ansicht wie v8 gilt jetzt auch für Tablet. Große Desktop-Bildschirme behalten die Desktop-Ansicht.
+Handy- und Tablet-Seite neu gebaut: kompakter Listen-/Tabellenlook wie v6 Desktop, große Desktop-Ansicht bleibt erhalten.
