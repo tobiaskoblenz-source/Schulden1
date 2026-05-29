@@ -12,7 +12,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="assets/icons/icon-192.png">
 <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
-<title>Schulden Manager – Dashboard Dark v16</title>
+<title>Schulden Manager – Dashboard Dark v17</title>
 
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
@@ -1686,6 +1686,343 @@ body.dark tbody tr.selectedRow td{
 }
 </style>
 
+
+<style id="v17-desktop-size-mobile-v8">
+/* v17 – Desktop sauberer, Ansicht-Buttons zurück, Handy wie v8 */
+.visibleViewSwitch{
+  display:flex;
+  gap:8px;
+  padding:4px;
+  border-radius:18px;
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.08);
+}
+.visibleViewSwitch button{
+  min-height:42px !important;
+  border-radius:14px !important;
+  padding:0 14px !important;
+  font-size:13px !important;
+  box-shadow:none !important;
+}
+.visibleViewSwitch button.activeView{
+  background:linear-gradient(135deg,#4f8cff,#7c71ff) !important;
+  color:#fff !important;
+}
+
+/* Desktop: rechte Info soll nichts überdecken */
+@media (min-width:769px){
+  body.dark .container{
+    max-width:none !important;
+    width:100% !important;
+    padding:0 !important;
+  }
+
+  .dashboardShell{
+    grid-template-columns:clamp(180px, 13vw, 216px) minmax(0,1fr) !important;
+  }
+
+  .contentArea{
+    padding:clamp(16px,1.6vw,26px) !important;
+    overflow-x:hidden !important;
+  }
+
+  .dashboardContentGrid{
+    display:grid !important;
+    grid-template-columns:minmax(0,1fr) clamp(320px,24vw,390px) !important;
+    gap:clamp(14px,1.4vw,20px) !important;
+    align-items:start !important;
+  }
+
+  .dashboardMainColumn{
+    min-width:0 !important;
+  }
+
+  .desktopDetailPanel{
+    width:100% !important;
+    max-width:390px !important;
+    min-width:0 !important;
+    padding:14px !important;
+    border-radius:24px !important;
+    position:sticky !important;
+    top:18px !important;
+  }
+
+  .desktopPanelBody{
+    max-height:calc(100dvh - 120px) !important;
+    overflow:auto !important;
+  }
+
+  .dashboardStats{
+    grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+    gap:12px !important;
+  }
+
+  .dashboardStats .stat{
+    padding:16px !important;
+    border-radius:20px !important;
+  }
+
+  .dashboardStats .statValue{
+    font-size:clamp(18px,1.45vw,25px) !important;
+  }
+
+  .actionToolbarGrid{
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  }
+
+  .boardToolbar{
+    grid-template-columns:minmax(0,1fr) 170px !important;
+  }
+
+  body.dark table{
+    table-layout:auto !important;
+    min-width:820px;
+  }
+
+  .dashboardTableWrap{
+    overflow:auto !important;
+  }
+
+  body.dark tbody td{
+    padding:12px 10px !important;
+  }
+
+  body.dark tbody td:last-child{
+    min-width:300px !important;
+    max-width:340px !important;
+  }
+
+  .tableActions{
+    grid-template-columns:repeat(3,max-content) !important;
+    gap:7px !important;
+  }
+
+  .tableUtilityActions{
+    grid-column:1 / -1;
+    justify-content:flex-start !important;
+  }
+
+  .tableActions .miniBtn{
+    min-height:36px !important;
+    padding:0 9px !important;
+    border-radius:11px !important;
+    font-size:12px !important;
+  }
+
+  .tableActions .tinyBtn{
+    width:36px !important;
+    height:36px !important;
+    min-width:36px !important;
+  }
+
+  .drawerBigValue{
+    font-size:24px !important;
+  }
+
+  .drawerRow,
+  .drawerFact{
+    grid-template-columns:112px 1fr !important;
+  }
+
+  .drawerRow span,
+  .drawerFact span{
+    font-size:12px !important;
+  }
+
+  .drawerRow strong,
+  .drawerFact strong{
+    font-size:13px !important;
+  }
+}
+
+/* Schmale Desktop/Tablet: Detailseite unter die Tabelle statt zu überdecken */
+@media (min-width:769px) and (max-width:1180px){
+  .dashboardContentGrid{
+    grid-template-columns:1fr !important;
+  }
+  .desktopDetailPanel{
+    position:relative !important;
+    top:auto !important;
+    max-width:none !important;
+    order:-1;
+    min-height:auto !important;
+  }
+  .desktopPanelBody{
+    max-height:430px !important;
+  }
+}
+
+/* Handy v8-Look wiederherstellen */
+@media (max-width:768px){
+  .visibleViewSwitch{
+    width:100%;
+    display:grid !important;
+    grid-template-columns:1fr 1fr;
+    margin-bottom:10px;
+  }
+
+  .heroTopActions{
+    display:grid !important;
+    grid-template-columns:1fr !important;
+    gap:10px !important;
+    margin-top:12px !important;
+  }
+
+  .heroTopActions > button{
+    width:100%;
+  }
+
+  .dashboardHeader h1{
+    font-size:28px !important;
+  }
+
+  .dashboardStats{
+    grid-template-columns:1fr !important;
+  }
+
+  #desktopTable{
+    display:none !important;
+  }
+
+  #mobileList{
+    display:grid !important;
+    gap:14px !important;
+  }
+
+  .desktopDetailPanel{
+    display:none !important;
+  }
+
+  .mobileCard{
+    background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.03)) !important;
+    border:1px solid rgba(19,35,59,.06) !important;
+    border-radius:24px !important;
+    padding:18px !important;
+    box-shadow:none !important;
+  }
+
+  .mobileTop{
+    display:flex !important;
+    align-items:flex-start !important;
+    justify-content:space-between !important;
+    gap:12px !important;
+  }
+
+  .mobileCard .amount{
+    margin-top:14px !important;
+    display:flex !important;
+    align-items:end !important;
+    justify-content:space-between !important;
+    gap:12px !important;
+  }
+
+  .mobileCard .amount strong{
+    font-size:28px !important;
+    letter-spacing:-.03em !important;
+  }
+
+  .mobileMeta{
+    display:grid !important;
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+    gap:10px !important;
+    margin-top:14px !important;
+  }
+
+  .metaItem{
+    padding:12px 14px !important;
+    border-radius:16px !important;
+    background:rgba(255,255,255,.04) !important;
+    border:1px solid rgba(255,255,255,.06) !important;
+  }
+
+  .metaItem span{
+    display:block !important;
+    color:var(--muted) !important;
+    font-size:12px !important;
+    margin-bottom:5px !important;
+  }
+
+  .mobileRow{
+    display:grid !important;
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+    gap:10px !important;
+    margin-top:14px !important;
+  }
+
+  .mobileRow .actionBtn{
+    width:100% !important;
+    min-width:0 !important;
+    min-height:54px !important;
+    padding:10px 8px !important;
+    border-radius:16px !important;
+    font-size:13px !important;
+    line-height:1.1 !important;
+    display:flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    gap:6px !important;
+  }
+
+  .mobileRow .actionBtn .ico{
+    display:inline-flex !important;
+    font-size:15px !important;
+    line-height:1 !important;
+    background:transparent !important;
+    padding:0 !important;
+    min-width:auto !important;
+    min-height:auto !important;
+  }
+
+  .mobileRow .actionBtn .lbl{
+    display:block !important;
+  }
+
+  .mobileRow .btn-status{grid-column:1/2}
+  .mobileRow .btn-delete{grid-column:2/3}
+  .mobileRow .btn-pay{grid-column:1/2}
+  .mobileRow .btn-history{grid-column:2/3}
+  .mobileRow .btn-info{grid-column:1/2}
+  .mobileRow .btn-contact{grid-column:2/3}
+
+  .mobileActionMain,
+  .mobileTinyActions{
+    display:none !important;
+  }
+
+  .mobileBottomNav{
+    display:flex !important;
+  }
+}
+
+/* Manuell gewählte Handy-Ansicht auch auf Desktop zulassen */
+body.force-mobile-view .dashboardContentGrid{
+  grid-template-columns:1fr !important;
+}
+body.force-mobile-view .desktopDetailPanel,
+body.force-mobile-view #desktopTable{
+  display:none !important;
+}
+body.force-mobile-view #mobileList{
+  display:grid !important;
+}
+body.force-mobile-view .desktopPanelBody{
+  max-height:none !important;
+}
+body.force-mobile-view .dashboardStats{
+  grid-template-columns:1fr !important;
+}
+body.force-mobile-view .contentArea{
+  max-width:640px;
+  margin:0 auto;
+}
+body.force-mobile-view .sidebar{
+  display:none !important;
+}
+body.force-mobile-view .dashboardShell{
+  grid-template-columns:1fr !important;
+}
+</style>
+
 </head>
 <body class="dark">
 <div class="container">
@@ -1726,11 +2063,15 @@ body.dark tbody tr.selectedRow td{
     <section class="hero heroDashboard">
       <div class="heroMain dashboardHeader">
         <div class="dashboardGreetingWrap">
-          <div class="eyebrow">Dark Dashboard · v16</div>
+          <div class="eyebrow">Dark Dashboard · v17</div>
           <h1 id="greetingTitle">Guten Abend!</h1>
           <p id="greetingText">Hier ist die Übersicht deiner Schulden.</p>
         </div>
         <div class="heroTopActions">
+          <div class="visibleViewSwitch" aria-label="Ansicht wählen">
+            <button id="viewDesktopVisible" class="secondary" type="button">🖥 Desktop</button>
+            <button id="viewMobileVisible" class="secondary" type="button">📱 Handy</button>
+          </div>
           <button id="btnOpenAdd" type="button">＋ Neue Schuld</button>
           <button id="btnInstall" class="secondary" type="button">📲 App installieren</button>
         </div>
@@ -3642,6 +3983,167 @@ if ('serviceWorker' in navigator) {
   document.getElementById("statusFilter")?.addEventListener("change", render);
 
   applyViewV16();
+})();
+</script>
+
+
+<script id="v17-view-buttons-mobile-v8">
+(function(){
+  let manualView = localStorage.getItem("godmode_view") || "desktop";
+
+  function setVisibleButtons(){
+    const desktop = document.getElementById("viewDesktopVisible");
+    const mobile = document.getElementById("viewMobileVisible");
+    const isMobile = document.body.classList.contains("force-mobile-view") || window.matchMedia("(max-width: 768px)").matches;
+    if(desktop) desktop.classList.toggle("activeView", !isMobile);
+    if(mobile) mobile.classList.toggle("activeView", isMobile);
+  }
+
+  function applyManualView(view){
+    manualView = view === "mobile" ? "mobile" : "desktop";
+    try{ localStorage.setItem("godmode_view", manualView); }catch(e){}
+
+    const phone = window.matchMedia("(max-width: 768px)").matches;
+    document.body.classList.toggle("force-mobile-view", manualView === "mobile" && !phone);
+
+    const desktopTable = document.getElementById("desktopTable");
+    const mobileList = document.getElementById("mobileList");
+
+    if(phone || manualView === "mobile"){
+      if(desktopTable) desktopTable.style.display = "none";
+      if(mobileList) mobileList.style.display = "grid";
+    }else{
+      if(desktopTable) desktopTable.style.display = "block";
+      if(mobileList) mobileList.style.display = "none";
+    }
+
+    setVisibleButtons();
+    if(typeof render === "function") render();
+  }
+
+  const originalSetView = window.setView;
+  window.setView = function(v){
+    applyManualView(v);
+  };
+
+  document.getElementById("viewDesktopVisible")?.addEventListener("click", () => applyManualView("desktop"));
+  document.getElementById("viewMobileVisible")?.addEventListener("click", () => applyManualView("mobile"));
+
+  // v8-artiges Mobile-Rendering erzwingen
+  function esc(str){
+    return String(str || "")
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#039;");
+  }
+  function label(status){
+    if(status === "bezahlt") return "BEZAHLT";
+    if(status === "teilzahlung") return "TEILZAHLUNG";
+    if(status === "klaerung") return "IN KLÄRUNG";
+    return "OFFEN";
+  }
+  function filteredPairs(){
+    const search = (document.getElementById("search")?.value || "").toLowerCase();
+    const filter = document.getElementById("statusFilter")?.value || "alle";
+    return debts.map((d,index)=>({d,index})).filter(({d})=>{
+      const okSearch = !search || JSON.stringify(d).toLowerCase().includes(search);
+      const okFilter = filter === "alle" ? true : String(d.status || "offen") === filter;
+      return okSearch && okFilter;
+    });
+  }
+  function updateStats(){
+    let sum = 0, open = 0, paid = 0;
+    debts.forEach(d=>{
+      const amount = Number(d.betrag) || 0;
+      sum += amount;
+      if(isOpenLikeStatus(d.status)) open += amount; else paid += amount;
+    });
+    const unique = new Set(debts.map(d=>String(d.name||"").trim()).filter(Boolean));
+    const set = (id,val)=>{ const el=document.getElementById(id); if(el) el.textContent = val; };
+    set("sum", formatEUR(sum));
+    set("open", formatEUR(open));
+    set("paid", formatEUR(paid));
+    set("personsCount", String(unique.size));
+    set("openShare", sum ? (open/sum*100).toFixed(1).replace(".",",") + " % der Gesamtsumme" : "0 % der Gesamtsumme");
+    set("paidShare", sum ? (paid/sum*100).toFixed(1).replace(".",",") + " % der Gesamtsumme" : "0 % der Gesamtsumme");
+  }
+  function renderMobileV8(pairs){
+    const mobile = document.getElementById("mobileList");
+    if(!mobile) return;
+    mobile.innerHTML = "";
+    pairs.forEach(({d,index:i})=>{
+      const badgeClass = isOpenLikeStatus(d.status) ? "badgeOpen" : "badgePaid";
+      const card = document.createElement("div");
+      card.className = "mobileCard";
+      card.innerHTML =
+        "<div class='mobileTop'>" +
+          "<div>" +
+            "<div style='font-weight:800;font-size:18px;'>"+esc(d.name)+"</div>" +
+            "<div style='color:var(--muted);margin-top:4px;'>"+esc(d.grund || "–")+"</div>" +
+          "</div>" +
+          "<span class='badge "+badgeClass+"'>"+label(d.status)+"</span>" +
+        "</div>" +
+        "<div class='amount'>" +
+          "<div><span style='display:block;color:var(--muted);font-size:12px;margin-bottom:6px;'>Restbetrag</span><strong>"+formatEUR(Number(d.betrag)||0)+"</strong></div>" +
+        "</div>" +
+        "<div class='mobileMeta'>" +
+          "<div class='metaItem'><span>Datum</span><strong>"+esc(d.datum || "–")+"</strong></div>" +
+          "<div class='metaItem'><span>Zahlungen</span><strong>"+(((d.history && d.history.length) || 0))+" Einträge</strong></div>" +
+        "</div>" +
+        "<div class='mobileRow'>" +
+          "<button class='actionBtn btn-status' type='button'><span class='ico'>↺</span><span class='lbl'>Status</span></button>" +
+          "<button class='actionBtn btn-delete' type='button'><span class='ico'>✕</span><span class='lbl'>Löschen</span></button>" +
+          "<button class='actionBtn btn-pay' type='button'><span class='ico'>€</span><span class='lbl'>Abbau</span></button>" +
+          "<button class='actionBtn btn-history' type='button'><span class='ico'>◷</span><span class='lbl'>Historie</span></button>" +
+          "<button class='actionBtn btn-info' type='button'><span class='ico'>i</span><span class='lbl'>Info</span></button>" +
+          "<button class='actionBtn btn-contact' type='button'><span class='ico'>☎</span><span class='lbl'>Ansprechpartner</span></button>" +
+        "</div>";
+      const b = card.querySelectorAll("button");
+      b[0].addEventListener("click", ()=>toggleStatus(i));
+      b[1].addEventListener("click", ()=>removeDebt(i));
+      b[2].addEventListener("click", ()=>paySingleDebt(i));
+      b[3].addEventListener("click", ()=>showHistory(i));
+      b[4].addEventListener("click", ()=>showInfo(i));
+      b[5].addEventListener("click", ()=>showContact(i));
+      mobile.appendChild(card);
+    });
+  }
+
+  const previousRender = window.render;
+  window.render = function(){
+    const phone = window.matchMedia("(max-width: 768px)").matches;
+    const forcedMobile = document.body.classList.contains("force-mobile-view");
+
+    if(phone || forcedMobile){
+      const pairs = filteredPairs();
+      updateStats();
+      const count = document.getElementById("debtCount");
+      if(count) count.textContent = String(pairs.length);
+      const tbody = document.getElementById("tbody");
+      if(tbody) tbody.innerHTML = "";
+      renderMobileV8(pairs);
+      const desktopTable = document.getElementById("desktopTable");
+      const mobileList = document.getElementById("mobileList");
+      if(desktopTable) desktopTable.style.display = "none";
+      if(mobileList) mobileList.style.display = "grid";
+      setVisibleButtons();
+      return;
+    }
+
+    if(typeof previousRender === "function") previousRender();
+    const desktopTable = document.getElementById("desktopTable");
+    const mobileList = document.getElementById("mobileList");
+    if(desktopTable) desktopTable.style.display = "block";
+    if(mobileList) mobileList.style.display = "none";
+    setVisibleButtons();
+  };
+
+  window.addEventListener("resize", () => applyManualView(manualView));
+  window.addEventListener("orientationchange", () => setTimeout(() => applyManualView(manualView), 250));
+
+  applyManualView(manualView);
 })();
 </script>
 

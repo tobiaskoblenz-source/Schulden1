@@ -1,3 +1,3 @@
-# Schulden v16
+# Schulden v17
 
-Desktop basiert wieder auf v13. Die Handy-Ansicht ist wieder klassischer wie vor dem großen Dashboard-Bild.
+Desktop-Größe angepasst, Ansicht-Buttons Desktop/Handy zurück, Handy-Ansicht wieder wie v8.
