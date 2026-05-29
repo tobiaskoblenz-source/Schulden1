@@ -1,29 +1,21 @@
-# Schulden Manager Dark – Railway Version v8
+# Schulden v10 – Railway Version
 
-Diese Version ist für Railway vorbereitet und läuft als kleine Node-App.
+Dark-Mode-Version für Railway.
 
-## Enthalten
-- Nur Dark Mode
-- Info-Fenster mit speicherbarem Notizfeld pro Schuld
-- PWA-Dateien: `manifest.webmanifest` und `sw.js`
-- `package.json` mit Start-Befehl
-- `server.js` als statischer Webserver
-- `railway.toml` für Railway
+## Neu in v10
 
-## Deployment auf Railway
-1. ZIP entpacken
-2. Inhalt in dein GitHub-Repository hochladen
-3. Bei Railway ein neues Projekt aus diesem GitHub-Repo erstellen
-4. Railway erkennt Node automatisch
-5. Start-Befehl ist: `npm start`
+- Neue geführte Eingabe über „+ Neue Schuld“
+- Pflichtfelder: Name, Grund, Betrag
+- Status als Buttons: Offen, Bezahlt, Teilzahlung, In Klärung
+- Ansprechpartner optional direkt beim Anlegen
+- Erste Notiz optional direkt beim Anlegen
+- „Speichern & weitere“ für mehrere Einträge hintereinander
+- Cache/Service Worker auf v10 gesetzt
 
-Railway nutzt automatisch die Variable `PORT`. Du musst dafür nichts extra eintragen.
+## Railway
 
-- Neuer Aktionen-Button „Ansprechpartner“ pro Schuld
+Start-Befehl:
 
-
-## Änderungen v8
-- Buttons und Schriftgrößen besser lesbar angepasst.
-- Aktionsbuttons größer und ruhiger angeordnet.
-- Info-/Aktion-Fenster sind jetzt scrollbar, wenn Inhalte zu lang werden.
-- Lange Notizen und Ansprechpartner-Daten sprengen das Fenster nicht mehr.
+```bash
+npm start
+```

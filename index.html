@@ -12,7 +12,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="assets/icons/icon-192.png">
 <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
-<title>Schulden Manager – Dark Mode v8</title>
+<title>Schulden Manager – Dark Mode v10</title>
 
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
@@ -877,11 +877,11 @@ body.softlight #actionConfirm{
 }
 </style>
 
-<style id="v8-compact-buttons-overrides">
+<style id="v7-ergonomie-overrides">
 
-/* v8 – kompaktere Buttons, Lesbarkeit und scrollbare Fenster bleiben erhalten */
+/* v7 – bessere Lesbarkeit, größere Buttons und scrollbare Fenster */
 html{
-  font-size:16px;
+  font-size:16.5px;
 }
 body{
   -webkit-text-size-adjust:100%;
@@ -896,31 +896,31 @@ input,
 button,
 select,
 textarea{
-  min-height:50px;
-  font-size:15.5px;
-  border-radius:16px;
+  min-height:54px;
+  font-size:16px;
+  border-radius:18px;
 }
 button{
-  padding:0 14px;
+  padding:0 18px;
 }
 .actionRow{
-  grid-template-columns:repeat(4,minmax(104px,1fr));
-  gap:9px;
+  grid-template-columns:repeat(3,minmax(128px,1fr));
+  gap:12px;
   align-items:stretch;
 }
 .actionBtn,
 .actionRow button{
-  min-height:50px;
-  padding:8px 10px;
-  font-size:13.5px;
-  line-height:1.1;
-  border-radius:15px;
+  min-height:64px;
+  padding:12px 14px;
+  font-size:15px;
+  line-height:1.15;
+  border-radius:18px;
   white-space:normal;
 }
 .actionBtn .ico{
-  font-size:15px;
-  min-width:20px;
-  min-height:20px;
+  font-size:18px;
+  min-width:28px;
+  min-height:28px;
   display:inline-flex;
   align-items:center;
   justify-content:center;
@@ -929,24 +929,23 @@ button{
   overflow-wrap:anywhere;
 }
 td:last-child{
-  min-width:360px;
+  min-width:430px;
 }
 .mobileRow{
-  gap:9px;
+  gap:12px;
 }
 .mobileRow .actionBtn{
-  min-height:54px;
-  font-size:13.5px;
-  padding:8px 9px;
+  min-height:66px;
+  font-size:15px;
 }
 .sectionTitle h2,
 .card h2{
-  font-size:23px;
+  font-size:24px;
 }
 .hero p,
 .smallMuted,
 .sectionTitle span{
-  font-size:15px;
+  font-size:15.5px;
 }
 .stat .num,
 .mobileCard .amount strong{
@@ -962,20 +961,20 @@ td:last-child{
   max-height:calc(100dvh - 36px);
   overflow-y:auto;
   margin:18px auto;
-  padding:24px;
+  padding:26px;
   scrollbar-width:thin;
   -webkit-overflow-scrolling:touch;
 }
 .modalBox h3{
-  font-size:24px;
+  font-size:26px;
   line-height:1.15;
 }
 #actionBody{
   max-height:42dvh;
   overflow:auto;
   padding-right:6px;
-  line-height:1.65 !important;
-  font-size:15.5px;
+  line-height:1.7 !important;
+  font-size:16px;
   word-break:break-word;
 }
 #actionTextareaWrap,
@@ -984,23 +983,23 @@ td:last-child{
   max-height:none;
 }
 .noteBox{
-  min-height:140px;
-  font-size:15.5px;
-  line-height:1.5;
+  min-height:150px;
+  font-size:16px;
+  line-height:1.55;
 }
 .contactAddressBox{
-  min-height:100px;
+  min-height:110px;
 }
 .contactForm{
-  gap:10px;
+  gap:12px;
 }
 .infoNoteLabel{
-  font-size:13px;
+  font-size:13.5px;
 }
 .modalActions{
   position:sticky;
-  bottom:-24px;
-  padding-top:12px;
+  bottom:-26px;
+  padding-top:14px;
   padding-bottom:4px;
   background:linear-gradient(180deg, rgba(14,25,43,0), rgba(14,25,43,.96) 35%, rgba(8,16,29,.98));
   z-index:2;
@@ -1009,20 +1008,16 @@ body.dark .modalActions{
   background:linear-gradient(180deg, rgba(14,25,43,0), rgba(18,28,44,.96) 35%, rgba(14,22,36,.98));
 }
 .modalActions button{
-  flex:1 1 150px;
-  min-height:50px;
-  font-size:15px;
-}
-@media (max-width:900px){
-  .actionRow{grid-template-columns:repeat(3,minmax(0,1fr));}
-  td:last-child{min-width:320px;}
+  flex:1 1 180px;
+  min-height:56px;
+  font-size:16px;
 }
 @media (max-width:768px){
   html{font-size:16px;}
   .container{padding:14px 12px 122px;}
-  .actionRow{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;}
+  .actionRow{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}
   .actionBtn,
-  .actionRow button{min-height:54px;font-size:13.5px;padding:8px 9px;}
+  .actionRow button{min-height:68px;font-size:15px;padding:12px 10px;}
   td:last-child{min-width:unset;}
   .modalOverlay{padding:10px;}
   .modalBox{
@@ -1032,17 +1027,52 @@ body.dark .modalActions{
     padding:20px;
     border-radius:24px;
   }
-  .modalBox h3{font-size:23px;}
+  .modalBox h3{font-size:24px;}
   #actionBody{max-height:40dvh;font-size:15.5px;}
   .modalActions{bottom:-20px;}
-  .modalActions button{flex:1 1 130px;min-height:50px;}
+  .modalActions button{flex:1 1 140px;min-height:56px;}
 }
 @media (max-width:420px){
   .actionBtn,
-  .actionRow button{font-size:13px;min-height:52px;}
+  .actionRow button{font-size:14px;min-height:64px;}
   .actionBtn .ico{display:none;}
 }
 
+</style>
+
+<style id="v10-new-debt-ui">
+/* v10 – neue, geführte Eingabe */
+.newDebtStart{display:grid;grid-template-columns:minmax(220px,.9fr) minmax(280px,1.6fr);gap:16px;align-items:stretch;}
+.newDebtIntro{padding:18px;border-radius:22px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);display:flex;flex-direction:column;gap:6px;}
+.newDebtIntro strong{font-size:18px;letter-spacing:-.01em;}
+.newDebtIntro span{color:var(--muted);line-height:1.55;font-size:14px;}
+.newDebtActions{grid-template-columns:repeat(4,minmax(0,1fr));align-items:stretch;}
+.modalHeaderRow{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:16px;}
+.modalHeaderRow h3{margin:4px 0 0;}
+.modalKicker{display:inline-flex;padding:7px 10px;border-radius:999px;background:rgba(79,140,255,.14);border:1px solid rgba(125,211,252,.18);color:#cfe4ff;font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;}
+.modalCloseBtn{min-width:52px;width:52px;height:52px;padding:0;border-radius:18px;flex:0 0 auto;}
+.newDebtModal{width:min(880px,100%);}
+.newDebtSteps{display:grid;gap:14px;}
+.newDebtStep{padding:16px;border-radius:22px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.08);}
+.stepHead{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.stepHead span,.stepToggle b{width:30px;height:30px;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#4f8cff,#7c71ff);color:#fff;font-weight:900;font-size:14px;}
+.stepHead strong{font-size:17px;}
+.stepHead em,.stepToggle em{margin-left:auto;color:var(--muted);font-size:12px;font-style:normal;font-weight:800;text-transform:uppercase;letter-spacing:.06em;}
+.fieldLabel{display:block;margin:0 0 7px;color:var(--muted);font-size:13px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;}
+.newDebtGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;align-items:start;}
+.newDebtGrid input,.newDebtGrid textarea{width:100%;min-width:0;}
+.wideField{grid-column:1 / -1;}
+.statusPills{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;}
+.statusPill{min-height:46px;padding:0 12px;border-radius:16px;background:rgba(255,255,255,.05)!important;border:1px solid rgba(255,255,255,.08)!important;color:var(--text)!important;box-shadow:none!important;font-size:14px;}
+.statusPill.active{background:linear-gradient(135deg,#4f8cff,#7c71ff)!important;color:#fff!important;border-color:transparent!important;box-shadow:0 12px 24px rgba(79,140,255,.18)!important;}
+.stepToggle{width:100%;min-height:54px;background:transparent!important;box-shadow:none!important;border:0!important;padding:0!important;color:var(--text)!important;display:flex;align-items:center;justify-content:space-between;gap:12px;text-align:left;}
+.stepToggle span{display:flex;align-items:center;gap:10px;font-weight:900;}
+.optionalFields{padding-top:14px;border-top:1px solid rgba(255,255,255,.08);margin-top:12px;}
+.newDebtFooter{display:grid;grid-template-columns:1fr 1fr 1.2fr;gap:10px;}
+.newDebtFooter button{min-height:54px;}
+body.dark .newDebtIntro,body.dark .newDebtStep{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.08);}
+@media (max-width:900px){.newDebtStart{grid-template-columns:1fr}.newDebtActions{grid-template-columns:repeat(2,minmax(0,1fr));}.newDebtGrid{grid-template-columns:1fr}.statusPills{grid-template-columns:1fr 1fr}.newDebtFooter{grid-template-columns:1fr}.modalHeaderRow h3{font-size:23px}}
+@media (max-width:420px){.statusPills{grid-template-columns:1fr}.newDebtStep{padding:14px}.newDebtActions{grid-template-columns:1fr}.modalCloseBtn{width:46px;height:46px;min-width:46px}}
 </style>
 </head>
 <body class="dark">
@@ -1051,7 +1081,7 @@ body.dark .modalActions{
 
   <section class="hero">
     <div class="heroMain">
-      <div class="eyebrow">✦ Dark iPad Edition · v8</div>
+      <div class="eyebrow">✦ Dark iPad Edition · v10</div>
       <h1>Schulden Manager<br>mit mehr iPad-Feeling</h1>
       <p>Mehr Dashboard, weniger Handy-App: großzügige Flächen, dunkle Glas-Panels und ein ruhiger Tablet-Look für bessere Übersicht beim Verwalten deiner offenen und bezahlten Beträge.</p>
       <div class="heroMeta">
@@ -1080,26 +1110,19 @@ body.dark .modalActions{
     </div>
   </section>
 
-  <section class="card">
+  <section class="card newDebtCard">
     <div class="sectionTitle">
-      <h2>Neue Karte anlegen</h2>
-      <span>Mehr Platz, mehr Ruhe, besser für Tablet und große Displays</span>
+      <h2>Neue Schuld erfassen</h2>
+      <span>Geführte Eingabe mit Ansprechpartner und erster Notiz</span>
     </div>
 
-    <div id="inlineForm">
-      <div class="formRow">
-        <input id="name" placeholder="Name">
-        <input id="grund" placeholder="Grund">
-        <input id="betrag" type="number" placeholder="Betrag €">
-        <input id="datum" type="date">
-        <select id="status">
-          <option>offen</option>
-          <option>bezahlt</option>
-        </select>
+    <div id="inlineForm" class="newDebtStart">
+      <div class="newDebtIntro">
+        <strong>Alles in einem Fenster</strong>
+        <span>Name, Grund und Betrag sind Pflicht. Ansprechpartner und erste Notiz kannst du direkt mit anlegen.</span>
       </div>
-
-      <div class="actionRow" style="margin-top:12px;">
-        <button id="btnAdd" type="button">Hinzufügen</button>
+      <div class="actionRow newDebtActions">
+        <button id="btnOpenAdd" type="button">＋ Neue Schuld</button>
         <button id="btnBackup" class="secondary" type="button">💾 Backup</button>
         <button id="btnBackupPick" class="secondary" type="button">📁 Speicherort wählen</button>
         <button id="btnRestore" class="secondary" type="button">📂 Restore</button>
@@ -1165,20 +1188,87 @@ body.dark .modalActions{
 </div>
 
 <div id="addModal" class="modalOverlay" aria-hidden="true">
-  <div class="modalBox">
-    <h3>➕ Neue Schuld anlegen</h3>
-    <div class="formRow" style="margin-top:0;">
-      <input id="m_name" placeholder="Name">
-      <input id="m_grund" placeholder="Grund">
-      <input id="m_betrag" type="number" placeholder="Betrag €">
-      <input id="m_datum" type="date">
-      <select id="m_status">
-        <option>offen</option>
-        <option>bezahlt</option>
-      </select>
+  <div class="modalBox newDebtModal">
+    <div class="modalHeaderRow">
+      <div>
+        <span class="modalKicker">Neue Eingabe</span>
+        <h3>➕ Neue Schuld anlegen</h3>
+      </div>
+      <button id="m_close" class="secondary modalCloseBtn" type="button" aria-label="Schließen">✕</button>
     </div>
-    <div class="modalActions" style="margin-top:16px;">
-      <button id="m_add" type="button">Hinzufügen</button>
+
+    <div class="newDebtSteps">
+      <section class="newDebtStep">
+        <div class="stepHead"><span>1</span><strong>Schuldner</strong></div>
+        <label class="fieldLabel" for="m_name">Name / Person *</label>
+        <input id="m_name" placeholder="z. B. Thomas Hauptmann" autocomplete="name">
+      </section>
+
+      <section class="newDebtStep">
+        <div class="stepHead"><span>2</span><strong>Schuld-Daten</strong></div>
+        <div class="newDebtGrid">
+          <div>
+            <label class="fieldLabel" for="m_grund">Grund *</label>
+            <input id="m_grund" placeholder="Darlehen, Rechnung offen, Mietrückstand">
+          </div>
+          <div>
+            <label class="fieldLabel" for="m_betrag">Betrag *</label>
+            <input id="m_betrag" type="number" step="0.01" inputmode="decimal" placeholder="2500,00 €">
+          </div>
+          <div>
+            <label class="fieldLabel" for="m_datum">Fällig am</label>
+            <input id="m_datum" type="date">
+          </div>
+          <div>
+            <label class="fieldLabel">Status</label>
+            <input id="m_status" type="hidden" value="offen">
+            <div class="statusPills" role="group" aria-label="Status wählen">
+              <button class="statusPill active" type="button" data-status="offen">Offen</button>
+              <button class="statusPill" type="button" data-status="bezahlt">Bezahlt</button>
+              <button class="statusPill" type="button" data-status="teilzahlung">Teilzahlung</button>
+              <button class="statusPill" type="button" data-status="klaerung">In Klärung</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="newDebtStep collapsibleStep">
+        <button id="toggleContactFields" class="stepToggle" type="button" aria-expanded="false">
+          <span><b>3</b> Ansprechpartner hinzufügen</span>
+          <em>Optional</em>
+        </button>
+        <div id="newDebtContactFields" class="optionalFields" hidden>
+          <div class="newDebtGrid">
+            <div>
+              <label class="fieldLabel" for="m_contactRepresentative">Name / Vertreter</label>
+              <input id="m_contactRepresentative" placeholder="z. B. Max Mustermann">
+            </div>
+            <div>
+              <label class="fieldLabel" for="m_contactPhone">Telefonnummer</label>
+              <input id="m_contactPhone" type="tel" placeholder="+49 ...">
+            </div>
+            <div class="wideField">
+              <label class="fieldLabel" for="m_contactAddress">Anschrift</label>
+              <textarea id="m_contactAddress" class="noteBox contactAddressBox" placeholder="Straße, Hausnummer, PLZ Ort"></textarea>
+            </div>
+            <div class="wideField">
+              <label class="fieldLabel" for="m_contactEmail">E-Mail</label>
+              <input id="m_contactEmail" type="email" placeholder="name@beispiel.de">
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="newDebtStep">
+        <div class="stepHead"><span>4</span><strong>Erste Notiz</strong><em>Optional</em></div>
+        <textarea id="m_firstNote" class="noteBox" placeholder="z. B. Erstkontakt geführt, Rückzahlung zugesagt..."></textarea>
+      </section>
+    </div>
+
+    <div class="modalActions newDebtFooter" style="margin-top:16px;">
+      <button id="m_cancel" class="secondary" type="button">Abbrechen</button>
+      <button id="m_add_more" class="secondary" type="button">Speichern & weitere</button>
+      <button id="m_add" type="button">Schuld speichern</button>
     </div>
   </div>
 </div>
@@ -1228,7 +1318,7 @@ try {
 
 let currentView = (localStorage.getItem("godmode_view") || "desktop");
 if(currentView !== "desktop" && currentView !== "mobile") currentView = "desktop";
-// Dark-only Version v8: alte Light/Soft-Light-Einstellungen werden überschrieben.
+// Dark-only Version v10: alte Light/Soft-Light-Einstellungen werden überschrieben.
 document.body.classList.remove("softlight");
 document.body.classList.add("dark");
 localStorage.setItem("godmode_dark", "1");
@@ -1449,26 +1539,82 @@ function notesText(d){
   return entries.map(n => formatNoteDate(n.at) + " – " + n.text).join("\n");
 }
 
-function addDebtFromInputs(prefix){
-  const name = document.getElementById(prefix + "name").value.trim();
-  const grund = document.getElementById(prefix + "grund").value.trim();
-  const betrag = parseFloat(document.getElementById(prefix + "betrag").value);
-  const datum = document.getElementById(prefix + "datum").value;
-  const status = document.getElementById(prefix + "status").value;
+function setNewDebtStatus(status){
+  const allowed = ["offen","bezahlt","teilzahlung","klaerung"];
+  const value = allowed.includes(status) ? status : "offen";
+  const input = document.getElementById("m_status");
+  if(input) input.value = value;
+  document.querySelectorAll(".statusPill").forEach(btn=>{
+    btn.classList.toggle("active", btn.dataset.status === value);
+  });
+}
+function statusLabel(value){
+  if(value === "bezahlt") return "BEZAHLT";
+  if(value === "teilzahlung") return "TEILZAHLUNG";
+  if(value === "klaerung") return "IN KLÄRUNG";
+  return "OFFEN";
+}
+function isOpenLikeStatus(value){
+  return value === "offen" || value === "teilzahlung" || value === "klaerung";
+}
+function parseMoneyInput(value){
+  return parseFloat(String(value || "").replace(/\./g, "").replace(",", "."));
+}
+function createDebtFromModal({keepOpen=false}={}){
+  const name = document.getElementById("m_name").value.trim();
+  const grund = document.getElementById("m_grund").value.trim();
+  const betrag = parseMoneyInput(document.getElementById("m_betrag").value);
+  const datum = document.getElementById("m_datum").value;
+  const status = document.getElementById("m_status").value || "offen";
+  const contact = {
+    representative: document.getElementById("m_contactRepresentative").value.trim(),
+    address: document.getElementById("m_contactAddress").value.trim(),
+    email: document.getElementById("m_contactEmail").value.trim(),
+    phone: document.getElementById("m_contactPhone").value.trim()
+  };
+  const note = document.getElementById("m_firstNote").value.trim();
 
-  if(!name || !grund || isNaN(betrag) || !datum){
-    alert("Bitte alle Felder korrekt ausfüllen!");
+  if(!name || !grund || isNaN(betrag) || betrag <= 0){
+    showToast("Bitte Name, Grund und Betrag korrekt ausfüllen.");
     return false;
   }
 
-  debts.push({name,grund,betrag,datum,status,contactDetails:{representative:"",address:"",email:"",phone:""},contactPerson:"",notes:"",notesHistory:[],history:[]});
+  const notesHistory = note ? [{at:new Date().toISOString(), text:note}] : [];
+  const debt = {
+    name,
+    grund,
+    betrag,
+    datum,
+    status,
+    contactDetails:contact,
+    contactPerson: contact.representative || "",
+    notes:"",
+    notesHistory,
+    history:[]
+  };
+  debt.notes = notesText(debt);
+  debts.push(debt);
   save();
   render();
+  showToast("Schuld gespeichert ✅");
+
+  if(keepOpen){
+    clearModalInputs();
+    setTimeout(()=>document.getElementById("m_name")?.focus(), 50);
+  }else{
+    clearModalInputs();
+    closeAddModal();
+  }
   return true;
+}
+function addDebtFromInputs(prefix){
+  // Kompatibilität für ältere Buttons: öffnet ab v10 die neue Eingabe.
+  openAddModal();
+  return false;
 }
 
 function removeDebt(i){debts.splice(i,1);save();render();}
-function toggleStatus(i){debts[i].status=debts[i].status==="offen"?"bezahlt":"offen";save();render();}
+function toggleStatus(i){debts[i].status=isOpenLikeStatus(debts[i].status)?"bezahlt":"offen";save();render();}
 function toggleDark(){
   // Dark-only Version: Theme bleibt immer dunkel.
   document.body.classList.remove("softlight");
@@ -1634,12 +1780,12 @@ function showInfo(i){
 
   const msg =
     "Name: " + d.name + "\n" +
+    "Ansprechpartner: " + (String(d.contactPerson || "").trim() || "–") + "\n" +
     "Grund: " + d.grund + "\n" +
     "Ursprünglich: " + original.toFixed(2) + " €\n" +
     "Bereits abgebaut: " + paidSum.toFixed(2) + " €\n" +
     "Restschuld: " + remaining.toFixed(2) + " €\n" +
     "Status: " + (d.status || "–") + "\n" +
-    "Ansprechpartner: " + (String(d.contactPerson || "").trim() || "–") + "\n" +
     "Anzahl Zahlungen: " + count + "\n" +
     "Letzte Zahlung: " + lastDate + "\n\n" +
     "Notiz-Historie:\n" + notesText(d);
@@ -1680,10 +1826,10 @@ function render(){
     if(s && !JSON.stringify(d).toLowerCase().includes(s)) return;
 
     sum+=Number(d.betrag)||0;
-    if(d.status==="offen") open+=Number(d.betrag)||0; else paid+=Number(d.betrag)||0;
+    if(isOpenLikeStatus(d.status)) open+=Number(d.betrag)||0; else paid+=Number(d.betrag)||0;
 
-    const badgeClass = (d.status==="offen") ? "badgeOpen" : "badgePaid";
-    const badgeText  = (d.status==="offen") ? "OFFEN" : "BEZAHLT";
+    const badgeClass = isOpenLikeStatus(d.status) ? "badgeOpen" : "badgePaid";
+    const badgeText  = statusLabel(d.status);
 
     const row = document.createElement("tr");
     row.innerHTML =
@@ -1813,8 +1959,8 @@ function openAddModal(){
   modal.style.display = "block";
   modal.setAttribute("aria-hidden","false");
   document.body.classList.add("modalOpen");
-  document.getElementById("m_status").value = "offen";
-  setTimeout(()=>document.getElementById("m_name").focus(), 50);
+  setNewDebtStatus(document.getElementById("m_status")?.value || "offen");
+  setTimeout(()=>document.getElementById("m_name")?.focus(), 50);
 }
 function closeAddModal(){
   const modal = document.getElementById("addModal");
@@ -1823,24 +1969,18 @@ function closeAddModal(){
   document.body.classList.remove("modalOpen");
 }
 function clearModalInputs(){
-  document.getElementById("m_name").value="";
-  document.getElementById("m_grund").value="";
-  document.getElementById("m_betrag").value="";
-  document.getElementById("m_datum").value="";
-  document.getElementById("m_status").value="offen";
+  const ids = ["m_name","m_grund","m_betrag","m_datum","m_contactRepresentative","m_contactAddress","m_contactEmail","m_contactPhone","m_firstNote"];
+  ids.forEach(id=>{ const el=document.getElementById(id); if(el) el.value=""; });
+  setNewDebtStatus("offen");
+  const fields = document.getElementById("newDebtContactFields");
+  const toggle = document.getElementById("toggleContactFields");
+  if(fields) fields.hidden = true;
+  if(toggle) toggle.setAttribute("aria-expanded", "false");
 }
 
 document.getElementById("btnDesktop").addEventListener("click", ()=>setView("desktop"));
 document.getElementById("btnMobile").addEventListener("click", ()=>setView("mobile"));
-document.getElementById("btnAdd").addEventListener("click", ()=>{
-  if(addDebtFromInputs("")){
-    document.getElementById("name").value="";
-    document.getElementById("grund").value="";
-    document.getElementById("betrag").value="";
-    document.getElementById("datum").value="";
-    document.getElementById("status").value="offen";
-  }
-});
+document.getElementById("btnOpenAdd").addEventListener("click", openAddModal);
 document.getElementById("btnDark")?.addEventListener("click", toggleDark);
 document.getElementById("btnBackup").addEventListener("click", downloadBackup);
 document.getElementById("btnBackupPick").addEventListener("click", ()=>downloadBackupWithPicker().catch(err=>{console.error(err); alert("Konnte Speicher-Dialog nicht öffnen.");}));
@@ -1853,18 +1993,19 @@ document.getElementById("fabAdd").addEventListener("click", openAddModal);
 document.getElementById("addModal").addEventListener("click", (e)=>{ if(e.target.id==="addModal") closeAddModal(); });
 const actionModalEl = document.getElementById("actionModal");
 if(actionModalEl){ actionModalEl.addEventListener("click", (e)=>{ if(e.target.id==="actionModal") closeActionModal(); }); }
-document.getElementById("m_add").addEventListener("click", ()=>{
-  document.getElementById("name").value = document.getElementById("m_name").value;
-  document.getElementById("grund").value = document.getElementById("m_grund").value;
-  document.getElementById("betrag").value = document.getElementById("m_betrag").value;
-  document.getElementById("datum").value = document.getElementById("m_datum").value;
-  document.getElementById("status").value = document.getElementById("m_status").value;
-
-  if(addDebtFromInputs("")){
-    clearModalInputs();
-    closeAddModal();
-  }
+document.querySelectorAll(".statusPill").forEach(btn=>btn.addEventListener("click", ()=>setNewDebtStatus(btn.dataset.status)));
+document.getElementById("toggleContactFields").addEventListener("click", ()=>{
+  const fields = document.getElementById("newDebtContactFields");
+  const toggle = document.getElementById("toggleContactFields");
+  const willOpen = fields.hidden;
+  fields.hidden = !willOpen;
+  toggle.setAttribute("aria-expanded", String(willOpen));
+  if(willOpen) setTimeout(()=>document.getElementById("m_contactRepresentative")?.focus(), 50);
 });
+document.getElementById("m_close").addEventListener("click", closeAddModal);
+document.getElementById("m_cancel").addEventListener("click", closeAddModal);
+document.getElementById("m_add_more").addEventListener("click", ()=>createDebtFromModal({keepOpen:true}));
+document.getElementById("m_add").addEventListener("click", ()=>createDebtFromModal({keepOpen:false}));
 document.addEventListener("keydown", (e)=>{ if(e.key==="Escape"){ closeAddModal(); closeActionModal(); } });
 document.getElementById("search").addEventListener("input", render);
 
