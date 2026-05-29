@@ -12,7 +12,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="assets/icons/icon-192.png">
 <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
-<title>Schulden Manager – Dashboard Dark v20</title>
+<title>Schulden Manager – Dashboard Dark v21</title>
 
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
@@ -2727,6 +2727,39 @@ body.force-mobile-view .dashboardShell{
 }
 </style>
 
+
+<style id="v21-auto-sync-css">
+.syncPill{
+  margin-top:8px;
+  display:inline-flex;
+  align-items:center;
+  padding:10px 12px;
+  border-radius:14px;
+  background:rgba(49,196,141,.10);
+  border:1px solid rgba(49,196,141,.18);
+  color:#bdf7dc;
+  font-weight:800;
+  font-size:13px;
+}
+.syncPill.sync-error{
+  background:rgba(251,113,133,.12);
+  border-color:rgba(251,113,133,.24);
+  color:#ffc1cb;
+}
+.syncPill.sync-wait{
+  background:rgba(251,191,36,.11);
+  border-color:rgba(251,191,36,.22);
+  color:#ffe2a3;
+}
+@media (max-width:1180px){
+  .syncPill{
+    width:100%;
+    justify-content:center;
+    font-size:12px;
+  }
+}
+</style>
+
 </head>
 <body class="dark">
 <div class="container">
@@ -2767,7 +2800,7 @@ body.force-mobile-view .dashboardShell{
     <section class="hero heroDashboard">
       <div class="heroMain dashboardHeader">
         <div class="dashboardGreetingWrap">
-          <div class="eyebrow">Dark Dashboard · v20</div>
+          <div class="eyebrow">Dark Dashboard · v21</div>
           <h1 id="greetingTitle">Guten Abend!</h1>
           <p id="greetingText">Hier ist die Übersicht deiner Schulden.</p>
         </div>
@@ -2802,6 +2835,7 @@ body.force-mobile-view .dashboardShell{
         <button id="btnClear" class="btn-delete" type="button">✕ Alles löschen</button>
       </div>
       <div id="backupStatus" class="backupPill">Letztes Backup: –</div>
+      <div id="syncStatus" class="syncPill">Sync: wird vorbereitet…</div>
       <div id="installHint" class="installHint">Installierbar auf iPhone, iPad, Android und Desktop-Browsern.</div>
       <input id="restoreFile" type="file" accept=".godmode,application/octet-stream,application/json,text/plain" style="display:none">
     </section>
@@ -5249,6 +5283,203 @@ if ('serviceWorker' in navigator) {
 
   window.addEventListener("resize", ()=>setTimeout(()=>{ if(typeof render === "function") render(); }, 50));
   setTimeout(()=>{ if(typeof render === "function") render(); }, 50);
+})();
+</script>
+
+
+<script id="v21-auto-sync-script">
+(function(){
+  const SYNC_URL = "/api/sync";
+  const CLIENT_ID_KEY = "schulden_sync_client_id_v21";
+  const SYNC_META_KEY = "schulden_sync_meta_v21";
+  const SYNC_DEBOUNCE_MS = 900;
+  const PULL_INTERVAL_MS = 12000;
+
+  let syncTimer = null;
+  let pullTimer = null;
+  let syncBusy = false;
+  let lastServerUpdatedAt = "";
+  let suppressNextPush = false;
+
+  function clientId(){
+    let id = localStorage.getItem(CLIENT_ID_KEY);
+    if(!id){
+      id = "client-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2,10);
+      localStorage.setItem(CLIENT_ID_KEY, id);
+    }
+    return id;
+  }
+
+  function syncStatus(text, mode){
+    const el = document.getElementById("syncStatus");
+    if(!el) return;
+    el.textContent = text;
+    el.classList.toggle("sync-error", mode === "error");
+    el.classList.toggle("sync-wait", mode === "wait");
+  }
+
+  function readMeta(){
+    try{
+      return JSON.parse(localStorage.getItem(SYNC_META_KEY) || "{}");
+    }catch(e){
+      return {};
+    }
+  }
+
+  function writeMeta(meta){
+    localStorage.setItem(SYNC_META_KEY, JSON.stringify(meta || {}));
+  }
+
+  function safeDebts(){
+    return Array.isArray(debts) ? debts : [];
+  }
+
+  function localUpdatedAt(){
+    const meta = readMeta();
+    return meta.localUpdatedAt || "";
+  }
+
+  function markLocalChanged(){
+    const meta = readMeta();
+    meta.localUpdatedAt = new Date().toISOString();
+    writeMeta(meta);
+  }
+
+  const originalSave = window.save;
+  window.save = function(){
+    if(typeof originalSave === "function") originalSave();
+    else localStorage.setItem("godmode_debts", JSON.stringify(safeDebts()));
+
+    if(!suppressNextPush){
+      markLocalChanged();
+      schedulePush();
+    }
+  };
+
+  async function fetchServer(){
+    const res = await fetch(SYNC_URL, {cache:"no-store"});
+    if(!res.ok) throw new Error("GET " + res.status);
+    return await res.json();
+  }
+
+  async function pushServer(reason){
+    if(syncBusy) {
+      schedulePush();
+      return;
+    }
+    syncBusy = true;
+    syncStatus("Sync: speichert…", "wait");
+    try{
+      const payload = {
+        clientId: clientId(),
+        reason: reason || "auto",
+        updatedAt: new Date().toISOString(),
+        debts: safeDebts()
+      };
+      const res = await fetch(SYNC_URL, {
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify(payload)
+      });
+      if(!res.ok) throw new Error("POST " + res.status);
+      const data = await res.json();
+      lastServerUpdatedAt = data.updatedAt || payload.updatedAt;
+      const meta = readMeta();
+      meta.lastSyncedAt = new Date().toISOString();
+      meta.serverUpdatedAt = lastServerUpdatedAt;
+      writeMeta(meta);
+      syncStatus("Sync: gespeichert ✓", "");
+    }catch(err){
+      console.error("Sync speichern fehlgeschlagen", err);
+      syncStatus("Sync: offline / Fehler", "error");
+    }finally{
+      syncBusy = false;
+    }
+  }
+
+  function schedulePush(){
+    clearTimeout(syncTimer);
+    syncTimer = setTimeout(()=>pushServer("auto-save"), SYNC_DEBOUNCE_MS);
+  }
+
+  function isLocalEmpty(){
+    return safeDebts().length === 0;
+  }
+
+  function shouldAcceptServer(server){
+    if(!server || !Array.isArray(server.debts)) return false;
+
+    const meta = readMeta();
+    const serverUpdatedAt = server.updatedAt || "";
+    const localTime = meta.localUpdatedAt || "";
+    const currentServerTime = meta.serverUpdatedAt || lastServerUpdatedAt || "";
+
+    if(isLocalEmpty() && server.debts.length > 0) return true;
+    if(serverUpdatedAt && serverUpdatedAt !== currentServerTime && (!localTime || serverUpdatedAt > localTime)) return true;
+    return false;
+  }
+
+  async function pullServer(initial){
+    try{
+      const server = await fetchServer();
+      if(server && server.updatedAt) lastServerUpdatedAt = server.updatedAt;
+
+      if(shouldAcceptServer(server)){
+        suppressNextPush = true;
+        debts = server.debts || [];
+        localStorage.setItem("godmode_debts", JSON.stringify(debts));
+
+        const meta = readMeta();
+        meta.serverUpdatedAt = server.updatedAt || "";
+        meta.lastPulledAt = new Date().toISOString();
+        meta.localUpdatedAt = server.updatedAt || meta.localUpdatedAt || "";
+        writeMeta(meta);
+
+        if(typeof render === "function") render();
+        suppressNextPush = false;
+        syncStatus("Sync: aktualisiert ✓", "");
+      }else if(initial && isLocalEmpty()){
+        syncStatus("Sync: bereit ✓", "");
+      }else{
+        syncStatus("Sync: aktuell ✓", "");
+      }
+
+      if(initial && !isLocalEmpty()){
+        const meta = readMeta();
+        if(!server || !server.debts || server.debts.length === 0){
+          schedulePush();
+        }else if(!meta.serverUpdatedAt){
+          meta.serverUpdatedAt = server.updatedAt || "";
+          writeMeta(meta);
+        }
+      }
+    }catch(err){
+      console.error("Sync laden fehlgeschlagen", err);
+      syncStatus("Sync: offline / Fehler", "error");
+    }
+  }
+
+  function startSync(){
+    syncStatus("Sync: verbindet…", "wait");
+    pullServer(true);
+    clearInterval(pullTimer);
+    pullTimer = setInterval(()=>pullServer(false), PULL_INTERVAL_MS);
+
+    window.addEventListener("online", ()=>{
+      syncStatus("Sync: online…", "wait");
+      pullServer(false).then(()=>schedulePush());
+    });
+    window.addEventListener("offline", ()=>syncStatus("Sync: offline", "error"));
+    document.addEventListener("visibilitychange", ()=>{
+      if(!document.hidden) pullServer(false);
+    });
+  }
+
+  window.schuldenSyncNow = function(){
+    return pushServer("manual");
+  };
+
+  setTimeout(startSync, 500);
 })();
 </script>
 
