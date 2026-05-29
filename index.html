@@ -12,7 +12,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="assets/icons/icon-192.png">
 <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
-<title>Schulden Manager – Dashboard Dark v11</title>
+<title>Schulden Manager – Dashboard Dark v12</title>
 
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
@@ -1151,6 +1151,42 @@ body.dark .statusPill{background:#0f1c2f!important;border-color:rgba(255,255,255
 @media (min-width:769px){#fabAdd{display:none!important;}.mobileBottomNav{display:none!important;}}
 </style>
 
+
+<style id="v12-refine-overrides">
+.dashboardContentGrid{display:grid;grid-template-columns:minmax(0,1.35fr) 430px;gap:20px;align-items:start;}
+.dashboardMainColumn{display:grid;gap:20px;min-width:0;}
+.desktopDetailPanel{position:sticky;top:24px;border-radius:28px;padding:18px;background:linear-gradient(180deg, rgba(11,20,34,.98), rgba(8,16,29,.98));border:1px solid rgba(255,255,255,.08);box-shadow:0 20px 44px rgba(0,0,0,.26);min-height:620px;display:flex;flex-direction:column;}
+.desktopPanelHead{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.06);}
+.desktopPanelHead h3{margin:10px 0 0;color:#fff;font-size:34px;}
+.smallSideBtn{min-height:42px!important;padding:0 14px!important;font-size:13px!important;border-radius:14px!important;}
+.desktopPanelBody{padding-top:14px;display:grid;gap:14px;max-height:calc(100vh - 120px);overflow:auto;padding-right:4px;}
+.desktopPanelSection{padding:16px;border-radius:18px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);}
+.sideNotesTimeline{max-height:250px;}
+.tableActions{display:grid;grid-template-columns:auto auto auto 1fr;gap:8px;align-items:center;}
+.tableUtilityActions{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end;}
+.tableActions .miniBtn.infoBtn{background:linear-gradient(135deg,#1d56df,#377eff)!important;}
+.tableActions .miniBtn.contactBtn{background:linear-gradient(180deg,#13243b,#0f1d31)!important;}
+.tableActions .miniBtn.payBtn{background:linear-gradient(180deg,#13243b,#0f1d31)!important;}
+.tableActions .tinyBtn,.mobileTinyActions .tinyBtn{min-width:40px;height:40px;padding:0;border-radius:12px;background:#0f1c2f!important;border:1px solid rgba(255,255,255,.08)!important;color:#ddecff!important;box-shadow:none!important;display:inline-flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;}
+.tableActions .tinyDanger,.mobileTinyActions .tinyDanger{background:linear-gradient(180deg,#3a1520,#2a1017)!important;color:#ffb4c3!important;border-color:rgba(255,108,131,.18)!important;}
+.mobileActionMain{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:14px;}
+.mobileActionMain .miniBtn{min-height:42px;padding:0 10px;border-radius:12px;background:#12233a!important;border:1px solid rgba(255,255,255,.08)!important;color:#eaf2ff!important;font-size:13px;font-weight:800;}
+.mobileTinyActions{display:flex;gap:8px;margin-top:10px;}
+#mobileList .mobileCard{padding:18px;}
+.newDebtModal{width:min(980px,100%);} 
+.newDebtModal .newDebtSteps{gap:16px;}
+.newDebtModal .newDebtStep{padding:18px;border-radius:24px;}
+.newDebtModal .stepHead strong{font-size:18px;}
+.newDebtModal .fieldLabel{font-size:12px;letter-spacing:.08em;}
+.newDebtModal .statusPills{grid-template-columns:repeat(4,minmax(0,1fr));}
+.newDebtModal .modalActions.newDebtFooter{grid-template-columns:1fr 1fr 1.2fr;position:sticky;bottom:-24px;background:linear-gradient(180deg, rgba(8,16,29,0), rgba(8,16,29,.92) 35%, rgba(8,16,29,.98));padding-top:14px;}
+.newDebtModal #m_add{background:linear-gradient(135deg,#1d56df,#377eff)!important;}
+.newDebtModal #m_add_more,.newDebtModal #m_cancel{background:#0f1c2f!important;border:1px solid rgba(255,255,255,.08)!important;color:#dfeaff!important;box-shadow:none!important;}
+@media (max-width:1320px){.dashboardContentGrid{grid-template-columns:1fr 380px;}}
+@media (max-width:1120px){.dashboardContentGrid{grid-template-columns:1fr;}.desktopDetailPanel{display:none;}.newDebtModal .statusPills{grid-template-columns:repeat(2,minmax(0,1fr));}}
+@media (max-width:768px){.boardToolbar{grid-template-columns:1fr;}.actionToolbarGrid{grid-template-columns:1fr 1fr;}.newDebtModal .statusPills{grid-template-columns:1fr 1fr;}.newDebtModal .modalActions.newDebtFooter{grid-template-columns:1fr;}.mobileActionMain{grid-template-columns:1fr 1fr 1fr;}.mobileRow{display:block!important;}.tableActions{grid-template-columns:1fr;}.tableUtilityActions{justify-content:flex-start;}}
+</style>
+
 </head>
 <body class="dark">
 <div class="container">
@@ -1191,7 +1227,7 @@ body.dark .statusPill{background:#0f1c2f!important;border-color:rgba(255,255,255
     <section class="hero heroDashboard">
       <div class="heroMain dashboardHeader">
         <div class="dashboardGreetingWrap">
-          <div class="eyebrow">Dark Dashboard · v11</div>
+          <div class="eyebrow">Dark Dashboard · v12</div>
           <h1 id="greetingTitle">Guten Abend!</h1>
           <p id="greetingText">Hier ist die Übersicht deiner Schulden.</p>
         </div>
@@ -1202,6 +1238,8 @@ body.dark .statusPill{background:#0f1c2f!important;border-color:rgba(255,255,255
       </div>
     </section>
 
+    <div class="dashboardContentGrid">
+      <div class="dashboardMainColumn">
     <section class="card actionToolbarCard" id="newDebtSection">
       <div class="sectionTitle compactTitle">
         <h2>Schnellaktionen</h2>
@@ -1282,6 +1320,50 @@ body.dark .statusPill{background:#0f1c2f!important;border-color:rgba(255,255,255
 
       <div id="mobileList"></div>
     </section>
+      </div>
+      <aside class="desktopDetailPanel" id="desktopDetailPanel">
+        <div class="desktopPanelHead">
+          <div>
+            <span class="drawerEyebrow">Info</span>
+            <h3>Details</h3>
+          </div>
+          <button id="desktopNewNoteBtn" class="secondary smallSideBtn" type="button">＋ Notiz</button>
+        </div>
+        <div class="desktopPanelBody">
+          <section class="desktopPanelSection">
+            <div class="drawerSectionHead"><span>1</span><strong>Name</strong></div>
+            <div id="sideNameValue" class="drawerBigValue">–</div>
+          </section>
+
+          <section class="desktopPanelSection">
+            <div class="drawerSectionHead"><span>2</span><strong>Ansprechpartner</strong></div>
+            <div class="drawerList">
+              <div class="drawerRow"><span>Name / Vertreter</span><strong id="sideContactRepresentative">–</strong></div>
+              <div class="drawerRow"><span>Anschrift</span><strong id="sideContactAddress">–</strong></div>
+              <div class="drawerRow drawerRowActions"><span>E-Mail</span><div class="drawerValueActions"><strong id="sideContactEmail">–</strong><div id="sideContactEmailActions" class="miniActions"></div></div></div>
+              <div class="drawerRow drawerRowActions"><span>Telefonnummer</span><div class="drawerValueActions"><strong id="sideContactPhone">–</strong><div id="sideContactPhoneActions" class="miniActions"></div></div></div>
+            </div>
+          </section>
+
+          <section class="desktopPanelSection">
+            <div class="drawerSectionHead"><span>3</span><strong>Notizen</strong></div>
+            <div id="sideNotesList" class="notesTimeline sideNotesTimeline"></div>
+          </section>
+
+          <section class="desktopPanelSection">
+            <div class="drawerSectionHead"><span>4</span><strong>Weitere Informationen</strong></div>
+            <div class="drawerFacts">
+              <div class="drawerFact"><span>Grund</span><strong id="sideReasonValue">–</strong></div>
+              <div class="drawerFact"><span>Betrag</span><strong id="sideAmountValue">–</strong></div>
+              <div class="drawerFact"><span>Status</span><strong id="sideStatusValue">–</strong></div>
+              <div class="drawerFact"><span>Fällig am</span><strong id="sideDateValue">–</strong></div>
+              <div class="drawerFact"><span>Bereits abgebaut</span><strong id="sidePaidValue">–</strong></div>
+              <div class="drawerFact"><span>Letzte Zahlung</span><strong id="sideLastPaymentValue">–</strong></div>
+            </div>
+          </section>
+        </div>
+      </aside>
+    </div>
   </main>
 </div>
 </div>
@@ -1291,8 +1373,8 @@ body.dark .statusPill{background:#0f1c2f!important;border-color:rgba(255,255,255
   <div class="modalBox newDebtModal">
     <div class="modalHeaderRow">
       <div>
-        <span class="modalKicker">Neue Eingabe</span>
-        <h3>➕ Neue Schuld anlegen</h3>
+        <span class="modalKicker">Neuer Eintrag</span>
+        <h3>Neue Schuld</h3>
       </div>
       <button id="m_close" class="secondary modalCloseBtn" type="button" aria-label="Schließen">✕</button>
     </div>
@@ -2486,6 +2568,228 @@ if ('serviceWorker' in navigator) {
   }else{
     setView('desktop');
   }
+  render();
+})();
+</script>
+
+
+<script>
+(function(){
+  let selectedDebtIndex = 0;
+  const mobileOverlayShowInfo = window.showInfo;
+
+  function escapeHTML2(str){
+    return String(str || '').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#039;');
+  }
+  function nl2br2(str){ return escapeHTML2(str).replace(/\n/g,'<br>'); }
+  function prettyStatus(value){
+    if(value === 'bezahlt') return 'Bezahlt';
+    if(value === 'teilzahlung') return 'Teilzahlung';
+    if(value === 'klaerung') return 'In Klärung';
+    return 'Offen';
+  }
+  function statusCss(value){
+    return value === 'bezahlt' ? 'status-bezahlt' : 'status-open';
+  }
+  function initials2(name){
+    return String(name || '').trim().split(/\s+/).slice(0,2).map(x=>x[0]||'').join('').toUpperCase() || 'S';
+  }
+  function filteredPairs(){
+    const search = (document.getElementById('search')?.value || '').toLowerCase();
+    const filter = document.getElementById('statusFilter')?.value || 'alle';
+    return debts.map((d,index)=>({d,index})).filter(({d})=>{
+      const matchSearch = !search || JSON.stringify(d).toLowerCase().includes(search);
+      const matchStatus = filter === 'alle' ? true : String(d.status || 'offen') === filter;
+      return matchSearch && matchStatus;
+    });
+  }
+  function ensureSelectedDebt(pairs){
+    if(!debts.length){ selectedDebtIndex = -1; return; }
+    if(selectedDebtIndex == null || selectedDebtIndex < 0 || !debts[selectedDebtIndex]){
+      selectedDebtIndex = pairs.length ? pairs[0].index : 0;
+      return;
+    }
+    if(pairs.length && !pairs.some(item => item.index === selectedDebtIndex)){
+      selectedDebtIndex = pairs[0].index;
+    }
+  }
+  function buildMiniActions(containerId, value, type){
+    const box = document.getElementById(containerId);
+    if(!box) return;
+    box.innerHTML = '';
+    if(!value) return;
+    if(type === 'email'){
+      box.innerHTML += '<a class="miniActionLink" href="mailto:' + encodeURIComponent(value) + '" title="E-Mail">✉</a>';
+    }
+    if(type === 'phone'){
+      box.innerHTML += '<a class="miniActionLink" href="tel:' + encodeURIComponent(value) + '" title="Anrufen">☎</a>';
+    }
+    box.innerHTML += '<button class="miniActionBtn" type="button" data-copy="' + escapeHTML2(value) + '" title="Kopieren">⧉</button>';
+  }
+  function fillSidePanel(i){
+    const nameEl = document.getElementById('sideNameValue');
+    if(!nameEl) return;
+    if(i == null || i < 0 || !debts[i]){
+      nameEl.textContent = 'Keine Daten';
+      ['sideContactRepresentative','sideContactAddress','sideContactEmail','sideContactPhone','sideReasonValue','sideAmountValue','sideDateValue','sidePaidValue','sideLastPaymentValue'].forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent='–'; });
+      const status = document.getElementById('sideStatusValue'); if(status) status.textContent = '–';
+      const notes = document.getElementById('sideNotesList'); if(notes) notes.innerHTML = '<div class="noteTimelineEmpty">Noch keine Schuld ausgewählt.</div>';
+      buildMiniActions('sideContactEmailActions','');
+      buildMiniActions('sideContactPhoneActions','');
+      return;
+    }
+    const d = debts[i];
+    const contact = normalizeContactData(d);
+    document.getElementById('sideNameValue').textContent = d.name || '–';
+    document.getElementById('sideContactRepresentative').textContent = contact.representative || '–';
+    document.getElementById('sideContactAddress').innerHTML = nl2br2(contact.address || '–');
+    document.getElementById('sideContactEmail').textContent = contact.email || '–';
+    document.getElementById('sideContactPhone').textContent = contact.phone || '–';
+    document.getElementById('sideReasonValue').textContent = d.grund || '–';
+    document.getElementById('sideAmountValue').textContent = formatEUR(Number(d.betrag) || 0);
+    document.getElementById('sideStatusValue').innerHTML = '<span class="statusBadge ' + statusCss(d.status) + '">' + prettyStatus(d.status) + '</span>';
+    document.getElementById('sideDateValue').textContent = d.datum || '–';
+    document.getElementById('sidePaidValue').textContent = formatEUR(sumHistory(d));
+    document.getElementById('sideLastPaymentValue').textContent = lastPaymentDate(d);
+    buildMiniActions('sideContactEmailActions', contact.email, 'email');
+    buildMiniActions('sideContactPhoneActions', contact.phone, 'phone');
+    const entries = noteEntries(d).slice().reverse();
+    const notesBox = document.getElementById('sideNotesList');
+    notesBox.innerHTML = entries.length ? entries.map(n => '<div class="noteTimelineItem"><time>' + escapeHTML2(formatNoteDate(n.at)) + '</time><p>' + nl2br2(n.text) + '</p></div>').join('') : '<div class="noteTimelineEmpty">Keine Notizen vorhanden.</div>';
+  }
+  window.showInfo = function(i){
+    selectedDebtIndex = i;
+    fillSidePanel(i);
+    if(window.innerWidth <= 1120 && typeof mobileOverlayShowInfo === 'function'){
+      mobileOverlayShowInfo(i);
+    } else {
+      const panel = document.getElementById('desktopDetailPanel');
+      if(panel) panel.scrollIntoView({behavior:'smooth', block:'start'});
+    }
+  };
+
+  const originalRender = window.render;
+  window.render = function(){
+    const pairs = filteredPairs();
+    ensureSelectedDebt(pairs);
+    const tbody = document.getElementById('tbody');
+    const mobile = document.getElementById('mobileList');
+    if(tbody) tbody.innerHTML = '';
+    if(mobile) mobile.innerHTML = '';
+
+    let sum = 0, open = 0, paid = 0;
+    debts.forEach(d=>{
+      const amount = Number(d.betrag) || 0;
+      sum += amount;
+      if(isOpenLikeStatus(d.status)) open += amount; else paid += amount;
+    });
+    const uniqueNames = new Set(debts.map(d => String(d.name || '').trim()).filter(Boolean));
+    document.getElementById('sum').textContent = formatEUR(sum);
+    document.getElementById('open').textContent = formatEUR(open);
+    document.getElementById('paid').textContent = formatEUR(paid);
+    document.getElementById('personsCount').textContent = String(uniqueNames.size);
+    document.getElementById('debtCount').textContent = String(pairs.length);
+    document.getElementById('openShare').textContent = sum ? (open/sum*100).toFixed(1).replace('.',',') + ' % der Gesamtsumme' : '0 % der Gesamtsumme';
+    document.getElementById('paidShare').textContent = sum ? (paid/sum*100).toFixed(1).replace('.',',') + ' % der Gesamtsumme' : '0 % der Gesamtsumme';
+
+    pairs.forEach(({d,index:i}) => {
+      const openLike = isOpenLikeStatus(d.status);
+      const amountClass = openLike ? 'amountOpen' : 'amountPaid';
+      const selectedClass = i === selectedDebtIndex ? ' selectedRow' : '';
+      const tr = document.createElement('tr');
+      tr.className = selectedClass.trim();
+      tr.innerHTML =
+        '<td><div class="nameCell"><div class="avatarCircle">' + escapeHTML2(initials2(d.name)) + '</div><div class="nameStack"><strong>' + escapeHTML2(d.name) + '</strong><small>Schuld-ID: S-' + String(1001 + i) + '</small></div></div></td>' +
+        '<td><div class="reasonStack"><strong>' + escapeHTML2(d.grund || '–') + '</strong><small>' + escapeHTML2(normalizeContactData(d).representative || 'Kein Ansprechpartner') + '</small></div></td>' +
+        '<td><div class="dateText">' + escapeHTML2(d.datum || '–') + '</div></td>' +
+        '<td><div class="amountText ' + amountClass + '">' + escapeHTML2(formatEUR(Number(d.betrag) || 0)) + '</div></td>' +
+        '<td><span class="statusBadge ' + statusCss(d.status) + '">' + escapeHTML2(prettyStatus(d.status)) + '</span></td>' +
+        '<td><div class="tableActions">' +
+          '<button class="miniBtn infoBtn" type="button">Info</button>' +
+          '<button class="miniBtn payBtn" type="button">Abbau</button>' +
+          '<button class="miniBtn contactBtn" type="button">Ansprechpartner</button>' +
+          '<div class="tableUtilityActions">' +
+            '<button class="tinyBtn" type="button" title="Status">↺</button>' +
+            '<button class="tinyBtn" type="button" title="Historie">◷</button>' +
+            '<button class="tinyBtn tinyDanger" type="button" title="Löschen">✕</button>' +
+          '</div>' +
+        '</div></td>';
+      const btns = tr.querySelectorAll('button');
+      btns[0].addEventListener('click', ()=>showInfo(i));
+      btns[1].addEventListener('click', ()=>paySingleDebt(i));
+      btns[2].addEventListener('click', ()=>showContact(i));
+      btns[3].addEventListener('click', ()=>toggleStatus(i));
+      btns[4].addEventListener('click', ()=>showHistory(i));
+      btns[5].addEventListener('click', ()=>removeDebt(i));
+      tr.addEventListener('click', (e)=>{ if(!e.target.closest('button')){ selectedDebtIndex = i; fillSidePanel(i); window.render(); } });
+      tbody.appendChild(tr);
+
+      const card = document.createElement('div');
+      card.className = 'mobileCard';
+      card.innerHTML =
+        '<div class="mobileTop"><div><strong>' + escapeHTML2(d.name) + '</strong><div style="color:var(--muted);margin-top:4px;">' + escapeHTML2(d.grund || '–') + '</div></div><span class="statusBadge ' + statusCss(d.status) + '">' + escapeHTML2(prettyStatus(d.status)) + '</span></div>' +
+        '<div class="amount"><div><span style="display:block;color:var(--muted);font-size:12px;margin-bottom:6px;">Restbetrag</span><strong class="' + amountClass + '">' + escapeHTML2(formatEUR(Number(d.betrag)||0)) + '</strong></div></div>' +
+        '<div class="mobileMeta"><div class="metaItem"><span>Fällig am</span><strong>' + escapeHTML2(d.datum || '–') + '</strong></div><div class="metaItem"><span>Ansprechpartner</span><strong>' + escapeHTML2(normalizeContactData(d).representative || '–') + '</strong></div></div>' +
+        '<div class="mobileActionMain">' +
+          '<button class="miniBtn" type="button">Info</button>' +
+          '<button class="miniBtn" type="button">Abbau</button>' +
+          '<button class="miniBtn" type="button">Kontakt</button>' +
+        '</div>' +
+        '<div class="mobileTinyActions">' +
+          '<button class="tinyBtn" type="button" title="Status">↺</button>' +
+          '<button class="tinyBtn" type="button" title="Historie">◷</button>' +
+          '<button class="tinyBtn tinyDanger" type="button" title="Löschen">✕</button>' +
+        '</div>';
+      const cbtns = card.querySelectorAll('button');
+      cbtns[0].addEventListener('click', ()=>showInfo(i));
+      cbtns[1].addEventListener('click', ()=>paySingleDebt(i));
+      cbtns[2].addEventListener('click', ()=>showContact(i));
+      cbtns[3].addEventListener('click', ()=>toggleStatus(i));
+      cbtns[4].addEventListener('click', ()=>showHistory(i));
+      cbtns[5].addEventListener('click', ()=>removeDebt(i));
+      mobile.appendChild(card);
+    });
+
+    fillSidePanel(selectedDebtIndex);
+  };
+
+  const oldRemoveDebt = window.removeDebt;
+  window.removeDebt = function(i){
+    if(confirm('Diese Schuld wirklich löschen?')){
+      debts.splice(i,1);
+      if(selectedDebtIndex >= debts.length) selectedDebtIndex = debts.length - 1;
+      save();
+      render();
+    }
+  };
+
+  document.getElementById('desktopNewNoteBtn')?.addEventListener('click', ()=>{
+    if(selectedDebtIndex == null || selectedDebtIndex < 0 || !debts[selectedDebtIndex]) return;
+    openActionModal({
+      title:'Neue Notiz',
+      body:'Füge eine neue Notiz für diesen Eintrag hinzu.',
+      confirmText:'Neue Notiz speichern',
+      textareaLabel:'Neue Notiz',
+      textareaPlaceholder:'Neue Notiz eintragen...',
+      textareaValue:'',
+      onTextareaConfirm:(value)=>{
+        const text = String(value || '').trim();
+        if(!text){ showToast('Bitte erst eine Notiz eintragen.'); return; }
+        if(!Array.isArray(debts[selectedDebtIndex].notesHistory)) debts[selectedDebtIndex].notesHistory = [];
+        debts[selectedDebtIndex].notesHistory.push({at:new Date().toISOString(), text});
+        debts[selectedDebtIndex].notes = notesText(debts[selectedDebtIndex]);
+        save(); closeActionModal(); render(); showToast('Neue Notiz gespeichert ✅');
+      }
+    });
+  });
+
+  document.addEventListener('click', async (e)=>{
+    const btn = e.target.closest('[data-copy]');
+    if(!btn) return;
+    const value = btn.getAttribute('data-copy') || '';
+    try{ await navigator.clipboard.writeText(value); showToast('Kopiert ✅'); }catch(err){ console.error(err); }
+  });
+
   render();
 })();
 </script>
