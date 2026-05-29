@@ -1,0 +1,1625 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#06101c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Schulden Manager">
+<meta name="description" content="Schulden Manager als installierbare PWA in reiner Dark-Mode-Version.">
+<meta name="format-detection" content="telephone=no">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="assets/icons/icon-192.png">
+<link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+<title>Schulden Manager – Dark Mode v3</title>
+
+<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf-autotable"></script>
+
+<style>
+:root{
+  --bg:#eef3fb;
+  --bg-2:#dfe8f6;
+  --surface:rgba(255,255,255,.76);
+  --surface-strong:#ffffff;
+  --surface-soft:rgba(255,255,255,.72);
+  --card:rgba(255,255,255,.82);
+  --panel:#f4f7fd;
+  --panel-2:#e9eff9;
+  --text:#13233b;
+  --muted:#6d7f99;
+  --line:rgba(19,35,59,.08);
+  --accent:#4f8cff;
+  --accent-2:#7c71ff;
+  --accent-3:#31c48d;
+  --danger:#ff6b86;
+  --warning:#f4b63f;
+  --success:#27b66e;
+  --shadow:0 30px 80px rgba(48,72,112,.14);
+  --radius-xl:32px;
+  --radius-lg:24px;
+  --radius-md:18px;
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  font-family:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color:var(--text);
+  background:
+    radial-gradient(circle at top left, rgba(79,140,255,.16), transparent 28%),
+    radial-gradient(circle at top right, rgba(124,113,255,.14), transparent 24%),
+    radial-gradient(circle at bottom center, rgba(49,196,141,.10), transparent 30%),
+    linear-gradient(180deg, #f5f8fd 0%, #edf3fb 46%, #e4ebf6 100%);
+  min-height:100vh;
+}
+body::before,
+body::after{
+  content:"";
+  position:fixed;
+  inset:auto;
+  width:340px;
+  height:340px;
+  border-radius:50%;
+  filter:blur(80px);
+  opacity:.16;
+  pointer-events:none;
+  z-index:0;
+}
+body::before{top:-80px;left:-80px;background:#8fb9ff}
+body::after{right:-120px;bottom:-100px;background:#b6acff}
+
+.container{
+  position:relative;
+  z-index:1;
+  max-width:1480px;
+  margin:auto;
+  padding:28px 20px 120px;
+}
+
+.hero{
+  position:relative;
+  overflow:hidden;
+  display:grid;
+  grid-template-columns:minmax(0,1.35fr) minmax(320px,.8fr);
+  gap:22px;
+  padding:34px;
+  margin-bottom:24px;
+  border-radius:38px;
+  border:1px solid rgba(255,255,255,.55);
+  background:linear-gradient(135deg, rgba(255,255,255,.84), rgba(244,248,255,.72));
+  box-shadow:var(--shadow);
+  backdrop-filter:blur(22px);
+}
+.hero::before{
+  content:"";
+  position:absolute;
+  inset:-1px;
+  background:linear-gradient(135deg, rgba(79,140,255,.18), rgba(124,113,255,.12), transparent 52%);
+  pointer-events:none;
+}
+.heroMain,.heroSide{position:relative;z-index:1}
+.eyebrow{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:8px 12px;
+  border-radius:999px;
+  background:rgba(79,140,255,.10);
+  border:1px solid rgba(79,140,255,.14);
+  color:#2954a3;
+  font-size:13px;
+  letter-spacing:.02em;
+}
+.hero h1{
+  margin:16px 0 8px;
+  font-size:clamp(30px,4vw,48px);
+  line-height:1.04;
+  letter-spacing:-.03em;
+}
+.hero p{
+  margin:0;
+  color:var(--muted);
+  max-width:760px;
+  line-height:1.75;
+  font-size:16px;
+}
+.heroMeta{
+  display:grid;
+  grid-template-columns:repeat(3, minmax(0,1fr));
+  gap:12px;
+  margin-top:22px;
+}
+.metaChip{
+  padding:14px 16px;
+  border-radius:18px;
+  background:rgba(255,255,255,.60);
+  border:1px solid rgba(19,35,59,.06);
+}
+.metaChip strong{display:block;font-size:13px;color:var(--muted);font-weight:600;margin-bottom:6px}
+.metaChip span{font-size:16px;font-weight:700}
+.heroSide{
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  gap:12px;
+}
+.quickPanel{
+  padding:18px;
+  border-radius:24px;
+  background:rgba(255,255,255,.60);
+  border:1px solid rgba(19,35,59,.06);
+}
+.quickPanel h3{margin:0 0 10px;font-size:15px}
+.quickPanel p{font-size:14px;line-height:1.55}
+.smallMuted{
+  color:var(--muted);
+  font-size:13px;
+  line-height:1.5;
+}
+
+.card{
+  background:var(--card);
+  border:1px solid rgba(255,255,255,.62);
+  border-radius:var(--radius-xl);
+  padding:26px;
+  margin-bottom:22px;
+  box-shadow:var(--shadow);
+  backdrop-filter:blur(18px);
+}
+.sectionTitle{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:22px;
+}
+.sectionTitle h2,
+.card h2{
+  margin:0;
+  font-size:22px;
+  letter-spacing:-.02em;
+}
+.sectionTitle span{color:var(--muted);font-size:14px}
+
+.viewSwitch,
+.actionRow,
+.formRow,
+.mobileRow,
+.modalActions,
+.toolbar{
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+}
+.viewSwitch{margin-top:14px}
+.formRow{align-items:stretch}
+
+input,button,select{
+  min-height:50px;
+  padding:0 16px;
+  border-radius:18px;
+  border:1px solid rgba(19,35,59,.06);
+  font-size:15px;
+  background:rgba(247,250,255,.92);
+  color:var(--text);
+  transition:transform .16s ease, border-color .16s ease, background .16s ease, box-shadow .16s ease;
+}
+input,select{flex:1;min-width:160px;text-align:left}
+input::placeholder{color:#8c9bb0}
+input:focus,select:focus,button:focus{
+  outline:none;
+  border-color:rgba(125,211,252,.5);
+  box-shadow:0 0 0 4px rgba(125,211,252,.12);
+}
+button{
+  cursor:pointer;
+  font-weight:700;
+  letter-spacing:.01em;
+  background:linear-gradient(135deg, var(--accent), #c4b5fd);
+  color:white;
+  box-shadow:0 12px 24px rgba(79,140,255,.18);
+}
+button:hover{transform:translateY(-1px)}
+button.secondary{
+  background:rgba(19,35,59,.06);
+  color:var(--text);
+  box-shadow:none;
+}
+button.secondary:hover{background:rgba(19,35,59,.09)}
+button.btn-delete{background:linear-gradient(135deg, #fb7185, #f97316); color:white}
+button.btn-status{background:linear-gradient(135deg, #60a5fa, #22d3ee); color:#07111f}
+button.btn-pay{background:linear-gradient(135deg, #34d399, #86efac); color:#052015}
+button.btn-history{background:linear-gradient(135deg, #fbbf24, #f59e0b); color:#1f1300}
+button.btn-info{background:linear-gradient(135deg, #a78bfa, #7dd3fc); color:#0b1530}
+
+.actionRow{
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:10px;
+}
+.actionBtn{
+  min-height:58px;
+  padding:10px 12px;
+  border-radius:18px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  font-size:14px;
+  font-weight:800;
+  text-align:center;
+  line-height:1.1;
+  touch-action:manipulation;
+  -webkit-tap-highlight-color:transparent;
+}
+.actionBtn .ico{
+  font-size:16px;
+  line-height:1;
+}
+.actionBtn .lbl{
+  display:block;
+}
+.mobileRow{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+}
+.mobileRow .actionBtn{
+  width:100%;
+  min-width:0;
+}
+.mobileRow .btn-status{grid-column:1/2}
+.mobileRow .btn-delete{grid-column:2/3}
+.mobileRow .btn-pay{grid-column:1/2}
+.mobileRow .btn-history{grid-column:2/3}
+.mobileRow .btn-info{grid-column:1/3}
+
+.activeView{
+  background:linear-gradient(135deg, rgba(125,211,252,.95), rgba(167,139,250,.95)) !important;
+  color:#07111f !important;
+  border-color:transparent !important;
+}
+
+#backupStatus{
+  margin-top:14px;
+  padding:14px 16px;
+  border-radius:18px;
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.07);
+  color:#d8e8ff;
+  font-weight:600;
+}
+
+.stats{
+  display:grid;
+  grid-template-columns:repeat(3, minmax(0,1fr));
+  gap:16px;
+}
+.stat{
+  position:relative;
+  overflow:hidden;
+  background:linear-gradient(180deg, rgba(255,255,255,.92), rgba(242,246,253,.82));
+  padding:20px;
+  border-radius:24px;
+  border:1px solid rgba(19,35,59,.06);
+}
+.stat::after{
+  content:"";
+  position:absolute;
+  inset:auto -40px -40px auto;
+  width:120px;
+  height:120px;
+  border-radius:50%;
+  background:radial-gradient(circle, rgba(79,140,255,.16), transparent 60%);
+}
+.statLabel{display:block;color:var(--muted);font-size:13px;font-weight:600;margin-bottom:8px}
+.stat span{
+  position:relative;
+  z-index:1;
+  display:block;
+  font-size:34px;
+  line-height:1;
+  letter-spacing:-.03em;
+  color:var(--text);
+}
+.stat em{display:block;margin-top:8px;color:#c8daf2;font-style:normal;font-size:14px}
+
+.toolbar{margin-bottom:16px}
+#search{width:100%;min-width:unset}
+
+.tableWrap{
+  border:1px solid rgba(19,35,59,.06);
+  border-radius:22px;
+  overflow:hidden;
+  background:rgba(247,250,255,.70);
+}
+
+table{width:100%;border-collapse:separate;border-spacing:0}
+thead th{
+  text-align:left;
+  padding:16px;
+  font-size:13px;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  color:#7890af;
+  background:rgba(79,140,255,.06);
+  border-bottom:1px solid rgba(19,35,59,.06);
+}
+tbody tr{transition:background .14s ease}
+tbody tr:hover{background:rgba(79,140,255,.045)}
+td{
+  padding:16px;
+  border-bottom:1px solid rgba(19,35,59,.06);
+  vertical-align:top;
+}
+tbody tr:last-child td{border-bottom:none}
+
+td:last-child{min-width:310px}
+
+.badge,
+.badgeOpen,
+.badgePaid{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:94px;
+  padding:8px 12px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:800;
+  letter-spacing:.06em;
+}
+.badgeOpen{background:rgba(251,113,133,.18); color:#ffd6de; border:1px solid rgba(251,113,133,.26)}
+.badgePaid{background:rgba(34,197,94,.16); color:#cefadf; border:1px solid rgba(34,197,94,.26)}
+
+#mobileList{display:grid;gap:14px}
+.mobileCard{
+  background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.03));
+  border:1px solid rgba(19,35,59,.06);
+  border-radius:24px;
+  padding:18px;
+}
+.mobileTop{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+}
+.mobileCard .amount{
+  margin-top:14px;
+  display:flex;
+  align-items:end;
+  justify-content:space-between;
+  gap:12px;
+}
+.mobileCard .amount strong{font-size:28px;letter-spacing:-.03em}
+.mobileMeta{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:14px}
+.metaItem{
+  padding:12px 14px;
+  border-radius:16px;
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.06);
+}
+.metaItem span{display:block;color:var(--muted);font-size:12px;margin-bottom:5px}
+
+.modalOverlay{
+  position:fixed;
+  inset:0;
+  display:none;
+  background:rgba(2,6,12,.68);
+  backdrop-filter:blur(12px);
+  z-index:10010;
+  padding:20px;
+}
+.modalBox{
+  width:min(760px,100%);
+  margin:6vh auto 0;
+  padding:24px;
+  border-radius:28px;
+  background:linear-gradient(180deg, rgba(14,25,43,.96), rgba(8,16,29,.94));
+  border:1px solid rgba(19,35,59,.06);
+  box-shadow:0 30px 80px rgba(0,0,0,.42);
+}
+.modalBox h3{margin:0 0 18px;font-size:24px;letter-spacing:-.02em}
+
+#fabAdd{
+  position:fixed;
+  bottom:24px;
+  left:50%;
+  transform:translateX(-50%);
+  width:68px;
+  height:68px;
+  border-radius:22px;
+  font-size:30px;
+  z-index:9999;
+  box-shadow:0 18px 40px rgba(125,211,252,.28), 0 14px 30px rgba(0,0,0,.45);
+}
+
+.mobileBottomNav{
+  display:none;
+  pointer-events:auto;
+  touch-action:manipulation;
+  position:fixed;
+  left:50%;
+  bottom:22px;
+  transform:translateX(-50%);
+  width:min(560px, calc(100% - 24px));
+  min-height:76px;
+  padding:10px 12px;
+  border-radius:28px;
+  background:rgba(255,255,255,.82);
+  border:1px solid rgba(255,255,255,.72);
+  box-shadow:0 24px 60px rgba(48,72,112,.18);
+  backdrop-filter:blur(18px);
+  z-index:2147483000;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+.mobileBottomNav .navBtn{
+  flex:1;
+  position:relative;
+  z-index:1;
+  touch-action:manipulation;
+  min-width:0;
+  height:54px;
+  border-radius:20px;
+  background:rgba(19,35,59,.05);
+  color:var(--text);
+  box-shadow:none;
+  padding:0 8px;
+}
+.mobileBottomNav .navBtn span{display:block;font-size:11px;font-weight:700}
+.mobileBottomNav .navPlus{
+  flex:0 0 70px;
+  height:58px;
+  border-radius:22px;
+  font-size:28px;
+  background:linear-gradient(135deg, #4f8cff, #7c71ff);
+}
+body.modalOpen .mobileBottomNav{display:none !important}
+
+
+.installRow{display:flex;flex-wrap:wrap;gap:12px;margin-top:12px}
+#btnInstall{display:none}
+#btnInstall.show{display:inline-flex;align-items:center;justify-content:center}
+.installHint{margin-top:10px;color:var(--muted);font-size:13px}
+.toast{position:fixed;left:50%;bottom:110px;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;transition:opacity .25s ease, transform .25s ease;z-index:2147483600;padding:12px 16px;border-radius:16px;background:rgba(19,35,59,.92);color:#fff;box-shadow:0 14px 30px rgba(0,0,0,.18);font-size:14px}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+body.softlight .toast,body.dark .toast{background:rgba(10,18,30,.94)}
+
+@media (max-width:1180px){
+  .hero{grid-template-columns:1fr}
+  .heroMeta{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+
+.appFrame{
+  position:relative;
+}
+
+@media (min-width:980px){
+  .container{padding-top:34px}
+  .appFrame{
+    padding:18px;
+    border-radius:42px;
+    background:rgba(255,255,255,.34);
+    border:1px solid rgba(255,255,255,.45);
+    box-shadow:0 24px 80px rgba(84,108,150,.12);
+    backdrop-filter:blur(14px);
+  }
+  .heroMain{padding-right:12px}
+  .sectionTitle h2,
+  .card h2{font-size:24px}
+  .tableWrap{border-radius:28px}
+}
+
+@media (max-width:1040px){
+  .hero{grid-template-columns:1fr}
+}
+
+@media (max-width:768px){
+  .container{padding:16px 14px 118px}
+  .actionRow{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .hero{padding:20px;border-radius:28px}
+  .heroMeta,.stats,.mobileMeta{grid-template-columns:1fr}
+  .card{padding:18px;border-radius:24px}
+  .sectionTitle{align-items:flex-start;flex-direction:column}
+  td:last-child{min-width:unset}
+  table{display:none}
+  .mobileBottomNav{display:flex}
+  #inlineForm{display:none !important}
+  #fabAdd{display:none !important}
+}
+
+@media (min-width:769px){
+  #fabAdd,.mobileBottomNav,#mobileList{display:none !important}
+  #desktopTable{display:block !important}
+  #addModal{display:none !important}
+}
+</style>
+
+<style id="apple-dark-overrides">
+/* Light mode: softer and slightly darker */
+:root{
+  --text:#1a2f4a;
+  --muted:#6f819b;
+  --line:rgba(26,47,74,.10);
+  --shadow:0 22px 60px rgba(86,112,150,.12);
+}
+body{
+  transition:background .35s ease,color .25s ease;
+  background:
+    radial-gradient(circle at 10% 8%, rgba(91,141,255,.10), transparent 24%),
+    radial-gradient(circle at 88% 0%, rgba(140,124,255,.08), transparent 22%),
+    linear-gradient(180deg, #e3eaf3 0%, #d8e1ec 48%, #cfd9e6 100%);
+}
+body::before{background:#b8d3ff;opacity:.12}
+body::after{background:#d7ceff;opacity:.10}
+.appFrame,
+.hero,
+.metaChip,
+.quickPanel,
+.card,
+.stat,
+.mobileCard,
+.tableWrap,
+.modalBox{
+  transition:background .35s ease, box-shadow .25s ease, border-color .25s ease, transform .2s ease;
+}
+.appFrame{
+  background:rgba(255,255,255,.58);
+  border:1px solid rgba(255,255,255,.72);
+  box-shadow:0 18px 50px rgba(101,122,154,.08);
+  backdrop-filter:blur(6px);
+}
+.hero{
+  background:linear-gradient(180deg, #e8eef6, #dde6f0);
+  border:1px solid rgba(255,255,255,.90);
+  box-shadow:0 20px 55px rgba(96,120,158,.10);
+}
+.hero::before{
+  background:linear-gradient(135deg, rgba(91,141,255,.08), rgba(140,124,255,.06), transparent 58%);
+}
+.eyebrow{
+  background:#f2f6fd;
+  border-color:rgba(26,47,74,.06);
+  color:#35527b;
+}
+.metaChip,.quickPanel{
+  background:linear-gradient(180deg, #e8eef6, #dde6f0);
+  border:1px solid rgba(26,47,74,.06);
+  box-shadow:0 8px 20px rgba(107,130,167,.06);
+}
+.card{
+  background:linear-gradient(180deg, #e8eef6, #dde6f0);
+  border:1px solid rgba(26,47,74,.06);
+  box-shadow:0 18px 46px rgba(96,120,158,.08);
+  backdrop-filter:none;
+}
+input,select,textarea{
+  background:#e3eaf3;
+  color:var(--text);
+  border-color:rgba(26,47,74,.08);
+  box-shadow:none;
+}
+input::placeholder, textarea::placeholder{color:#8a9bb1}
+button.secondary{
+  background:linear-gradient(180deg, #eef3f8, #dfe6ef);
+  color:var(--text);
+  border-color:rgba(26,47,74,.07);
+  box-shadow:0 8px 20px rgba(107,130,167,.06);
+}
+.tableWrap, table, .mobileCard, .stat, .emptyState{
+  background:linear-gradient(180deg, #e8eef6, #dde6f0) !important;
+  border-color:rgba(26,47,74,.06) !important;
+  box-shadow:0 10px 26px rgba(104,126,160,.06);
+}
+.stat{ background:linear-gradient(180deg, #e8eef6, #dde6f0) !important; }
+.actionBtn{
+  background:linear-gradient(180deg, #eef3f8, #dfe6ef) !important;
+  color:var(--text) !important;
+  border:1px solid rgba(26,47,74,.07) !important;
+  box-shadow:0 8px 18px rgba(108,130,164,.06) !important;
+}
+.actionBtn .ico{
+  background:#edf4ff;
+  color:#42689c;
+  padding:6px 8px;
+  border-radius:12px;
+}
+.bottomNav, .mobileBottomNav{
+  background:linear-gradient(180deg, rgba(238,243,248,.96), rgba(223,230,239,.92)) !important;
+  border-color:rgba(26,47,74,.08) !important;
+  box-shadow:0 18px 40px rgba(94,116,152,.12);
+  backdrop-filter:blur(10px);
+}
+.navBtn, .bottomBtn{ color:#314c72 !important; }
+.navBtn.active, .bottomBtn.active{
+  background:#eef4ff !important;
+  color:#163a6b !important;
+}
+.modalBox{
+  background:linear-gradient(180deg, #e8eef6, #dde6f0) !important;
+  border-color:rgba(26,47,74,.08) !important;
+  box-shadow:0 24px 60px rgba(92,116,153,.12);
+}
+.modalBox h3, #actionBody, #actionTitle{ color:#16324f !important; }
+th{background:#dfe6ef}
+tr:hover td{background:#e7edf5}
+.badgeOpen{background:rgba(255,109,134,.12);color:#b53e58;border:1px solid rgba(255,109,134,.18)}
+.badgePaid{background:rgba(41,184,116,.12);color:#198552;border:1px solid rgba(41,184,116,.18)}
+#open{color:#d6455d}
+#paid{color:#1f9d63}
+
+/* Night mode */
+body.dark{
+  --text:#edf4ff;
+  --muted:#9db0cb;
+  --line:rgba(255,255,255,.08);
+  --shadow:0 26px 70px rgba(0,0,0,.28);
+  background:
+    radial-gradient(circle at 10% 8%, rgba(91,141,255,.18), transparent 24%),
+    radial-gradient(circle at 88% 0%, rgba(140,124,255,.14), transparent 22%),
+    linear-gradient(180deg, #06101c 0%, #0b1524 48%, #0f1a2b 100%);
+}
+body.dark::before{background:#3a6fcd;opacity:.20}
+body.dark::after{background:#6556cc;opacity:.16}
+body.dark .appFrame{
+  background:rgba(12,20,34,.46);
+  border-color:rgba(255,255,255,.08);
+  box-shadow:0 18px 50px rgba(0,0,0,.24);
+  backdrop-filter:blur(10px);
+}
+body.dark .hero,
+body.dark .metaChip,
+body.dark .quickPanel,
+body.dark .card,
+body.dark .tableWrap,
+body.dark table,
+body.dark .mobileCard,
+body.dark .stat,
+body.dark .emptyState,
+body.dark .modalBox{
+  background:linear-gradient(180deg, rgba(18,28,44,.94), rgba(14,22,36,.90)) !important;
+  border-color:rgba(255,255,255,.08) !important;
+  box-shadow:0 18px 46px rgba(0,0,0,.22) !important;
+}
+body.dark .hero::before{
+  background:linear-gradient(135deg, rgba(91,141,255,.14), rgba(140,124,255,.10), transparent 58%);
+}
+body.dark .eyebrow{
+  background:rgba(255,255,255,.06);
+  border-color:rgba(255,255,255,.08);
+  color:#d9e7ff;
+}
+body.dark input, body.dark select, body.dark textarea{
+  background:#132238;
+  color:var(--text);
+  border-color:rgba(255,255,255,.08);
+}
+body.dark input::placeholder, body.dark textarea::placeholder{color:#7f93b0}
+body.dark button.secondary{
+  background:linear-gradient(180deg, #16253d, #132238);
+  color:var(--text);
+  border-color:rgba(255,255,255,.08);
+  box-shadow:none;
+}
+body.dark .actionBtn{
+  background:linear-gradient(180deg, #172740, #122137) !important;
+  color:var(--text) !important;
+  border-color:rgba(255,255,255,.08) !important;
+  box-shadow:none !important;
+}
+body.dark .actionBtn .ico{background:#1b3150;color:#d9e7ff}
+body.dark .bottomNav, body.dark .mobileBottomNav{
+  background:linear-gradient(180deg, rgba(13,21,34,.96), rgba(10,18,30,.92)) !important;
+  border-color:rgba(255,255,255,.08) !important;
+  box-shadow:0 18px 40px rgba(0,0,0,.28);
+}
+body.dark .navBtn, body.dark .bottomBtn{color:#d5e3fb !important}
+body.dark .navBtn.active, body.dark .bottomBtn.active{
+  background:#173154 !important;
+  color:#ffffff !important;
+}
+body.dark .modalBox h3, body.dark #actionBody, body.dark #actionTitle{color:#edf4ff !important}
+body.dark th{background:#122137;color:#a7bbd8}
+body.dark tr:hover td{background:#13243c}
+body.dark .badgeOpen{background:rgba(255,109,134,.16);color:#ffb7c4;border:1px solid rgba(255,109,134,.22)}
+body.dark .badgePaid{background:rgba(41,184,116,.16);color:#b8f0d2;border:1px solid rgba(41,184,116,.22)}
+body.dark #open{color:#ff8fa3}
+body.dark #paid{color:#6ee7b7}
+
+/* Soft Light Pro – Apple Titanium Theme */
+body.softlight{
+  background:linear-gradient(180deg,#c9ccd1 0%,#c3c7cc 48%,#bcc1c7 100%);
+}
+body.softlight .appFrame{
+  background:rgba(232,234,238,.75);
+  border-color:rgba(0,0,0,.14);
+  box-shadow:0 16px 40px rgba(0,0,0,.10);
+  backdrop-filter:blur(16px) saturate(110%);
+}
+body.softlight .hero{
+  background:linear-gradient(180deg,rgba(238,240,244,.88),rgba(226,229,234,.84));
+  border-color:rgba(0,0,0,.10);
+  backdrop-filter:blur(18px) saturate(110%);
+}
+body.softlight .card,
+body.softlight .metaChip,
+body.softlight .quickPanel,
+body.softlight .stat,
+body.softlight .mobileCard{
+  background:linear-gradient(180deg,rgba(233,236,240,.92),rgba(221,225,231,.88));
+  border-color:rgba(0,0,0,.10);
+  box-shadow:0 10px 24px rgba(0,0,0,.08);
+  backdrop-filter:blur(16px) saturate(110%);
+}
+body.softlight input,
+body.softlight select{
+  background:rgba(228,231,236,.92);
+  border-color:rgba(0,0,0,.12);
+  backdrop-filter:blur(10px);
+}
+body.softlight .mobileBottomNav{
+  background:linear-gradient(180deg,rgba(238,240,244,.95),rgba(224,227,232,.92)) !important;
+  border-color:rgba(0,0,0,.12) !important;
+  backdrop-filter:blur(20px) saturate(110%);
+}
+body.softlight .actionBtn{
+  background:linear-gradient(180deg,rgba(232,236,242,.9),rgba(215,220,227,.85)) !important;
+  border:1px solid rgba(0,0,0,.10) !important;
+  box-shadow:0 4px 10px rgba(0,0,0,.08) !important;
+  transition:all .18s ease;
+}
+body.softlight .actionBtn:hover{
+  box-shadow:0 8px 22px rgba(91,141,255,.25), 0 0 0 1px rgba(91,141,255,.18) !important;
+  transform:translateY(-1px);
+}
+body.softlight .card::before,
+body.softlight .quickPanel::before,
+body.softlight .metaChip::before{
+  content:"";
+  position:absolute;
+  top:0; left:0; right:0;
+  height:2px;
+  background:linear-gradient(90deg,rgba(255,255,255,.6),rgba(255,255,255,0));
+  border-top-left-radius:inherit;
+  border-top-right-radius:inherit;
+  pointer-events:none;
+}
+body.softlight .card,
+body.softlight .quickPanel,
+body.softlight .metaChip,
+body.softlight .stat,
+body.softlight .mobileCard{
+  position:relative;
+}
+body.softlight .card::after,
+body.softlight .quickPanel::after,
+body.softlight .metaChip::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:inherit;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.55), inset 0 -1px 0 rgba(0,0,0,.05);
+  pointer-events:none;
+}
+body.softlight .hero,
+body.softlight .quickPanel{
+  box-shadow:0 8px 24px rgba(0,0,0,.10);
+}
+body.softlight .card,
+body.softlight .metaChip,
+body.softlight .stat,
+body.softlight .mobileCard{
+  box-shadow:0 14px 34px rgba(0,0,0,.14);
+}
+body.softlight .card:hover,
+body.softlight .mobileCard:hover,
+body.softlight .stat:hover{
+  transform:translateY(-2px);
+  box-shadow:0 18px 42px rgba(0,0,0,.18);
+}
+
+.noteBox{
+  width:100%;
+  min-height:130px;
+  resize:vertical;
+  border-radius:18px;
+  padding:14px 16px;
+  border:1px solid rgba(180,210,255,.18);
+  background:rgba(255,255,255,.07);
+  color:var(--text);
+  outline:none;
+  font-size:15px;
+  line-height:1.45;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08);
+}
+.noteBox::placeholder{color:rgba(217,231,251,.55)}
+.infoNoteLabel{
+  display:block;
+  margin:4px 0 8px;
+  font-size:13px;
+  color:var(--muted);
+  font-weight:800;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+}
+
+#actionConfirm{
+  min-height:50px;
+  padding:0 18px;
+  border-radius:18px;
+  background:linear-gradient(135deg, var(--accent), #c4b5fd);
+  color:#fff;
+  box-shadow:0 12px 24px rgba(79,140,255,.18);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+}
+body.dark #actionConfirm,
+body.softlight #actionConfirm{
+  background:linear-gradient(135deg, var(--accent), #c4b5fd);
+  color:#fff;
+  box-shadow:0 12px 24px rgba(79,140,255,.18);
+}
+</style>
+
+</head>
+<body class="dark">
+<div class="container">
+<div class="appFrame">
+
+  <section class="hero">
+    <div class="heroMain">
+      <div class="eyebrow">✦ Dark iPad Edition · v1</div>
+      <h1>Schulden Manager<br>mit mehr iPad-Feeling</h1>
+      <p>Mehr Dashboard, weniger Handy-App: großzügige Flächen, dunkle Glas-Panels und ein ruhiger Tablet-Look für bessere Übersicht beim Verwalten deiner offenen und bezahlten Beträge.</p>
+      <div class="heroMeta">
+        <div class="metaChip"><strong>Fokus</strong><span>Tablet-Dashboard</span></div>
+        <div class="metaChip"><strong>Design</strong><span>Dark Glass & Panels</span></div>
+        <div class="metaChip"><strong>Gefühl</strong><span>Mehr iPad, weniger Phone</span></div>
+      </div>
+    </div>
+    <div class="heroSide">
+      <div class="quickPanel">
+        <h3>Geräteansicht</h3>
+        <div class="viewSwitch">
+          <button id="btnDesktop" class="secondary" type="button">🖥 Desktop</button>
+          <button id="btnMobile" class="secondary" type="button">📱 Handy</button>
+        </div>
+      </div>
+      <div class="quickPanel">
+        <h3>Backup-Status</h3>
+        <div id="backupStatus">Letztes Backup: –</div>
+        <div class="smallMuted">Tipp: Diese Version bleibt dauerhaft im Dark Mode. Backup-Datei einfach in Dateien, Drive oder iCloud speichern.</div>
+        <div class="installRow">
+          <button id="btnInstall" class="secondary" type="button">📲 App installieren</button>
+        </div>
+        <div id="installHint" class="installHint">Installierbar auf iPhone, iPad, Android und Desktop-Browsern.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="sectionTitle">
+      <h2>Neue Karte anlegen</h2>
+      <span>Mehr Platz, mehr Ruhe, besser für Tablet und große Displays</span>
+    </div>
+
+    <div id="inlineForm">
+      <div class="formRow">
+        <input id="name" placeholder="Name">
+        <input id="grund" placeholder="Grund">
+        <input id="betrag" type="number" placeholder="Betrag €">
+        <input id="datum" type="date">
+        <select id="status">
+          <option>offen</option>
+          <option>bezahlt</option>
+        </select>
+      </div>
+
+      <div class="actionRow" style="margin-top:12px;">
+        <button id="btnAdd" type="button">Hinzufügen</button>
+        <button id="btnBackup" class="secondary" type="button">💾 Backup</button>
+        <button id="btnBackupPick" class="secondary" type="button">📁 Speicherort wählen</button>
+        <button id="btnRestore" class="secondary" type="button">📂 Restore</button>
+      </div>
+    </div>
+
+    <input id="restoreFile" type="file" accept=".godmode,application/octet-stream,application/json,text/plain" style="display:none">
+  </section>
+
+  <section class="card stats" id="statsCard">
+    <div class="stat">
+      <span class="statLabel">Gesamt</span>
+      <span id="sum" class="statValue">0,00 €</span>
+      <em>Alle aktuell gespeicherten Beträge</em>
+    </div>
+    <div class="stat">
+      <span class="statLabel">Offen</span>
+      <span id="open" class="statValue">0,00 €</span>
+      <em>Noch nicht vollständig ausgeglichen</em>
+    </div>
+    <div class="stat">
+      <span class="statLabel">Bezahlt</span>
+      <span id="paid" class="statValue">0,00 €</span>
+      <em>Einträge mit Status bezahlt</em>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="sectionTitle">
+      <h2>Deine Kartenübersicht</h2>
+      <span>Tablet-optimierte Übersicht mit klareren Aktionen</span>
+    </div>
+
+    <div class="toolbar">
+      <input id="search" placeholder="🔎 Nach Name, Grund oder Betrag suchen...">
+    </div>
+
+    <div id="desktopTable" class="tableWrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Grund</th>
+            <th>Betrag</th>
+            <th>Datum</th>
+            <th>Status</th>
+            <th>Aktion</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+
+    <div id="mobileList"></div>
+
+    <div class="actionRow" style="margin-top:18px;">
+      <button id="btnExcel" class="secondary" type="button">Excel Export</button>
+      <button id="btnPDF" class="secondary" type="button">PDF Export</button>
+      <button id="btnClear" class="btn-delete" type="button">Alles löschen</button>
+    </div>
+  </section>
+</div>
+</div>
+
+<div id="addModal" class="modalOverlay" aria-hidden="true">
+  <div class="modalBox">
+    <h3>➕ Neue Schuld anlegen</h3>
+    <div class="formRow" style="margin-top:0;">
+      <input id="m_name" placeholder="Name">
+      <input id="m_grund" placeholder="Grund">
+      <input id="m_betrag" type="number" placeholder="Betrag €">
+      <input id="m_datum" type="date">
+      <select id="m_status">
+        <option>offen</option>
+        <option>bezahlt</option>
+      </select>
+    </div>
+    <div class="modalActions" style="margin-top:16px;">
+      <button id="m_add" type="button">Hinzufügen</button>
+    </div>
+  </div>
+</div>
+
+<div id="actionModal" class="modalOverlay" aria-hidden="true">
+  <div class="modalBox">
+    <h3 id="actionTitle">Aktion</h3>
+    <div id="actionBody" style="white-space:pre-line;color:#d9e7fb;line-height:1.6;margin-bottom:16px;"></div>
+    <div id="actionInputWrap" style="display:none;margin-bottom:16px;">
+      <input id="actionInput" type="number" step="0.01" inputmode="decimal" placeholder="Wert eingeben">
+    </div>
+    <div id="actionTextareaWrap" style="display:none;margin-bottom:16px;">
+      <label id="actionTextareaLabel" class="infoNoteLabel" for="actionTextarea">Notizen</label>
+      <textarea id="actionTextarea" class="noteBox" placeholder="Notiz eintragen..."></textarea>
+    </div>
+    <div class="modalActions" style="margin-top:16px;">
+      <button id="actionCancel" class="secondary" type="button">Schließen</button>
+      <button id="actionConfirm" type="button">Speichern</button>
+    </div>
+  </div>
+</div>
+
+<button id="fabAdd" type="button" aria-label="Neu">＋</button>
+
+<div id="toast" class="toast" aria-live="polite"></div>
+
+<script>
+let debts = [];
+try {
+  const raw = localStorage.getItem("godmode_debts");
+  debts = raw ? JSON.parse(raw) : [];
+  if(!Array.isArray(debts)) debts = [];
+} catch (e) {
+  console.warn("Konnte godmode_debts nicht laden, setze neu.", e);
+  debts = [];
+}
+
+let currentView = (localStorage.getItem("godmode_view") || "desktop");
+if(currentView !== "desktop" && currentView !== "mobile") currentView = "desktop";
+// Dark-only Version v1: alte Light/Soft-Light-Einstellungen werden überschrieben.
+document.body.classList.remove("softlight");
+document.body.classList.add("dark");
+localStorage.setItem("godmode_dark", "1");
+function save(){ localStorage.setItem("godmode_debts", JSON.stringify(debts)); }
+
+
+let deferredInstallPrompt = null;
+function showToast(message){
+  const toast = document.getElementById("toast");
+  if(!toast) return;
+  toast.textContent = message;
+  toast.classList.add("show");
+  clearTimeout(showToast._timer);
+  showToast._timer = setTimeout(()=>toast.classList.remove("show"), 2600);
+}
+function updateInstallUI(){
+  const btn = document.getElementById("btnInstall");
+  const hint = document.getElementById("installHint");
+  if(!btn || !hint) return;
+  const standalone = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone;
+  if(standalone){
+    btn.classList.remove('show');
+    hint.textContent = 'App ist installiert und kann wie eine normale App gestartet werden.';
+    return;
+  }
+  const isiOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  if(deferredInstallPrompt){
+    btn.classList.add('show');
+    hint.textContent = 'Tippe auf Installieren, um die App direkt auf deinem Gerät zu speichern.';
+  }else if(isiOS){
+    btn.classList.add('show');
+    hint.textContent = 'Auf iPhone/iPad: Teilen → Zum Home-Bildschirm, um die App zu installieren.';
+  }else{
+    btn.classList.remove('show');
+    hint.textContent = 'Installierbar auf kompatiblen Browsern, sobald der Browser die Installation anbietet.';
+  }
+}
+
+function setView(v){
+  currentView = v;
+  localStorage.setItem("godmode_view", v);
+  document.getElementById("desktopTable").style.display = (v==="desktop") ? "block" : "none";
+  document.getElementById("mobileList").style.display   = (v==="mobile")  ? "grid" : "none";
+  document.getElementById("btnDesktop").classList.toggle("activeView", v==="desktop");
+  document.getElementById("btnMobile").classList.toggle("activeView", v==="mobile");
+  render();
+}
+
+function setBackupStatusNow(){
+  const now = new Date();
+  const hh = String(now.getHours()).padStart(2,'0');
+  const mm = String(now.getMinutes()).padStart(2,'0');
+  const ss = String(now.getSeconds()).padStart(2,'0');
+  const txt = "Letztes Backup: " + hh + ":" + mm + ":" + ss;
+  document.getElementById("backupStatus").innerText = txt;
+  localStorage.setItem("godmode_last_backup", txt);
+}
+(function initBackupStatus(){
+  const last = localStorage.getItem("godmode_last_backup");
+  if(last) document.getElementById("backupStatus").innerText = last;
+})();
+
+function makeDatedFilename(){
+  const t = new Date();
+  const yyyy = t.getFullYear();
+  const mo = String(t.getMonth()+1).padStart(2,'0');
+  const dd = String(t.getDate()).padStart(2,'0');
+  const hh = String(t.getHours()).padStart(2,'0');
+  const mi = String(t.getMinutes()).padStart(2,'0');
+  return "schulden_backup_" + yyyy + "-" + mo + "-" + dd + "_" + hh + "-" + mi + ".godmode";
+}
+
+function downloadBackup(){
+  const payload = { version: 1, exportedAt: new Date().toISOString(), debts };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], {type:"application/octet-stream"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = makeDatedFilename();
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(a.href);
+  setBackupStatusNow();
+}
+
+async function downloadBackupWithPicker(){
+  if(!window.showSaveFilePicker){
+    downloadBackup();
+    return;
+  }
+  const payload = { version: 1, exportedAt: new Date().toISOString(), debts };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], {type:"application/octet-stream"});
+
+  const handle = await window.showSaveFilePicker({
+    suggestedName: makeDatedFilename(),
+    types: [{ description: "Schulden Backup", accept: { "application/octet-stream": [".godmode"] } }]
+  });
+  const writable = await handle.createWritable();
+  await writable.write(blob);
+  await writable.close();
+  setBackupStatusNow();
+}
+
+function triggerRestore(){
+  document.getElementById("restoreFile").click();
+}
+
+function restoreBackup(event){
+  const file = event.target.files && event.target.files[0];
+  if(!file) return;
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    try{
+      const data = JSON.parse(String(reader.result||""));
+      const imported = Array.isArray(data) ? data : data.debts;
+      if(!Array.isArray(imported)) throw new Error("Ungültiges Format");
+
+      debts = imported.map(d => ({
+        name: String(d.name ?? "").trim(),
+        grund: String(d.grund ?? "").trim(),
+        betrag: Number(d.betrag ?? 0),
+        datum: String(d.datum ?? ""),
+        status: (d.status === "bezahlt") ? "bezahlt" : "offen",
+        notes: String(d.notes ?? d.notizen ?? ""),
+        history: Array.isArray(d.history) ? d.history.map(h => ({
+          date: String(h.date ?? ""),
+          amount: Number(h.amount ?? 0)
+        })) : []
+      }));
+
+      save();
+      render();
+      alert("Restore erfolgreich ✅");
+    } catch(e){
+      console.error(e);
+      alert("Restore fehlgeschlagen ❌ (falsche Datei)");
+    } finally {
+      event.target.value="";
+    }
+  };
+  reader.readAsText(file);
+}
+
+function sumHistory(d){
+  if(!d.history || !Array.isArray(d.history)) return 0;
+  return d.history.reduce((acc,h)=>acc + (Number(h.amount)||0), 0);
+}
+function lastPaymentDate(d){
+  if(!d.history || d.history.length===0) return "–";
+  let latest = d.history[0].date;
+  for(const h of d.history){
+    if(h.date && new Date(h.date) > new Date(latest)) latest = h.date;
+  }
+  return latest || "–";
+}
+
+function addDebtFromInputs(prefix){
+  const name = document.getElementById(prefix + "name").value.trim();
+  const grund = document.getElementById(prefix + "grund").value.trim();
+  const betrag = parseFloat(document.getElementById(prefix + "betrag").value);
+  const datum = document.getElementById(prefix + "datum").value;
+  const status = document.getElementById(prefix + "status").value;
+
+  if(!name || !grund || isNaN(betrag) || !datum){
+    alert("Bitte alle Felder korrekt ausfüllen!");
+    return false;
+  }
+
+  debts.push({name,grund,betrag,datum,status,notes:"",history:[]});
+  save();
+  render();
+  return true;
+}
+
+function removeDebt(i){debts.splice(i,1);save();render();}
+function toggleStatus(i){debts[i].status=debts[i].status==="offen"?"bezahlt":"offen";save();render();}
+function toggleDark(){
+  // Dark-only Version: Theme bleibt immer dunkel.
+  document.body.classList.remove("softlight");
+  document.body.classList.add("dark");
+  localStorage.setItem("godmode_dark","1");
+  updateThemeButton();
+}
+function openActionModal({title, body, confirmText, inputValue, inputPlaceholder, onConfirm, textareaValue, textareaPlaceholder, textareaLabel, onTextareaConfirm}){
+  const modal = document.getElementById("actionModal");
+  const titleEl = document.getElementById("actionTitle");
+  const bodyEl = document.getElementById("actionBody");
+  const inputWrap = document.getElementById("actionInputWrap");
+  const input = document.getElementById("actionInput");
+  const textareaWrap = document.getElementById("actionTextareaWrap");
+  const textarea = document.getElementById("actionTextarea");
+  const textareaLabelEl = document.getElementById("actionTextareaLabel");
+  const confirmBtn = document.getElementById("actionConfirm");
+  const cancelBtn = document.getElementById("actionCancel");
+
+  titleEl.textContent = title || "Aktion";
+  bodyEl.textContent = body || "";
+
+  confirmBtn.onclick = null;
+  cancelBtn.onclick = closeActionModal;
+  inputWrap.style.display = "none";
+  input.value = "";
+  textareaWrap.style.display = "none";
+  textarea.value = "";
+
+  if(typeof onTextareaConfirm === "function"){
+    textareaWrap.style.display = "block";
+    textareaLabelEl.textContent = textareaLabel || "Notizen";
+    textarea.placeholder = textareaPlaceholder || "Notiz eintragen...";
+    textarea.value = textareaValue ?? "";
+    confirmBtn.style.display = "inline-flex";
+    confirmBtn.textContent = confirmText || "Notiz speichern";
+    confirmBtn.onclick = ()=>onTextareaConfirm(textarea.value);
+    setTimeout(()=>textarea.focus(), 50);
+  }else if(typeof onConfirm === "function"){
+    inputWrap.style.display = "block";
+    input.placeholder = inputPlaceholder || "Wert eingeben";
+    input.value = inputValue ?? "";
+    confirmBtn.style.display = "inline-flex";
+    confirmBtn.textContent = confirmText || "Speichern";
+    confirmBtn.onclick = ()=>onConfirm(input.value);
+    setTimeout(()=>input.focus(), 50);
+  }else{
+    confirmBtn.style.display = "none";
+  }
+
+  modal.style.display = "block";
+  modal.setAttribute("aria-hidden","false");
+  document.body.classList.add("modalOpen");
+}
+function closeActionModal(){
+  const modal = document.getElementById("actionModal");
+  modal.style.display = "none";
+  modal.setAttribute("aria-hidden","true");
+  document.body.classList.remove("modalOpen");
+}
+function paySingleDebt(i){
+  let d=debts[i];
+  if(d.status==="bezahlt"){
+    openActionModal({title:"Abbau", body:"Diese Schuld ist bereits bezahlt."});
+    return;
+  }
+
+  const handlePayConfirm = (rawValue)=>{
+      let payAmount=parseFloat(String(rawValue).replace(",","."));
+      if(isNaN(payAmount)||payAmount<=0){
+        openActionModal({
+          title:"Ungültiger Betrag",
+          body:"Bitte gib einen gültigen Betrag größer als 0 ein.",
+          confirmText:"Abbau speichern",
+          inputValue:rawValue,
+          inputPlaceholder:"Betrag eingeben",
+          onConfirm:handlePayConfirm
+        });
+        return;
+      }
+      const todayStr=new Date().toISOString().slice(0,10);
+      if(!d.history) d.history=[];
+      d.history.push({date:todayStr, amount: Math.min(payAmount, Number(d.betrag)||0)});
+
+      if(payAmount>=d.betrag){d.betrag=0; d.status="bezahlt";}
+      else{d.betrag = (Number(d.betrag)||0) - payAmount;}
+
+      d.datum=todayStr;
+      save();
+      render();
+      closeActionModal();
+  };
+
+  openActionModal({
+    title:"Schuld abbauen",
+    body:"Wie viel möchtest du von dieser Schuld bezahlen?\n\nAktuelle Restschuld: " + (Number(d.betrag)||0).toFixed(2) + " €",
+    confirmText:"Abbau speichern",
+    inputValue:"",
+    inputPlaceholder:"Betrag eingeben",
+    onConfirm:handlePayConfirm
+  });
+}
+function showHistory(i){
+  const d=debts[i];
+  if(!d.history || d.history.length===0){
+    openActionModal({title:"Historie", body:"Keine Abbauten bisher."});
+    return;
+  }
+  const sorted=[...d.history].sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const lines=sorted.map(h => h.date + "  –  " + (Number(h.amount)||0).toFixed(2) + " €");
+  openActionModal({title:"Historie von " + d.name, body:lines.join("\n")});
+}
+function showInfo(i){
+  const d=debts[i];
+  const paidSum = sumHistory(d);
+  const remaining = Number(d.betrag)||0;
+  const original = paidSum + remaining;
+  const count = (d.history && Array.isArray(d.history)) ? d.history.length : 0;
+  const lastDate = lastPaymentDate(d);
+
+  const msg =
+    "Name: " + d.name + "\n" +
+    "Grund: " + d.grund + "\n" +
+    "Ursprünglich: " + original.toFixed(2) + " €\n" +
+    "Bereits abgebaut: " + paidSum.toFixed(2) + " €\n" +
+    "Restschuld: " + remaining.toFixed(2) + " €\n" +
+    "Status: " + (d.status || "–") + "\n" +
+    "Anzahl Zahlungen: " + count + "\n" +
+    "Letzte Zahlung: " + lastDate;
+
+  openActionModal({
+    title:"Info",
+    body:msg,
+    confirmText:"Notiz speichern",
+    textareaLabel:"Notizen",
+    textareaPlaceholder:"Hier kannst du Notizen zu dieser Schuld speichern...",
+    textareaValue:d.notes || "",
+    onTextareaConfirm:(value)=>{
+      debts[i].notes = String(value || "").trim();
+      save();
+      render();
+      closeActionModal();
+      showToast("Notiz gespeichert ✅");
+    }
+  });
+}
+
+function render(){
+  const s=(document.getElementById("search").value||"").toLowerCase();
+  let sum=0,open=0,paid=0;
+  const tbody=document.getElementById("tbody");
+  tbody.innerHTML="";
+  const mobile=document.getElementById("mobileList");
+  mobile.innerHTML="";
+
+  debts.forEach((d,i)=>{
+    if(s && !JSON.stringify(d).toLowerCase().includes(s)) return;
+
+    sum+=Number(d.betrag)||0;
+    if(d.status==="offen") open+=Number(d.betrag)||0; else paid+=Number(d.betrag)||0;
+
+    const badgeClass = (d.status==="offen") ? "badgeOpen" : "badgePaid";
+    const badgeText  = (d.status==="offen") ? "OFFEN" : "BEZAHLT";
+
+    const row = document.createElement("tr");
+    row.innerHTML =
+      "<td><strong>"+escapeHtml(d.name)+"</strong></td>" +
+      "<td>"+escapeHtml(d.grund)+"</td>" +
+      "<td><strong>"+(Number(d.betrag)||0).toFixed(2)+" €</strong></td>" +
+      "<td>"+(d.datum||"")+"</td>" +
+      "<td><span class='"+badgeClass+"'>"+badgeText+"</span></td>" +
+      "<td>" +
+        "<div class='actionRow'>" +
+          "<button class='btn-status' type='button'>Status</button>" +
+          "<button class='btn-delete' type='button'>Löschen</button>" +
+          "<button class='btn-pay' type='button'>Abbauen</button>" +
+          "<button class='btn-history' type='button'>Historie</button>" +
+          "<button class='btn-info' type='button'>Info</button>" +
+        "</div>" +
+      "</td>";
+    const btns = row.querySelectorAll("button");
+    btns[0].addEventListener("click", ()=>toggleStatus(i));
+    btns[1].addEventListener("click", ()=>removeDebt(i));
+    btns[2].addEventListener("click", ()=>paySingleDebt(i));
+    btns[3].addEventListener("click", ()=>showHistory(i));
+    btns[4].addEventListener("click", ()=>showInfo(i));
+    tbody.appendChild(row);
+
+    const card = document.createElement("div");
+    card.className="mobileCard";
+    card.innerHTML =
+      "<div class='mobileTop'>" +
+        "<div>" +
+          "<div style='font-weight:800;font-size:18px;'>"+escapeHtml(d.name)+"</div>" +
+          "<div style='color:var(--muted);margin-top:4px;'>"+escapeHtml(d.grund)+"</div>" +
+        "</div>" +
+        "<span class='badge "+badgeClass+"'>"+badgeText+"</span>" +
+      "</div>" +
+      "<div class='amount'>" +
+        "<div><span style='display:block;color:var(--muted);font-size:12px;margin-bottom:6px;'>Restbetrag</span><strong>"+(Number(d.betrag)||0).toFixed(2)+" €</strong></div>" +
+      "</div>" +
+      "<div class='mobileMeta'>" +
+        "<div class='metaItem'><span>Datum</span><strong>"+(d.datum||"–")+"</strong></div>" +
+        "<div class='metaItem'><span>Zahlungen</span><strong>"+((d.history && d.history.length) || 0)+" Einträge</strong></div>" +
+      "</div>" +
+      "<div class='mobileRow' style='margin-top:14px;'>" +
+        "<button class='actionBtn btn-status' type='button'><span class='ico'>↺</span><span class='lbl'>Status</span></button>" +
+        "<button class='actionBtn btn-delete' type='button'><span class='ico'>✕</span><span class='lbl'>Löschen</span></button>" +
+        "<button class='actionBtn btn-pay' type='button'><span class='ico'>€</span><span class='lbl'>Abbau</span></button>" +
+        "<button class='actionBtn btn-history' type='button'><span class='ico'>◷</span><span class='lbl'>Historie</span></button>" +
+        "<button class='actionBtn btn-info' type='button'><span class='ico'>i</span><span class='lbl'>Info</span></button>" +
+      "</div>";
+    const cbtns = card.querySelectorAll("button");
+    cbtns[0].addEventListener("click", ()=>toggleStatus(i));
+    cbtns[1].addEventListener("click", ()=>removeDebt(i));
+    cbtns[2].addEventListener("click", ()=>paySingleDebt(i));
+    cbtns[3].addEventListener("click", ()=>showHistory(i));
+    cbtns[4].addEventListener("click", ()=>showInfo(i));
+    mobile.appendChild(card);
+  });
+
+  document.getElementById("sum").innerText = formatEUR(sum);
+  document.getElementById("open").innerText = formatEUR(open);
+  document.getElementById("paid").innerText = formatEUR(paid);
+}
+
+function formatEUR(value){
+  return new Intl.NumberFormat('de-DE', {minimumFractionDigits:2, maximumFractionDigits:2}).format(Number(value)||0) + ' €';
+}
+function updateThemeButton(){
+  document.body.classList.remove("softlight");
+  document.body.classList.add("dark");
+  localStorage.setItem("godmode_dark","1");
+  const btn = document.getElementById("btnDark");
+  if(btn) btn.textContent = "🌙 Dark Mode";
+}
+
+function escapeHtml(str){
+  return String(str||"")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+
+function exportExcel(){
+  const ws=XLSX.utils.json_to_sheet(debts);
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,"Schulden");
+  XLSX.writeFile(wb,"godmode_schulden.xlsx");
+}
+function exportPDF(){
+  const {jsPDF}=window.jspdf;
+  const doc=new jsPDF();
+  doc.text("Schulden Manager Report",14,15);
+  const rows=debts.map(d=>[d.name,d.grund,(Number(d.betrag)||0).toFixed(2)+"€",d.datum,d.status]);
+  doc.autoTable({head:[["Name","Grund","Betrag","Datum","Status"]],body:rows,startY:20});
+  doc.save("schulden_report.pdf");
+}
+function clearAll(){
+  if(confirm("Alles löschen?")){
+    debts=[];
+    save();
+    render();
+  }
+}
+
+function openAddModal(){
+  const modal = document.getElementById("addModal");
+  modal.style.display = "block";
+  modal.setAttribute("aria-hidden","false");
+  document.body.classList.add("modalOpen");
+  document.getElementById("m_status").value = "offen";
+  setTimeout(()=>document.getElementById("m_name").focus(), 50);
+}
+function closeAddModal(){
+  const modal = document.getElementById("addModal");
+  modal.style.display = "none";
+  modal.setAttribute("aria-hidden","true");
+  document.body.classList.remove("modalOpen");
+}
+function clearModalInputs(){
+  document.getElementById("m_name").value="";
+  document.getElementById("m_grund").value="";
+  document.getElementById("m_betrag").value="";
+  document.getElementById("m_datum").value="";
+  document.getElementById("m_status").value="offen";
+}
+
+document.getElementById("btnDesktop").addEventListener("click", ()=>setView("desktop"));
+document.getElementById("btnMobile").addEventListener("click", ()=>setView("mobile"));
+document.getElementById("btnAdd").addEventListener("click", ()=>{
+  if(addDebtFromInputs("")){
+    document.getElementById("name").value="";
+    document.getElementById("grund").value="";
+    document.getElementById("betrag").value="";
+    document.getElementById("datum").value="";
+    document.getElementById("status").value="offen";
+  }
+});
+document.getElementById("btnDark")?.addEventListener("click", toggleDark);
+document.getElementById("btnBackup").addEventListener("click", downloadBackup);
+document.getElementById("btnBackupPick").addEventListener("click", ()=>downloadBackupWithPicker().catch(err=>{console.error(err); alert("Konnte Speicher-Dialog nicht öffnen.");}));
+document.getElementById("btnRestore").addEventListener("click", triggerRestore);
+document.getElementById("restoreFile").addEventListener("change", restoreBackup);
+document.getElementById("btnExcel").addEventListener("click", exportExcel);
+document.getElementById("btnPDF").addEventListener("click", exportPDF);
+document.getElementById("btnClear").addEventListener("click", clearAll);
+document.getElementById("fabAdd").addEventListener("click", openAddModal);
+document.getElementById("addModal").addEventListener("click", (e)=>{ if(e.target.id==="addModal") closeAddModal(); });
+const actionModalEl = document.getElementById("actionModal");
+if(actionModalEl){ actionModalEl.addEventListener("click", (e)=>{ if(e.target.id==="actionModal") closeActionModal(); }); }
+document.getElementById("m_add").addEventListener("click", ()=>{
+  document.getElementById("name").value = document.getElementById("m_name").value;
+  document.getElementById("grund").value = document.getElementById("m_grund").value;
+  document.getElementById("betrag").value = document.getElementById("m_betrag").value;
+  document.getElementById("datum").value = document.getElementById("m_datum").value;
+  document.getElementById("status").value = document.getElementById("m_status").value;
+
+  if(addDebtFromInputs("")){
+    clearModalInputs();
+    closeAddModal();
+  }
+});
+document.addEventListener("keydown", (e)=>{ if(e.key==="Escape"){ closeAddModal(); closeActionModal(); } });
+document.getElementById("search").addEventListener("input", render);
+
+
+window.addEventListener('beforeinstallprompt', (event) => {
+  event.preventDefault();
+  deferredInstallPrompt = event;
+  updateInstallUI();
+});
+window.addEventListener('appinstalled', () => {
+  deferredInstallPrompt = null;
+  updateInstallUI();
+  showToast('App erfolgreich installiert.');
+});
+
+updateInstallUI();
+setView(currentView);
+if(window.matchMedia && window.matchMedia("(max-width: 768px)").matches){
+  setView("mobile");
+}
+try{
+  if(window.matchMedia && window.matchMedia("(max-width: 768px)").matches){
+    const inf = document.getElementById("inlineForm");
+    if(inf) inf.style.display = "none";
+  }
+}catch(e){}
+window.openAddModal = openAddModal;
+window.downloadBackup = downloadBackup;
+window.triggerRestore = triggerRestore;
+updateThemeButton();
+render();
+</script>
+
+<nav class="mobileBottomNav" aria-label="Navigation">
+  <button id="navHome" class="navBtn" type="button" data-action="home" aria-label="Übersicht" title="Übersicht">🏠<span>Home</span></button>
+  <button id="navStats" class="navBtn" type="button" data-action="stats" aria-label="Statistik" title="Statistik">📊<span>Stats</span></button>
+  <button id="navAdd" class="navBtn navPlus" type="button" data-action="add" aria-label="Neu" title="Neu">＋</button>
+  <button id="navBackup" class="navBtn" type="button" data-action="backup" aria-label="Backup" title="Backup">💾<span>Backup</span></button>
+  <button id="navRestore" class="navBtn" type="button" data-action="restore" aria-label="Restore" title="Restore">📂<span>Restore</span></button>
+</nav>
+
+<script>
+(function(){
+  const actions = {
+    home(){ window.scrollTo({top:0, behavior:"smooth"}); },
+    stats(){ const el = document.getElementById("statsCard"); if(el) el.scrollIntoView({behavior:"smooth", block:"start"}); },
+    add(){ if(typeof window.openAddModal === "function") window.openAddModal(); },
+    backup(){ if(typeof window.downloadBackup === "function") window.downloadBackup(); },
+    restore(){ if(typeof window.triggerRestore === "function") window.triggerRestore(); }
+  };
+
+  const runAction = (evt) => {
+    const btn = evt.target.closest("[data-action]");
+    if(!btn) return;
+    if(evt.type === "touchend") evt.preventDefault();
+    const action = btn.dataset.action;
+    if(actions[action]) actions[action]();
+  };
+
+  const nav = document.querySelector('.mobileBottomNav');
+  if(nav){
+    nav.addEventListener('click', runAction, {passive:false});
+    nav.addEventListener('touchend', runAction, {passive:false});
+    nav.addEventListener('pointerup', runAction, {passive:false});
+  }
+})();
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').then((reg)=>{ reg.update().catch(()=>{}); }).catch(console.error);
+  });
+}
+</script>
+</body>
+</html>

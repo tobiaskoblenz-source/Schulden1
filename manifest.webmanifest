@@ -1,0 +1,30 @@
+{
+  "name": "Schulden Manager Dark",
+  "short_name": "Schulden",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#06101c",
+  "theme_color": "#06101c",
+  "lang": "de",
+  "description": "Installierbarer Schulden Manager mit Backup, Restore und dauerhaftem Dark Mode. Version v3 mit Notizen im Info-Fenster.",
+  "categories": [
+    "finance",
+    "productivity"
+  ],
+  "icons": [
+    {
+      "src": "assets/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

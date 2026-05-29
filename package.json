@@ -1,0 +1,12 @@
+{
+  "name": "schulden-v3",
+  "version": "3.0.0",
+  "private": true,
+  "description": "Schulden Manager PWA Dark Mode - Railway Version",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
