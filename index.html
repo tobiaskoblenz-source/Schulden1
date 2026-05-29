@@ -12,7 +12,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="assets/icons/icon-192.png">
 <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
-<title>Schulden Manager – Dashboard Dark v17</title>
+<title>Schulden Manager – Dashboard Dark v18</title>
 
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
@@ -2023,6 +2023,332 @@ body.force-mobile-view .dashboardShell{
 }
 </style>
 
+
+<style id="v18-tablet-v8-mobile-view">
+/* v18 – Handy UND Tablet wie v8-Kartenansicht */
+
+/* Tablet/Handy bis 1180px bekommen die v8-Kartenansicht */
+@media (max-width:1180px){
+  body.dark .container{
+    padding:14px 12px 122px !important;
+    max-width:720px !important;
+    width:100% !important;
+    margin:0 auto !important;
+  }
+
+  body.dark .appFrame{
+    height:auto !important;
+    overflow:visible !important;
+    padding:0 !important;
+    background:transparent !important;
+    border:0 !important;
+    box-shadow:none !important;
+  }
+
+  .dashboardShell{
+    display:block !important;
+    min-height:auto !important;
+    height:auto !important;
+  }
+
+  .sidebar,
+  .desktopDetailPanel{
+    display:none !important;
+  }
+
+  .contentArea{
+    display:block !important;
+    height:auto !important;
+    overflow:visible !important;
+    padding:0 !important;
+  }
+
+  .heroDashboard{
+    margin-bottom:14px !important;
+    padding:0 !important;
+    background:transparent !important;
+    border:0 !important;
+    box-shadow:none !important;
+  }
+
+  .dashboardHeader{
+    display:block !important;
+    padding:0 !important;
+  }
+
+  .dashboardHeader h1{
+    font-size:28px !important;
+    margin:8px 0 6px !important;
+    line-height:1.08 !important;
+  }
+
+  .dashboardHeader p{
+    font-size:14px !important;
+    line-height:1.45 !important;
+  }
+
+  .heroTopActions{
+    display:grid !important;
+    grid-template-columns:1fr !important;
+    gap:10px !important;
+    margin-top:12px !important;
+  }
+
+  .visibleViewSwitch{
+    display:grid !important;
+    grid-template-columns:1fr 1fr !important;
+    width:100% !important;
+    margin-bottom:0 !important;
+  }
+
+  .visibleViewSwitch button,
+  .heroTopActions > button{
+    width:100% !important;
+    min-height:48px !important;
+    border-radius:16px !important;
+    font-size:14px !important;
+  }
+
+  .dashboardContentGrid,
+  .dashboardMainColumn{
+    display:block !important;
+  }
+
+  .actionToolbarCard{
+    padding:16px !important;
+    border-radius:22px !important;
+    margin-bottom:14px !important;
+  }
+
+  .compactTitle{
+    margin-bottom:12px !important;
+  }
+
+  .compactTitle h2{
+    font-size:20px !important;
+  }
+
+  .compactTitle span{
+    font-size:13px !important;
+  }
+
+  .actionToolbarGrid{
+    display:grid !important;
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+    gap:10px !important;
+  }
+
+  .actionToolbarGrid button{
+    min-height:48px !important;
+    border-radius:16px !important;
+    font-size:13px !important;
+    padding:0 10px !important;
+  }
+
+  .backupPill{
+    margin-top:10px !important;
+    padding:10px 12px !important;
+    font-size:12px !important;
+  }
+
+  .installHint{
+    font-size:12px !important;
+  }
+
+  .dashboardStats{
+    display:grid !important;
+    grid-template-columns:1fr !important;
+    gap:12px !important;
+    margin-bottom:14px !important;
+  }
+
+  .dashboardStats .stat{
+    padding:18px !important;
+    border-radius:20px !important;
+  }
+
+  .dashboardStats .statValue{
+    font-size:28px !important;
+  }
+
+  .debtBoardCard{
+    padding:16px !important;
+    border-radius:22px !important;
+    margin-bottom:0 !important;
+    display:block !important;
+    height:auto !important;
+    overflow:visible !important;
+  }
+
+  .boardHeader{
+    display:block !important;
+    margin-bottom:12px !important;
+  }
+
+  .boardHeader h2{
+    font-size:24px !important;
+    margin-bottom:4px !important;
+  }
+
+  .boardHeader span{
+    font-size:13px !important;
+  }
+
+  .boardToolbar{
+    display:grid !important;
+    grid-template-columns:1fr !important;
+    gap:10px !important;
+    margin-bottom:14px !important;
+  }
+
+  body.dark #search,
+  body.dark #statusFilter{
+    min-height:48px !important;
+    border-radius:16px !important;
+    font-size:15px !important;
+  }
+
+  #desktopTable{
+    display:none !important;
+  }
+
+  #mobileList{
+    display:grid !important;
+    gap:14px !important;
+  }
+
+  .mobileCard{
+    background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.03)) !important;
+    border:1px solid rgba(255,255,255,.08) !important;
+    border-radius:24px !important;
+    padding:18px !important;
+    box-shadow:none !important;
+  }
+
+  .mobileTop{
+    display:flex !important;
+    align-items:flex-start !important;
+    justify-content:space-between !important;
+    gap:12px !important;
+  }
+
+  .mobileCard .amount{
+    margin-top:14px !important;
+    display:flex !important;
+    align-items:end !important;
+    justify-content:space-between !important;
+    gap:12px !important;
+  }
+
+  .mobileCard .amount strong{
+    font-size:28px !important;
+    letter-spacing:-.03em !important;
+  }
+
+  .mobileMeta{
+    display:grid !important;
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+    gap:10px !important;
+    margin-top:14px !important;
+  }
+
+  .metaItem{
+    padding:12px 14px !important;
+    border-radius:16px !important;
+    background:rgba(255,255,255,.04) !important;
+    border:1px solid rgba(255,255,255,.06) !important;
+  }
+
+  .metaItem span{
+    display:block !important;
+    color:var(--muted) !important;
+    font-size:12px !important;
+    margin-bottom:5px !important;
+  }
+
+  .mobileRow{
+    display:grid !important;
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+    gap:10px !important;
+    margin-top:14px !important;
+  }
+
+  .mobileRow .actionBtn{
+    width:100% !important;
+    min-width:0 !important;
+    min-height:54px !important;
+    padding:10px 8px !important;
+    border-radius:16px !important;
+    font-size:13px !important;
+    line-height:1.1 !important;
+    display:flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    gap:6px !important;
+  }
+
+  .mobileRow .actionBtn .ico{
+    display:inline-flex !important;
+    font-size:15px !important;
+    line-height:1 !important;
+    background:transparent !important;
+    padding:0 !important;
+    min-width:auto !important;
+    min-height:auto !important;
+  }
+
+  .mobileRow .actionBtn .lbl{
+    display:block !important;
+  }
+
+  .mobileRow .btn-status{grid-column:1/2}
+  .mobileRow .btn-delete{grid-column:2/3}
+  .mobileRow .btn-pay{grid-column:1/2}
+  .mobileRow .btn-history{grid-column:2/3}
+  .mobileRow .btn-info{grid-column:1/2}
+  .mobileRow .btn-contact{grid-column:2/3}
+
+  .mobileActionMain,
+  .mobileTinyActions{
+    display:none !important;
+  }
+
+  .mobileBottomNav{
+    display:flex !important;
+  }
+}
+
+/* Größeres Tablet quer: immer noch v8, aber etwas breiter */
+@media (min-width:769px) and (max-width:1180px){
+  body.dark .container{
+    max-width:820px !important;
+  }
+
+  .dashboardHeader h1{
+    font-size:32px !important;
+  }
+
+  .dashboardStats{
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  }
+
+  .actionToolbarGrid{
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  }
+
+  .mobileCard{
+    padding:20px !important;
+  }
+}
+
+/* Nur große Bildschirme ab 1181px bleiben Desktop */
+@media (min-width:1181px){
+  body.force-mobile-view .container{
+    max-width:720px !important;
+  }
+}
+</style>
+
 </head>
 <body class="dark">
 <div class="container">
@@ -2063,7 +2389,7 @@ body.force-mobile-view .dashboardShell{
     <section class="hero heroDashboard">
       <div class="heroMain dashboardHeader">
         <div class="dashboardGreetingWrap">
-          <div class="eyebrow">Dark Dashboard · v17</div>
+          <div class="eyebrow">Dark Dashboard · v18</div>
           <h1 id="greetingTitle">Guten Abend!</h1>
           <p id="greetingText">Hier ist die Übersicht deiner Schulden.</p>
         </div>
@@ -4144,6 +4470,165 @@ if ('serviceWorker' in navigator) {
   window.addEventListener("orientationchange", () => setTimeout(() => applyManualView(manualView), 250));
 
   applyManualView(manualView);
+})();
+</script>
+
+
+<script id="v18-tablet-v8-render">
+(function(){
+  let manualView = localStorage.getItem("godmode_view") || "desktop";
+
+  function isCardView(){
+    return window.matchMedia("(max-width: 1180px)").matches || document.body.classList.contains("force-mobile-view");
+  }
+
+  function setVisibleButtonsV18(){
+    const desktop = document.getElementById("viewDesktopVisible");
+    const mobile = document.getElementById("viewMobileVisible");
+    const card = isCardView();
+    if(desktop) desktop.classList.toggle("activeView", !card);
+    if(mobile) mobile.classList.toggle("activeView", card);
+  }
+
+  function esc(str){
+    return String(str || "")
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#039;");
+  }
+
+  function label(status){
+    if(status === "bezahlt") return "BEZAHLT";
+    if(status === "teilzahlung") return "TEILZAHLUNG";
+    if(status === "klaerung") return "IN KLÄRUNG";
+    return "OFFEN";
+  }
+
+  function filteredPairs(){
+    const search = (document.getElementById("search")?.value || "").toLowerCase();
+    const filter = document.getElementById("statusFilter")?.value || "alle";
+    return debts.map((d,index)=>({d,index})).filter(({d})=>{
+      const okSearch = !search || JSON.stringify(d).toLowerCase().includes(search);
+      const okFilter = filter === "alle" ? true : String(d.status || "offen") === filter;
+      return okSearch && okFilter;
+    });
+  }
+
+  function updateStats(){
+    let sum = 0, open = 0, paid = 0;
+    debts.forEach(d=>{
+      const amount = Number(d.betrag) || 0;
+      sum += amount;
+      if(isOpenLikeStatus(d.status)) open += amount; else paid += amount;
+    });
+    const unique = new Set(debts.map(d=>String(d.name||"").trim()).filter(Boolean));
+    const set = (id,val)=>{ const el=document.getElementById(id); if(el) el.textContent = val; };
+    set("sum", formatEUR(sum));
+    set("open", formatEUR(open));
+    set("paid", formatEUR(paid));
+    set("personsCount", String(unique.size));
+    set("openShare", sum ? (open/sum*100).toFixed(1).replace(".",",") + " % der Gesamtsumme" : "0 % der Gesamtsumme");
+    set("paidShare", sum ? (paid/sum*100).toFixed(1).replace(".",",") + " % der Gesamtsumme" : "0 % der Gesamtsumme");
+  }
+
+  function renderCardsV8(pairs){
+    const mobile = document.getElementById("mobileList");
+    if(!mobile) return;
+    mobile.innerHTML = "";
+
+    pairs.forEach(({d,index:i})=>{
+      const badgeClass = isOpenLikeStatus(d.status) ? "badgeOpen" : "badgePaid";
+      const card = document.createElement("div");
+      card.className = "mobileCard";
+      card.innerHTML =
+        "<div class='mobileTop'>" +
+          "<div>" +
+            "<div style='font-weight:800;font-size:18px;'>"+esc(d.name)+"</div>" +
+            "<div style='color:var(--muted);margin-top:4px;'>"+esc(d.grund || "–")+"</div>" +
+          "</div>" +
+          "<span class='badge "+badgeClass+"'>"+label(d.status)+"</span>" +
+        "</div>" +
+        "<div class='amount'>" +
+          "<div><span style='display:block;color:var(--muted);font-size:12px;margin-bottom:6px;'>Restbetrag</span><strong>"+formatEUR(Number(d.betrag)||0)+"</strong></div>" +
+        "</div>" +
+        "<div class='mobileMeta'>" +
+          "<div class='metaItem'><span>Datum</span><strong>"+esc(d.datum || "–")+"</strong></div>" +
+          "<div class='metaItem'><span>Zahlungen</span><strong>"+(((d.history && d.history.length) || 0))+" Einträge</strong></div>" +
+        "</div>" +
+        "<div class='mobileRow'>" +
+          "<button class='actionBtn btn-status' type='button'><span class='ico'>↺</span><span class='lbl'>Status</span></button>" +
+          "<button class='actionBtn btn-delete' type='button'><span class='ico'>✕</span><span class='lbl'>Löschen</span></button>" +
+          "<button class='actionBtn btn-pay' type='button'><span class='ico'>€</span><span class='lbl'>Abbau</span></button>" +
+          "<button class='actionBtn btn-history' type='button'><span class='ico'>◷</span><span class='lbl'>Historie</span></button>" +
+          "<button class='actionBtn btn-info' type='button'><span class='ico'>i</span><span class='lbl'>Info</span></button>" +
+          "<button class='actionBtn btn-contact' type='button'><span class='ico'>☎</span><span class='lbl'>Ansprechpartner</span></button>" +
+        "</div>";
+
+      const b = card.querySelectorAll("button");
+      b[0].addEventListener("click", ()=>toggleStatus(i));
+      b[1].addEventListener("click", ()=>removeDebt(i));
+      b[2].addEventListener("click", ()=>paySingleDebt(i));
+      b[3].addEventListener("click", ()=>showHistory(i));
+      b[4].addEventListener("click", ()=>showInfo(i));
+      b[5].addEventListener("click", ()=>showContact(i));
+
+      mobile.appendChild(card);
+    });
+  }
+
+  const desktopRender = window.render;
+
+  window.render = function(){
+    if(isCardView()){
+      const pairs = filteredPairs();
+      updateStats();
+      const count = document.getElementById("debtCount");
+      if(count) count.textContent = String(pairs.length);
+
+      const tbody = document.getElementById("tbody");
+      if(tbody) tbody.innerHTML = "";
+
+      renderCardsV8(pairs);
+
+      const desktopTable = document.getElementById("desktopTable");
+      const mobileList = document.getElementById("mobileList");
+      if(desktopTable) desktopTable.style.display = "none";
+      if(mobileList) mobileList.style.display = "grid";
+      setVisibleButtonsV18();
+      return;
+    }
+
+    if(typeof desktopRender === "function") desktopRender();
+
+    const desktopTable = document.getElementById("desktopTable");
+    const mobileList = document.getElementById("mobileList");
+    if(desktopTable) desktopTable.style.display = "block";
+    if(mobileList) mobileList.style.display = "none";
+    setVisibleButtonsV18();
+  };
+
+  function applyView(view){
+    manualView = view === "mobile" ? "mobile" : "desktop";
+    try{ localStorage.setItem("godmode_view", manualView); }catch(e){}
+
+    const small = window.matchMedia("(max-width: 1180px)").matches;
+    document.body.classList.toggle("force-mobile-view", manualView === "mobile" && !small);
+
+    render();
+  }
+
+  window.setView = applyView;
+
+  document.getElementById("viewDesktopVisible")?.addEventListener("click", () => applyView("desktop"));
+  document.getElementById("viewMobileVisible")?.addEventListener("click", () => applyView("mobile"));
+
+  window.addEventListener("resize", () => render());
+  window.addEventListener("orientationchange", () => setTimeout(render, 250));
+
+  // Tablet/Handy immer v8-Kartenansicht; große Desktop nur bei Desktop-Auswahl
+  applyView(manualView);
 })();
 </script>
 

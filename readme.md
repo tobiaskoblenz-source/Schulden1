@@ -1,3 +1,3 @@
-# Schulden v17
+# Schulden v18
 
-Desktop-Größe angepasst, Ansicht-Buttons Desktop/Handy zurück, Handy-Ansicht wieder wie v8.
+Handy-Ansicht wie v8 gilt jetzt auch für Tablet. Große Desktop-Bildschirme behalten die Desktop-Ansicht.
