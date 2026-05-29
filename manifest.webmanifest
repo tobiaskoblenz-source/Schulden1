@@ -8,7 +8,7 @@
   "background_color": "#06101c",
   "theme_color": "#06101c",
   "lang": "de",
-  "description": "Installierbarer Schulden Manager im Dark Dashboard Look mit rechter Detailseite, verbesserter Eingabe und optimierter Mobile-Ansicht. Version v12.",
+  "description": "Installierbarer Schulden Manager im Dark Dashboard Look mit responsiver Größe und repariertem Neue-Schuld-Formular. Version v13.",
   "categories": [
     "finance",
     "productivity"

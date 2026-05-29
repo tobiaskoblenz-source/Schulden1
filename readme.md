@@ -1,3 +1,3 @@
-# Schulden v12
+# Schulden v13
 
-Dark Dashboard Version für Railway mit rechter Detailseite, verfeinerter Neue-Schuld-Eingabe, exakteren Tabellenbuttons und verbesserter Handy-Ansicht.
+Railway-Version mit automatischer Größenanpassung und repariertem Neue-Schuld-Formular.

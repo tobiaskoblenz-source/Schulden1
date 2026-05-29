@@ -12,7 +12,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="assets/icons/icon-192.png">
 <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
-<title>Schulden Manager – Dashboard Dark v12</title>
+<title>Schulden Manager – Dashboard Dark v13</title>
 
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
@@ -1187,6 +1187,250 @@ body.dark .statusPill{background:#0f1c2f!important;border-color:rgba(255,255,255
 @media (max-width:768px){.boardToolbar{grid-template-columns:1fr;}.actionToolbarGrid{grid-template-columns:1fr 1fr;}.newDebtModal .statusPills{grid-template-columns:1fr 1fr;}.newDebtModal .modalActions.newDebtFooter{grid-template-columns:1fr;}.mobileActionMain{grid-template-columns:1fr 1fr 1fr;}.mobileRow{display:block!important;}.tableActions{grid-template-columns:1fr;}.tableUtilityActions{justify-content:flex-start;}}
 </style>
 
+
+<style id="v13-responsive-form-fix">
+/* v13 – responsive Größenanpassung + stabiles Neue-Schuld-Formular */
+:root{
+  --content-pad: clamp(12px, 2vw, 30px);
+  --sidebar-w: clamp(188px, 14vw, 228px);
+  --detail-w: clamp(340px, 27vw, 460px);
+}
+.dashboardShell{
+  grid-template-columns: var(--sidebar-w) minmax(0,1fr) !important;
+}
+.contentArea{
+  padding: var(--content-pad) !important;
+  min-width:0;
+}
+.dashboardContentGrid{
+  grid-template-columns: minmax(0,1fr) var(--detail-w) !important;
+  gap: clamp(12px, 1.4vw, 22px) !important;
+}
+.dashboardStats{
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)) !important;
+}
+.actionToolbarGrid{
+  grid-template-columns: repeat(auto-fit, minmax(145px, 1fr)) !important;
+}
+.boardToolbar{
+  grid-template-columns: minmax(0,1fr) minmax(150px, 220px) !important;
+}
+body.dark tbody td:last-child{
+  min-width: clamp(300px, 25vw, 420px) !important;
+}
+.dashboardHeader{
+  display:flex !important;
+  flex-wrap:wrap;
+  align-items:flex-start;
+}
+.heroTopActions{
+  margin-left:auto;
+}
+.desktopDetailPanel{
+  width:100%;
+  min-width:0;
+}
+.desktopPanelBody{
+  max-height: calc(100dvh - 116px);
+}
+.boardHeader h2{
+  font-size: clamp(26px, 2.6vw, 36px) !important;
+}
+.dashboardHeader h1{
+  font-size: clamp(30px, 3.4vw, 52px) !important;
+}
+.tableActions{
+  grid-template-columns: repeat(3, max-content) 1fr !important;
+}
+.tableUtilityActions{
+  min-width:0;
+}
+
+/* Formular als echtes Slide-over / Modal */
+#addModal{
+  align-items:center;
+  justify-content:center;
+}
+#addModal[aria-hidden="false"]{
+  display:flex !important;
+}
+#addModal .newDebtModal{
+  width:min(980px, calc(100vw - 24px)) !important;
+  max-height:calc(100dvh - 24px) !important;
+  overflow:auto !important;
+  margin:0 !important;
+}
+#addModal .modalHeaderRow{
+  position:sticky;
+  top:-1px;
+  z-index:5;
+  padding-bottom:14px;
+  background:linear-gradient(180deg, rgba(11,20,34,.98), rgba(11,20,34,.92));
+  border-bottom:1px solid rgba(255,255,255,.06);
+}
+#addModal .newDebtSteps{
+  display:grid;
+  grid-template-columns: 1fr 1.25fr;
+  gap:16px;
+}
+#addModal .newDebtStep{
+  min-width:0;
+}
+#addModal .newDebtStep:nth-child(2),
+#addModal .newDebtStep:nth-child(4){
+  grid-column:2;
+}
+#addModal .newDebtStep:nth-child(3){
+  grid-column:1;
+  grid-row:2 / span 2;
+}
+#addModal .newDebtStep:nth-child(1){
+  grid-column:1;
+}
+#addModal .newDebtGrid{
+  grid-template-columns: repeat(2, minmax(0,1fr)) !important;
+}
+#addModal input,
+#addModal textarea,
+#addModal select{
+  width:100%;
+}
+#addModal .noteBox{
+  max-height:220px;
+}
+#addModal .statusPills{
+  grid-template-columns: repeat(2, minmax(0,1fr)) !important;
+}
+#newDebtContactFields[hidden]{
+  display:none !important;
+}
+#newDebtContactFields:not([hidden]){
+  display:block !important;
+}
+#addModal .modalActions.newDebtFooter{
+  position:sticky;
+  bottom:-1px;
+  z-index:5;
+  margin-top:18px !important;
+  padding-top:14px;
+  padding-bottom:2px;
+  background:linear-gradient(180deg, rgba(8,16,29,0), rgba(8,16,29,.95) 35%, rgba(8,16,29,.99));
+}
+
+/* Ausgewählte Zeile sichtbar markieren */
+body.dark tbody tr.selectedRow td{
+  border-color:rgba(79,140,255,.42) !important;
+  background:linear-gradient(180deg, rgba(17,34,58,.98), rgba(10,22,39,.98)) !important;
+}
+
+/* Tablet */
+@media (max-width:1280px){
+  .dashboardShell{
+    grid-template-columns: 1fr !important;
+  }
+  .sidebar{
+    display:none !important;
+  }
+  .dashboardContentGrid{
+    grid-template-columns:minmax(0,1fr) !important;
+  }
+  .desktopDetailPanel{
+    position:relative !important;
+    top:auto !important;
+    min-height:auto !important;
+    order:-1;
+  }
+  .desktopPanelBody{
+    max-height:520px;
+  }
+  .heroTopActions{
+    margin-left:0;
+  }
+}
+
+/* Handy */
+@media (max-width:768px){
+  .contentArea{
+    padding:12px 10px 118px !important;
+  }
+  .dashboardHeader{
+    padding:4px 2px 0 !important;
+  }
+  .heroTopActions{
+    display:flex !important;
+    width:100%;
+  }
+  .heroTopActions button{
+    flex:1 1 160px;
+  }
+  .actionToolbarGrid{
+    grid-template-columns: repeat(2, minmax(0,1fr)) !important;
+  }
+  .dashboardStats{
+    grid-template-columns:1fr !important;
+    gap:12px !important;
+  }
+  .boardToolbar{
+    grid-template-columns:1fr !important;
+  }
+  .desktopDetailPanel{
+    display:none !important;
+  }
+  #desktopTable{
+    display:none !important;
+  }
+  #mobileList{
+    display:grid !important;
+  }
+  #addModal{
+    padding:8px !important;
+    align-items:flex-start;
+  }
+  #addModal .newDebtModal{
+    width:100% !important;
+    max-height:calc(100dvh - 16px) !important;
+    border-radius:22px !important;
+    padding:18px !important;
+  }
+  #addModal .newDebtSteps{
+    grid-template-columns:1fr !important;
+  }
+  #addModal .newDebtStep:nth-child(1),
+  #addModal .newDebtStep:nth-child(2),
+  #addModal .newDebtStep:nth-child(3),
+  #addModal .newDebtStep:nth-child(4){
+    grid-column:auto !important;
+    grid-row:auto !important;
+  }
+  #addModal .newDebtGrid{
+    grid-template-columns:1fr !important;
+  }
+  #addModal .statusPills{
+    grid-template-columns:1fr 1fr !important;
+  }
+  #addModal .modalActions.newDebtFooter{
+    grid-template-columns:1fr !important;
+  }
+  .mobileBottomNav{
+    display:flex !important;
+  }
+}
+@media (max-width:430px){
+  .actionToolbarGrid{
+    grid-template-columns:1fr !important;
+  }
+  #addModal .statusPills{
+    grid-template-columns:1fr !important;
+  }
+  .mobileActionMain{
+    grid-template-columns:1fr !important;
+  }
+  .mobileTinyActions{
+    justify-content:space-between;
+  }
+}
+</style>
+
 </head>
 <body class="dark">
 <div class="container">
@@ -1227,7 +1471,7 @@ body.dark .statusPill{background:#0f1c2f!important;border-color:rgba(255,255,255
     <section class="hero heroDashboard">
       <div class="heroMain dashboardHeader">
         <div class="dashboardGreetingWrap">
-          <div class="eyebrow">Dark Dashboard · v12</div>
+          <div class="eyebrow">Dark Dashboard · v13</div>
           <h1 id="greetingTitle">Guten Abend!</h1>
           <p id="greetingText">Hier ist die Übersicht deiner Schulden.</p>
         </div>
@@ -2791,6 +3035,215 @@ if ('serviceWorker' in navigator) {
   });
 
   render();
+})();
+</script>
+
+
+<script id="v13-form-fix-script">
+(function(){
+  const $ = (id) => document.getElementById(id);
+
+  function safeToast(msg){
+    if(typeof showToast === "function") showToast(msg);
+    else alert(msg);
+  }
+
+  function parseAmountV13(value){
+    const cleaned = String(value || "")
+      .replace(/\s/g, "")
+      .replace(/€/g, "")
+      .replace(/\./g, "")
+      .replace(",", ".");
+    return Number.parseFloat(cleaned);
+  }
+
+  function setStatusV13(status){
+    const allowed = ["offen","bezahlt","teilzahlung","klaerung"];
+    const value = allowed.includes(status) ? status : "offen";
+    const hidden = $("m_status");
+    if(hidden) hidden.value = value;
+    document.querySelectorAll(".statusPill").forEach(btn => {
+      btn.classList.toggle("active", btn.dataset.status === value);
+    });
+  }
+
+  function openContactFields(){
+    const fields = $("newDebtContactFields");
+    const toggle = $("toggleContactFields");
+    if(fields) fields.hidden = false;
+    if(toggle) toggle.setAttribute("aria-expanded","true");
+  }
+
+  function clearFormV13(){
+    [
+      "m_name","m_grund","m_betrag","m_datum",
+      "m_contactRepresentative","m_contactAddress","m_contactEmail","m_contactPhone",
+      "m_firstNote"
+    ].forEach(id => {
+      const el = $(id);
+      if(el) el.value = "";
+    });
+    setStatusV13("offen");
+    const fields = $("newDebtContactFields");
+    const toggle = $("toggleContactFields");
+    if(fields) fields.hidden = true;
+    if(toggle) toggle.setAttribute("aria-expanded","false");
+  }
+
+  window.openAddModal = function(){
+    const modal = $("addModal");
+    if(!modal){
+      alert("Formular wurde nicht gefunden.");
+      return;
+    }
+    modal.style.display = "flex";
+    modal.setAttribute("aria-hidden","false");
+    document.body.classList.add("modalOpen");
+    setStatusV13($("m_status")?.value || "offen");
+    setTimeout(() => $("m_name")?.focus(), 60);
+  };
+
+  window.closeAddModal = function(){
+    const modal = $("addModal");
+    if(!modal) return;
+    modal.style.display = "none";
+    modal.setAttribute("aria-hidden","true");
+    document.body.classList.remove("modalOpen");
+  };
+
+  function saveDebtV13(keepOpen){
+    const name = $("m_name")?.value.trim() || "";
+    const grund = $("m_grund")?.value.trim() || "";
+    const betrag = parseAmountV13($("m_betrag")?.value);
+    const datum = $("m_datum")?.value || "";
+    const status = $("m_status")?.value || "offen";
+
+    if(!name){
+      safeToast("Bitte Name eintragen.");
+      $("m_name")?.focus();
+      return false;
+    }
+    if(!grund){
+      safeToast("Bitte Grund eintragen.");
+      $("m_grund")?.focus();
+      return false;
+    }
+    if(!Number.isFinite(betrag) || betrag <= 0){
+      safeToast("Bitte Betrag korrekt eintragen.");
+      $("m_betrag")?.focus();
+      return false;
+    }
+
+    const contact = {
+      representative: $("m_contactRepresentative")?.value.trim() || "",
+      address: $("m_contactAddress")?.value.trim() || "",
+      email: $("m_contactEmail")?.value.trim() || "",
+      phone: $("m_contactPhone")?.value.trim() || ""
+    };
+    const note = $("m_firstNote")?.value.trim() || "";
+    const debt = {
+      name,
+      grund,
+      betrag,
+      datum,
+      status,
+      contactDetails: contact,
+      contactPerson: [contact.representative, contact.address, contact.email, contact.phone].filter(Boolean).join(" | "),
+      notes: "",
+      notesHistory: note ? [{ at: new Date().toISOString(), text: note }] : [],
+      history: []
+    };
+    if(typeof notesText === "function"){
+      debt.notes = notesText(debt);
+    }else{
+      debt.notes = note;
+    }
+
+    if(!Array.isArray(window.debts) && typeof debts !== "undefined"){
+      window.debts = debts;
+    }
+    debts.push(debt);
+    if(typeof save === "function") save();
+    if(typeof render === "function") render();
+
+    safeToast("Schuld gespeichert ✅");
+
+    if(keepOpen){
+      clearFormV13();
+      setTimeout(() => $("m_name")?.focus(), 60);
+    }else{
+      clearFormV13();
+      window.closeAddModal();
+    }
+    return true;
+  }
+
+  window.createDebtFromModal = function(opts = {}){
+    return saveDebtV13(Boolean(opts.keepOpen));
+  };
+
+  function bindFormButtons(){
+    document.querySelectorAll("#btnOpenAdd, #navAdd, #fabAdd, [data-action='add']").forEach(btn => {
+      btn.onclick = function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        window.openAddModal();
+      };
+    });
+
+    $("m_close") && ($("m_close").onclick = window.closeAddModal);
+    $("m_cancel") && ($("m_cancel").onclick = window.closeAddModal);
+    $("m_add") && ($("m_add").onclick = () => saveDebtV13(false));
+    $("m_add_more") && ($("m_add_more").onclick = () => saveDebtV13(true));
+
+    document.querySelectorAll(".statusPill").forEach(btn => {
+      btn.onclick = (e) => {
+        e.preventDefault();
+        setStatusV13(btn.dataset.status);
+      };
+    });
+
+    const toggle = $("toggleContactFields");
+    if(toggle){
+      toggle.onclick = (e) => {
+        e.preventDefault();
+        const fields = $("newDebtContactFields");
+        if(!fields) return;
+        const willOpen = fields.hidden;
+        fields.hidden = !willOpen;
+        toggle.setAttribute("aria-expanded", String(willOpen));
+        if(willOpen) setTimeout(() => $("m_contactRepresentative")?.focus(), 50);
+      };
+    }
+
+    const modal = $("addModal");
+    if(modal){
+      modal.onclick = (e) => {
+        if(e.target === modal) window.closeAddModal();
+      };
+    }
+  }
+
+  function responsiveView(){
+    const isMobile = window.matchMedia("(max-width: 768px)").matches;
+    const desktop = $("desktopTable");
+    const mobile = $("mobileList");
+    if(isMobile){
+      if(desktop) desktop.style.display = "none";
+      if(mobile) mobile.style.display = "grid";
+    }else{
+      if(desktop) desktop.style.display = "block";
+      if(mobile) mobile.style.display = "none";
+    }
+  }
+
+  document.addEventListener("keydown", (e) => {
+    if(e.key === "Escape") window.closeAddModal();
+  });
+
+  window.addEventListener("resize", responsiveView);
+  bindFormButtons();
+  responsiveView();
 })();
 </script>
 
