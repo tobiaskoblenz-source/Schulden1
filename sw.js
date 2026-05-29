@@ -1,4 +1,4 @@
-const VERSION = 'dark-v10';
+const VERSION = 'dark-v11';
 const CACHE_STATIC = `schulden-manager-static-${VERSION}`;
 const CACHE_RUNTIME = `schulden-manager-runtime-${VERSION}`;
 const APP_SHELL = [

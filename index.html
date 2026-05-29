@@ -12,7 +12,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="assets/icons/icon-192.png">
 <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
-<title>Schulden Manager – Dark Mode v10</title>
+<title>Schulden Manager – Dashboard Dark v11</title>
 
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
@@ -1074,116 +1074,216 @@ body.dark .newDebtIntro,body.dark .newDebtStep{background:rgba(255,255,255,.04);
 @media (max-width:900px){.newDebtStart{grid-template-columns:1fr}.newDebtActions{grid-template-columns:repeat(2,minmax(0,1fr));}.newDebtGrid{grid-template-columns:1fr}.statusPills{grid-template-columns:1fr 1fr}.newDebtFooter{grid-template-columns:1fr}.modalHeaderRow h3{font-size:23px}}
 @media (max-width:420px){.statusPills{grid-template-columns:1fr}.newDebtStep{padding:14px}.newDebtActions{grid-template-columns:1fr}.modalCloseBtn{width:46px;height:46px;min-width:46px}}
 </style>
+
+<style id="v11-dashboard-overrides">
+body.dark{background:radial-gradient(circle at 10% 0%, rgba(48,104,255,.12), transparent 22%), radial-gradient(circle at 100% 0%, rgba(91,76,255,.14), transparent 18%), linear-gradient(180deg,#050c16 0%,#08111d 35%,#0a1320 100%); color:#edf4ff;}
+body.dark .container{max-width:1700px;padding:0;}
+body.dark .appFrame{background:transparent;border:0;box-shadow:none;padding:0;}
+.dashboardShell{display:grid;grid-template-columns:216px minmax(0,1fr);min-height:100vh;gap:0;}
+.sidebar{position:sticky;top:0;height:100vh;padding:22px 14px;border-right:1px solid rgba(255,255,255,.08);background:linear-gradient(180deg,#07111d 0%, #08121f 45%, #060f18 100%);display:flex;flex-direction:column;justify-content:space-between;}
+.brandCard{display:flex;align-items:center;gap:14px;padding:10px 12px 18px;}
+.brandLogo{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:900;color:#fff;background:linear-gradient(135deg,#4f8cff,#2354d8);box-shadow:0 16px 30px rgba(79,140,255,.28);}
+.brandTitle{font-size:18px;font-weight:900;letter-spacing:-.02em;color:#fff;}
+.brandSub{font-size:18px;font-weight:800;color:#3f82ff;line-height:1.05;}
+.sidebarNav{display:grid;gap:8px;}
+.sideNavBtn{justify-content:flex-start;border-radius:16px;background:transparent!important;border:1px solid transparent!important;box-shadow:none!important;color:#d5e5ff!important;min-height:54px;padding:0 14px;display:flex;gap:12px;align-items:center;font-size:16px;font-weight:700;}
+.sideNavBtn.active,.sideNavBtn:hover{background:linear-gradient(180deg, rgba(24,51,84,.94), rgba(14,34,59,.92))!important;border-color:rgba(75,125,255,.16)!important;}
+.navIco{width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;border-radius:10px;background:rgba(255,255,255,.06);font-size:15px;}
+.sidebarBottom{display:grid;gap:14px;}
+.userMiniCard,.modeMiniCard{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px;border-radius:18px;background:linear-gradient(180deg, rgba(16,28,45,.98), rgba(10,20,34,.96));border:1px solid rgba(255,255,255,.08);}
+.userMiniAvatar{width:40px;height:40px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:#101b2c;}
+.userMiniCard strong{display:block;font-size:14px;color:#fff;}
+.userMiniCard span{display:block;font-size:12px;color:#9eb0cb;}
+.modeMiniCard span:first-child{font-weight:700;color:#d6e5ff;}
+.modeSwitchOn{width:34px;height:20px;border-radius:999px;background:#3979ff;position:relative;display:inline-block;}
+.modeSwitchOn::after{content:"";position:absolute;top:2px;right:2px;width:16px;height:16px;border-radius:50%;background:#fff;}
+.contentArea{padding:28px 30px 40px;}
+.heroDashboard{padding:0;margin-bottom:20px;background:transparent!important;border:0!important;box-shadow:none!important;}
+.dashboardHeader{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:10px 4px 0;}
+.dashboardHeader h1{font-size:clamp(32px,3vw,52px);margin:8px 0 6px;color:#fff;}
+.dashboardHeader p{font-size:18px;line-height:1.5;color:#92a8c7;}
+.heroTopActions{display:flex;gap:12px;flex-wrap:wrap;justify-content:flex-end;}
+.heroTopActions button,.actionToolbarGrid button{min-height:50px;border-radius:16px;font-size:15px;}
+.compactTitle{margin-bottom:16px;}
+.actionToolbarCard,.debtBoardCard,.dashboardStats .stat{background:linear-gradient(180deg, rgba(11,20,34,.96), rgba(8,16,29,.96))!important;border:1px solid rgba(255,255,255,.08)!important;box-shadow:0 16px 40px rgba(0,0,0,.22)!important;}
+.actionToolbarGrid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;}
+.backupPill{margin-top:14px;display:inline-flex;align-items:center;padding:12px 16px;border-radius:14px;background:rgba(79,140,255,.09);border:1px solid rgba(79,140,255,.16);color:#d7e6ff;font-weight:700;}
+.installHint{margin-top:10px;color:#8ea4c3;font-size:13px;}
+.dashboardStats{grid-template-columns:repeat(4,minmax(0,1fr));gap:18px;padding:0!important;background:transparent!important;border:0!important;box-shadow:none!important;}
+.dashboardStats .stat{padding:20px 22px;border-radius:22px;position:relative;overflow:hidden;}
+.dashboardStats .stat::after{content:"";position:absolute;left:22px;bottom:16px;width:86px;height:4px;border-radius:999px;background:rgba(255,255,255,.12);}
+.dashboardStats .statCardBlue::before,.dashboardStats .statCardOrange::before,.dashboardStats .statCardGreen::before,.dashboardStats .statCardPurple::before{content:"";position:absolute;right:-10px;top:-12px;width:100px;height:100px;border-radius:50%;filter:blur(10px);opacity:.22;}
+.dashboardStats .statCardBlue::before{background:#3778ff;}.dashboardStats .statCardOrange::before{background:#d58b2f;}.dashboardStats .statCardGreen::before{background:#31c66e;}.dashboardStats .statCardPurple::before{background:#7b6eff;}
+.dashboardStats .statLabel{font-size:14px;color:#b7c9e4;margin-bottom:10px;}.dashboardStats .statValue{font-size:24px;color:#fff;font-weight:900;}.dashboardStats em{margin-top:8px;color:#8fa5c4;font-size:13px;}
+.boardHeader{margin-bottom:14px;}
+.boardHeader h2{font-size:36px;color:#fff;}.boardHeader span{font-size:14px;color:#8ea4c3;}
+.boardToolbar{display:grid;grid-template-columns:minmax(0,1fr) 220px;gap:14px;margin-bottom:16px;}
+body.dark #search, body.dark #statusFilter{background:#0f1c2f;border-color:rgba(255,255,255,.08);color:#e8f1ff;min-height:50px;border-radius:16px;}
+.dashboardTableWrap{background:transparent!important;border:0!important;box-shadow:none!important;overflow:visible;}
+body.dark table{border-collapse:separate;border-spacing:0 10px;background:transparent!important;}
+body.dark thead th{background:transparent;color:#7f97b8;border:0;padding:0 16px 8px;font-size:12px;}
+body.dark tbody tr{box-shadow:none;background:transparent;}
+body.dark tbody td{background:linear-gradient(180deg, rgba(12,21,35,.98), rgba(8,17,29,.98));border-top:1px solid rgba(255,255,255,.08);border-bottom:1px solid rgba(255,255,255,.08);padding:16px;}
+body.dark tbody td:first-child{border-left:1px solid rgba(255,255,255,.08);border-top-left-radius:18px;border-bottom-left-radius:18px;}
+body.dark tbody td:last-child{border-right:1px solid rgba(255,255,255,.08);border-top-right-radius:18px;border-bottom-right-radius:18px;min-width:370px;}
+body.dark tbody tr:hover td{background:linear-gradient(180deg, rgba(14,25,43,.98), rgba(10,20,36,.98));}
+.nameCell{display:flex;align-items:center;gap:14px;}.avatarCircle{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;color:#fff;background:linear-gradient(135deg,#4f8cff,#7c71ff);box-shadow:0 10px 20px rgba(79,140,255,.25);} 
+.nameStack strong{display:block;color:#fff;font-size:16px;}.nameStack small,.reasonStack small{display:block;color:#8ea4c3;font-size:12px;margin-top:4px;}
+.reasonStack strong{display:block;color:#dfe9ff;font-size:15px;font-weight:700;}.dateText{color:#dfe9ff;font-weight:700;}.amountText{font-size:16px;font-weight:900;}.amountOpen{color:#ff7a8f;}.amountPaid{color:#5ee18f;}
+.statusBadge{display:inline-flex;align-items:center;justify-content:center;min-width:94px;padding:8px 12px;border-radius:999px;font-size:12px;font-weight:800;letter-spacing:.02em;border:1px solid transparent;}.status-open,.status-teilzahlung,.status-klaerung{background:rgba(245,170,60,.14);color:#ffc46c;border-color:rgba(245,170,60,.24);}.status-bezahlt{background:rgba(49,198,110,.14);color:#89f0b0;border-color:rgba(49,198,110,.22);}
+.tableActions,.mobileRow{display:flex;flex-wrap:wrap;gap:8px;}
+.tableActions .miniBtn,.mobileRow .miniBtn{min-height:40px;padding:0 12px;border-radius:12px;background:linear-gradient(180deg,#13243b,#0f1d31)!important;border:1px solid rgba(255,255,255,.08)!important;color:#e8f1ff!important;box-shadow:none!important;font-size:13px;font-weight:800;display:inline-flex;align-items:center;gap:8px;}
+.tableActions .miniBtn.primary{background:linear-gradient(135deg,#1b4fd8,#2d79ff)!important;}
+#mobileList{gap:12px;}.mobileCard{background:linear-gradient(180deg, rgba(12,21,35,.98), rgba(8,17,29,.98))!important;border-color:rgba(255,255,255,.08)!important;border-radius:22px;}.mobileTop strong,.mobileCard .amount strong{color:#fff;}.mobileMeta .metaItem{background:#101d2f;border-color:rgba(255,255,255,.06);}.mobileMeta .metaItem strong{color:#e4eeff;}.mobileMeta .metaItem span{color:#8ea4c3;}
+.infoDrawerOverlay{position:fixed;inset:0;background:rgba(2,8,16,.55);backdrop-filter:blur(8px);display:none;z-index:10040;justify-content:flex-end;padding:18px;}.infoDrawer{width:min(430px,100%);height:calc(100dvh - 36px);display:flex;flex-direction:column;border-radius:26px;background:linear-gradient(180deg, rgba(11,20,34,.98), rgba(8,16,29,.98));border:1px solid rgba(255,255,255,.08);box-shadow:0 28px 70px rgba(0,0,0,.35);overflow:hidden;}
+.infoDrawerHead{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:20px 20px 10px;border-bottom:1px solid rgba(255,255,255,.06);}.drawerEyebrow{display:inline-flex;padding:7px 10px;border-radius:999px;background:rgba(79,140,255,.12);border:1px solid rgba(79,140,255,.16);color:#cfe0ff;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;}.infoDrawerHead h3{margin:10px 0 0;font-size:34px;color:#fff;}
+.infoDrawerBody{padding:18px 18px 12px;overflow:auto;display:grid;gap:14px;}.drawerSection{padding:16px;border-radius:18px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);}.drawerSectionHead{display:flex;align-items:center;gap:10px;margin-bottom:12px;}.drawerSectionHead span{width:28px;height:28px;border-radius:10px;background:linear-gradient(135deg,#4f8cff,#7c71ff);display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:#fff;}.drawerSectionHead strong{font-size:16px;color:#fff;}.drawerBigValue{font-size:30px;font-weight:900;color:#fff;line-height:1.15;}
+.drawerList,.drawerFacts{display:grid;gap:12px;}.drawerRow,.drawerFact{display:grid;grid-template-columns:130px 1fr;gap:10px;align-items:flex-start;}.drawerRow span,.drawerFact span{color:#8ea4c3;font-size:13px;}.drawerRow strong,.drawerFact strong{color:#e4eeff;font-size:14px;line-height:1.5;white-space:pre-line;}
+.drawerValueActions{display:grid;gap:8px;}.miniActions{display:flex;flex-wrap:wrap;gap:8px;}.miniActionBtn,.miniActionLink{min-width:38px;height:38px;border-radius:12px;border:1px solid rgba(79,140,255,.16);background:#122847;color:#cfe0ff;display:inline-flex;align-items:center;justify-content:center;text-decoration:none;box-shadow:none;}
+.notesTimeline{display:grid;gap:10px;max-height:280px;overflow:auto;padding-right:4px;}.noteTimelineItem{position:relative;padding:12px 12px 12px 16px;border-radius:14px;background:#0f1c2e;border:1px solid rgba(255,255,255,.06);}.noteTimelineItem::before{content:"";position:absolute;left:7px;top:18px;width:7px;height:7px;border-radius:50%;background:#4f8cff;}.noteTimelineItem time{display:block;color:#9bb0cd;font-size:12px;margin-bottom:6px;padding-left:10px;}.noteTimelineItem p{margin:0;padding-left:10px;color:#eaf2ff;font-size:14px;line-height:1.5;}.noteTimelineEmpty{color:#8ea4c3;font-size:14px;}
+.infoDrawerFooter{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:16px 18px 18px;border-top:1px solid rgba(255,255,255,.06);background:linear-gradient(180deg, rgba(8,16,29,.2), rgba(8,16,29,.98) 35%);}
+.newDebtModal{width:min(920px,100%);} body.dark .newDebtModal .modalKicker{background:rgba(79,140,255,.12);border-color:rgba(79,140,255,.18);color:#d5e7ff;} body.dark .newDebtModal .newDebtStep{background:rgba(255,255,255,.03);}
+body.dark .modalOverlay{background:rgba(2,8,16,.6);} body.dark .modalBox{background:linear-gradient(180deg, rgba(11,20,34,.98), rgba(8,16,29,.98))!important;border-color:rgba(255,255,255,.08)!important;}
+body.dark .newDebtGrid input, body.dark .newDebtGrid textarea, body.dark #actionInput, body.dark #actionTextarea, body.dark #contactRepresentative, body.dark #contactAddress, body.dark #contactEmail, body.dark #contactPhone{background:#0f1c2f!important;border-color:rgba(255,255,255,.08)!important;color:#e8f1ff!important;}
+body.dark .statusPill{background:#0f1c2f!important;border-color:rgba(255,255,255,.08)!important;color:#dce9ff!important;} body.dark .statusPill.active{background:linear-gradient(135deg,#1d56df,#377eff)!important;color:#fff!important;}
+@media (max-width:1120px){.dashboardShell{grid-template-columns:1fr;}.sidebar{display:none;}.contentArea{padding:18px 14px 124px;}.dashboardStats{grid-template-columns:repeat(2,minmax(0,1fr));}.actionToolbarGrid{grid-template-columns:repeat(2,minmax(0,1fr));}.boardToolbar{grid-template-columns:1fr;}.infoDrawerOverlay{padding:10px;}.infoDrawer{width:100%;height:calc(100dvh - 20px);}.dashboardHeader{flex-direction:column;}.heroTopActions{justify-content:flex-start;}}
+@media (max-width:768px){body.dark .container{padding:0;} .dashboardStats{grid-template-columns:1fr;} .actionToolbarGrid{grid-template-columns:1fr 1fr;} .boardHeader h2{font-size:28px;} body.dark tbody td:last-child{min-width:unset;} .heroTopActions{display:none;} .tableActions{display:none;} }
+@media (min-width:769px){#fabAdd{display:none!important;}.mobileBottomNav{display:none!important;}}
+</style>
+
 </head>
 <body class="dark">
 <div class="container">
 <div class="appFrame">
-
-  <section class="hero">
-    <div class="heroMain">
-      <div class="eyebrow">✦ Dark iPad Edition · v10</div>
-      <h1>Schulden Manager<br>mit mehr iPad-Feeling</h1>
-      <p>Mehr Dashboard, weniger Handy-App: großzügige Flächen, dunkle Glas-Panels und ein ruhiger Tablet-Look für bessere Übersicht beim Verwalten deiner offenen und bezahlten Beträge.</p>
-      <div class="heroMeta">
-        <div class="metaChip"><strong>Fokus</strong><span>Tablet-Dashboard</span></div>
-        <div class="metaChip"><strong>Design</strong><span>Dark Glass & Panels</span></div>
-        <div class="metaChip"><strong>Gefühl</strong><span>Mehr iPad, weniger Phone</span></div>
+<div class="dashboardShell">
+  <aside class="sidebar">
+    <div class="brandCard">
+      <div class="brandLogo">S</div>
+      <div>
+        <div class="brandTitle">Schulden</div>
+        <div class="brandSub">Manager</div>
       </div>
     </div>
-    <div class="heroSide">
-      <div class="quickPanel">
-        <h3>Geräteansicht</h3>
-        <div class="viewSwitch">
-          <button id="btnDesktop" class="secondary" type="button">🖥 Desktop</button>
-          <button id="btnMobile" class="secondary" type="button">📱 Handy</button>
+
+    <nav class="sidebarNav">
+      <button class="sideNavBtn active" type="button" data-scroll-target="dashboardTop"><span class="navIco">⌂</span><span>Übersicht</span></button>
+      <button class="sideNavBtn" type="button" data-scroll-target="debtListSection"><span class="navIco">▣</span><span>Schulden</span></button>
+      <button class="sideNavBtn" type="button" data-scroll-target="statsCard"><span class="navIco">◔</span><span>Statistiken</span></button>
+      <button class="sideNavBtn" type="button" data-scroll-target="newDebtSection"><span class="navIco">＋</span><span>Neu</span></button>
+    </nav>
+
+    <div class="sidebarBottom">
+      <div class="userMiniCard">
+        <div class="userMiniAvatar">👤</div>
+        <div>
+          <strong>Schulden App</strong>
+          <span>Dark Dashboard</span>
         </div>
       </div>
-      <div class="quickPanel">
-        <h3>Backup-Status</h3>
-        <div id="backupStatus">Letztes Backup: –</div>
-        <div class="smallMuted">Tipp: Diese Version bleibt dauerhaft im Dark Mode. Backup-Datei einfach in Dateien, Drive oder iCloud speichern.</div>
-        <div class="installRow">
+      <div class="modeMiniCard">
+        <span>🌙 Dunkelmodus</span>
+        <span class="modeSwitchOn"></span>
+      </div>
+    </div>
+  </aside>
+
+  <main class="contentArea" id="dashboardTop">
+    <section class="hero heroDashboard">
+      <div class="heroMain dashboardHeader">
+        <div class="dashboardGreetingWrap">
+          <div class="eyebrow">Dark Dashboard · v11</div>
+          <h1 id="greetingTitle">Guten Abend!</h1>
+          <p id="greetingText">Hier ist die Übersicht deiner Schulden.</p>
+        </div>
+        <div class="heroTopActions">
+          <button id="btnOpenAdd" type="button">＋ Neue Schuld</button>
           <button id="btnInstall" class="secondary" type="button">📲 App installieren</button>
         </div>
-        <div id="installHint" class="installHint">Installierbar auf iPhone, iPad, Android und Desktop-Browsern.</div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <section class="card newDebtCard">
-    <div class="sectionTitle">
-      <h2>Neue Schuld erfassen</h2>
-      <span>Geführte Eingabe mit Ansprechpartner und erster Notiz</span>
-    </div>
-
-    <div id="inlineForm" class="newDebtStart">
-      <div class="newDebtIntro">
-        <strong>Alles in einem Fenster</strong>
-        <span>Name, Grund und Betrag sind Pflicht. Ansprechpartner und erste Notiz kannst du direkt mit anlegen.</span>
+    <section class="card actionToolbarCard" id="newDebtSection">
+      <div class="sectionTitle compactTitle">
+        <h2>Schnellaktionen</h2>
+        <span>Backup, Restore, Export und neue Einträge</span>
       </div>
-      <div class="actionRow newDebtActions">
-        <button id="btnOpenAdd" type="button">＋ Neue Schuld</button>
+      <div class="hiddenViewSwitch" aria-hidden="true" style="display:none;">
+        <button id="btnDesktop" class="secondary" type="button">Desktop</button>
+        <button id="btnMobile" class="secondary" type="button">Handy</button>
+      </div>
+      <div class="actionToolbarGrid">
         <button id="btnBackup" class="secondary" type="button">💾 Backup</button>
         <button id="btnBackupPick" class="secondary" type="button">📁 Speicherort wählen</button>
         <button id="btnRestore" class="secondary" type="button">📂 Restore</button>
+        <button id="btnExcel" class="secondary" type="button">📊 Excel Export</button>
+        <button id="btnPDF" class="secondary" type="button">🧾 PDF Export</button>
+        <button id="btnClear" class="btn-delete" type="button">✕ Alles löschen</button>
       </div>
-    </div>
+      <div id="backupStatus" class="backupPill">Letztes Backup: –</div>
+      <div id="installHint" class="installHint">Installierbar auf iPhone, iPad, Android und Desktop-Browsern.</div>
+      <input id="restoreFile" type="file" accept=".godmode,application/octet-stream,application/json,text/plain" style="display:none">
+    </section>
 
-    <input id="restoreFile" type="file" accept=".godmode,application/octet-stream,application/json,text/plain" style="display:none">
-  </section>
+    <section class="card stats dashboardStats" id="statsCard">
+      <div class="stat statCardBlue">
+        <span class="statLabel">Gesamt Schulden</span>
+        <span id="sum" class="statValue">0,00 €</span>
+        <em>Alle Schulden insgesamt</em>
+      </div>
+      <div class="stat statCardOrange">
+        <span class="statLabel">Offen</span>
+        <span id="open" class="statValue">0,00 €</span>
+        <em id="openShare">0 % der Gesamtsumme</em>
+      </div>
+      <div class="stat statCardGreen">
+        <span class="statLabel">Bezahlt</span>
+        <span id="paid" class="statValue">0,00 €</span>
+        <em id="paidShare">0 % der Gesamtsumme</em>
+      </div>
+      <div class="stat statCardPurple">
+        <span class="statLabel">Anzahl Personen</span>
+        <span id="personsCount" class="statValue">0</span>
+        <em>Schuldner insgesamt</em>
+      </div>
+    </section>
 
-  <section class="card stats" id="statsCard">
-    <div class="stat">
-      <span class="statLabel">Gesamt</span>
-      <span id="sum" class="statValue">0,00 €</span>
-      <em>Alle aktuell gespeicherten Beträge</em>
-    </div>
-    <div class="stat">
-      <span class="statLabel">Offen</span>
-      <span id="open" class="statValue">0,00 €</span>
-      <em>Noch nicht vollständig ausgeglichen</em>
-    </div>
-    <div class="stat">
-      <span class="statLabel">Bezahlt</span>
-      <span id="paid" class="statValue">0,00 €</span>
-      <em>Einträge mit Status bezahlt</em>
-    </div>
-  </section>
+    <section class="card debtBoardCard" id="debtListSection">
+      <div class="sectionTitle boardHeader">
+        <h2>Schulden (<span id="debtCount">0</span>)</h2>
+        <span>Klare Übersicht mit Info, Abbau und Ansprechpartner</span>
+      </div>
 
-  <section class="card">
-    <div class="sectionTitle">
-      <h2>Deine Kartenübersicht</h2>
-      <span>Tablet-optimierte Übersicht mit klareren Aktionen</span>
-    </div>
+      <div class="toolbar boardToolbar">
+        <input id="search" placeholder="🔎 Suchen...">
+        <select id="statusFilter">
+          <option value="alle">Alle</option>
+          <option value="offen">Offen</option>
+          <option value="bezahlt">Bezahlt</option>
+          <option value="teilzahlung">Teilzahlung</option>
+          <option value="klaerung">In Klärung</option>
+        </select>
+      </div>
 
-    <div class="toolbar">
-      <input id="search" placeholder="🔎 Nach Name, Grund oder Betrag suchen...">
-    </div>
+      <div id="desktopTable" class="tableWrap dashboardTableWrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Grund</th>
+              <th>Fällig am</th>
+              <th>Betrag</th>
+              <th>Status</th>
+              <th>Aktionen</th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
 
-    <div id="desktopTable" class="tableWrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Grund</th>
-            <th>Betrag</th>
-            <th>Datum</th>
-            <th>Status</th>
-            <th>Aktion</th>
-          </tr>
-        </thead>
-        <tbody id="tbody"></tbody>
-      </table>
-    </div>
-
-    <div id="mobileList"></div>
-
-    <div class="actionRow" style="margin-top:18px;">
-      <button id="btnExcel" class="secondary" type="button">Excel Export</button>
-      <button id="btnPDF" class="secondary" type="button">PDF Export</button>
-      <button id="btnClear" class="btn-delete" type="button">Alles löschen</button>
-    </div>
-  </section>
+      <div id="mobileList"></div>
+    </section>
+  </main>
+</div>
 </div>
 </div>
 
@@ -1299,6 +1399,56 @@ body.dark .newDebtIntro,body.dark .newDebtStep{background:rgba(255,255,255,.04);
       <button id="actionConfirm" type="button">Speichern</button>
     </div>
   </div>
+</div>
+
+
+<div id="infoDrawerOverlay" class="infoDrawerOverlay" aria-hidden="true">
+  <aside class="infoDrawer">
+    <div class="infoDrawerHead">
+      <div class="infoDrawerTitleWrap">
+        <span class="drawerEyebrow">Info</span>
+        <h3>Info</h3>
+      </div>
+      <button id="infoDrawerClose" class="secondary modalCloseBtn" type="button" aria-label="Schließen">✕</button>
+    </div>
+    <div class="infoDrawerBody">
+      <section class="drawerSection">
+        <div class="drawerSectionHead"><span>1</span><strong>Name</strong></div>
+        <div id="infoNameValue" class="drawerBigValue">–</div>
+      </section>
+
+      <section class="drawerSection">
+        <div class="drawerSectionHead"><span>2</span><strong>Ansprechpartner</strong></div>
+        <div class="drawerList">
+          <div class="drawerRow"><span>Name / Vertreter</span><strong id="infoContactRepresentative">–</strong></div>
+          <div class="drawerRow"><span>Anschrift</span><strong id="infoContactAddress">–</strong></div>
+          <div class="drawerRow drawerRowActions"><span>E-Mail</span><div class="drawerValueActions"><strong id="infoContactEmail">–</strong><div id="infoContactEmailActions" class="miniActions"></div></div></div>
+          <div class="drawerRow drawerRowActions"><span>Telefonnummer</span><div class="drawerValueActions"><strong id="infoContactPhone">–</strong><div id="infoContactPhoneActions" class="miniActions"></div></div></div>
+        </div>
+      </section>
+
+      <section class="drawerSection">
+        <div class="drawerSectionHead"><span>3</span><strong>Notizen</strong></div>
+        <div id="infoNotesList" class="notesTimeline"></div>
+      </section>
+
+      <section class="drawerSection">
+        <div class="drawerSectionHead"><span>4</span><strong>Weitere Informationen</strong></div>
+        <div class="drawerFacts">
+          <div class="drawerFact"><span>Grund</span><strong id="infoReasonValue">–</strong></div>
+          <div class="drawerFact"><span>Betrag</span><strong id="infoAmountValue">–</strong></div>
+          <div class="drawerFact"><span>Status</span><strong id="infoStatusValue">–</strong></div>
+          <div class="drawerFact"><span>Fällig am</span><strong id="infoDateValue">–</strong></div>
+          <div class="drawerFact"><span>Bereits abgebaut</span><strong id="infoPaidValue">–</strong></div>
+          <div class="drawerFact"><span>Letzte Zahlung</span><strong id="infoLastPaymentValue">–</strong></div>
+        </div>
+      </section>
+    </div>
+    <div class="infoDrawerFooter">
+      <button id="infoDrawerCancel" class="secondary" type="button">Schließen</button>
+      <button id="infoDrawerAddNote" type="button">Neue Notiz</button>
+    </div>
+  </aside>
 </div>
 
 <button id="fabAdd" type="button" aria-label="Neu">＋</button>
@@ -2080,5 +2230,265 @@ if ('serviceWorker' in navigator) {
   });
 }
 </script>
+
+<script>
+(function(){
+  let infoDrawerIndex = null;
+
+  function niceStatusLabel(value){
+    if(value === 'bezahlt') return 'Bezahlt';
+    if(value === 'teilzahlung') return 'Teilzahlung';
+    if(value === 'klaerung') return 'In Klärung';
+    return 'Offen';
+  }
+  function initials(name){
+    return String(name || '').trim().split(/\s+/).slice(0,2).map(part => part[0] || '').join('').toUpperCase() || 'S';
+  }
+  function escapeHTML(str){
+    return String(str || '')
+      .replaceAll('&','&amp;')
+      .replaceAll('<','&lt;')
+      .replaceAll('>','&gt;')
+      .replaceAll('"','&quot;')
+      .replaceAll("'",'&#039;');
+  }
+  function nl2br(str){ return escapeHTML(str).replace(/\n/g,'<br>'); }
+  function getFilteredDebts(){
+    const search = (document.getElementById('search')?.value || '').toLowerCase();
+    const filter = document.getElementById('statusFilter')?.value || 'alle';
+    return debts.map((d,index)=>({d,index})).filter(({d})=>{
+      const matchesSearch = !search || JSON.stringify(d).toLowerCase().includes(search);
+      const matchesStatus = filter === 'alle' ? true : (String(d.status || 'offen') === filter);
+      return matchesSearch && matchesStatus;
+    });
+  }
+  function updateGreeting(){
+    const hour = new Date().getHours();
+    let greeting = 'Guten Abend!';
+    if(hour < 12) greeting = 'Guten Morgen!';
+    else if(hour < 18) greeting = 'Guten Tag!';
+    const title = document.getElementById('greetingTitle');
+    const text = document.getElementById('greetingText');
+    if(title) title.textContent = greeting;
+    if(text) text.textContent = 'Hier ist die Übersicht deiner Schulden.';
+  }
+  function openInfoDrawer(index){
+    infoDrawerIndex = index;
+    const d = debts[index];
+    if(!d) return;
+    const overlay = document.getElementById('infoDrawerOverlay');
+    const contact = normalizeContactData(d);
+    const notes = noteEntries(d).slice().reverse();
+    const paidSum = sumHistory(d);
+    const remaining = Number(d.betrag) || 0;
+    document.getElementById('infoNameValue').textContent = d.name || '–';
+    document.getElementById('infoContactRepresentative').textContent = contact.representative || '–';
+    document.getElementById('infoContactAddress').innerHTML = nl2br(contact.address || '–');
+    document.getElementById('infoContactEmail').textContent = contact.email || '–';
+    document.getElementById('infoContactPhone').textContent = contact.phone || '–';
+    document.getElementById('infoReasonValue').textContent = d.grund || '–';
+    document.getElementById('infoAmountValue').textContent = formatEUR(remaining);
+    const statusEl = document.getElementById('infoStatusValue');
+    statusEl.innerHTML = '<span class="statusBadge status-' + escapeHTML(String(d.status || 'offen')) + '">' + niceStatusLabel(d.status) + '</span>';
+    document.getElementById('infoDateValue').textContent = d.datum || '–';
+    document.getElementById('infoPaidValue').textContent = formatEUR(paidSum);
+    document.getElementById('infoLastPaymentValue').textContent = lastPaymentDate(d);
+
+    const emailActions = document.getElementById('infoContactEmailActions');
+    emailActions.innerHTML = '';
+    if(contact.email){
+      emailActions.innerHTML += '<a class="miniActionLink" href="mailto:' + encodeURIComponent(contact.email) + '" title="E-Mail">✉</a>';
+      emailActions.innerHTML += '<button class="miniActionBtn" type="button" data-copy="' + escapeHTML(contact.email) + '" title="Kopieren">⧉</button>';
+    }
+    const phoneActions = document.getElementById('infoContactPhoneActions');
+    phoneActions.innerHTML = '';
+    if(contact.phone){
+      phoneActions.innerHTML += '<a class="miniActionLink" href="tel:' + encodeURIComponent(contact.phone) + '" title="Anrufen">☎</a>';
+      phoneActions.innerHTML += '<button class="miniActionBtn" type="button" data-copy="' + escapeHTML(contact.phone) + '" title="Kopieren">⧉</button>';
+    }
+
+    const notesList = document.getElementById('infoNotesList');
+    if(!notes.length){
+      notesList.innerHTML = '<div class="noteTimelineEmpty">Keine Notizen vorhanden.</div>';
+    } else {
+      notesList.innerHTML = notes.map(n => '<div class="noteTimelineItem"><time>' + escapeHTML(formatNoteDate(n.at)) + '</time><p>' + nl2br(n.text) + '</p></div>').join('');
+    }
+
+    overlay.style.display = 'flex';
+    overlay.setAttribute('aria-hidden','false');
+    document.body.classList.add('modalOpen');
+  }
+  function closeInfoDrawer(){
+    const overlay = document.getElementById('infoDrawerOverlay');
+    if(!overlay) return;
+    overlay.style.display = 'none';
+    overlay.setAttribute('aria-hidden','true');
+    document.body.classList.remove('modalOpen');
+  }
+
+  const oldShowInfo = window.showInfo;
+  window.showInfo = function(i){ openInfoDrawer(i); };
+
+  const oldRemoveDebt = window.removeDebt;
+  window.removeDebt = function(i){ if(confirm('Diese Schuld wirklich löschen?')){ debts.splice(i,1); save(); render(); closeInfoDrawer(); } };
+
+  window.render = function(){
+    const filtered = getFilteredDebts();
+    const tbody = document.getElementById('tbody');
+    const mobile = document.getElementById('mobileList');
+    tbody.innerHTML = '';
+    mobile.innerHTML = '';
+
+    let sum = 0, open = 0, paid = 0;
+    debts.forEach(d=>{
+      const amount = Number(d.betrag) || 0;
+      sum += amount;
+      if(isOpenLikeStatus(d.status)) open += amount; else paid += amount;
+    });
+    const uniquePersons = new Set(debts.map(d => String(d.name || '').trim()).filter(Boolean));
+    document.getElementById('sum').textContent = formatEUR(sum);
+    document.getElementById('open').textContent = formatEUR(open);
+    document.getElementById('paid').textContent = formatEUR(paid);
+    document.getElementById('personsCount').textContent = String(uniquePersons.size);
+    document.getElementById('debtCount').textContent = String(filtered.length);
+    document.getElementById('openShare').textContent = sum ? (open/sum*100).toFixed(1).replace('.',',') + ' % der Gesamtsumme' : '0 % der Gesamtsumme';
+    document.getElementById('paidShare').textContent = sum ? (paid/sum*100).toFixed(1).replace('.',',') + ' % der Gesamtsumme' : '0 % der Gesamtsumme';
+
+    filtered.forEach(({d,index:i}, idx)=>{
+      const row = document.createElement('tr');
+      const badgeClass = isOpenLikeStatus(d.status) ? 'status-open' : 'status-bezahlt';
+      const amountClass = isOpenLikeStatus(d.status) ? 'amountOpen' : 'amountPaid';
+      row.innerHTML =
+        '<td><div class="nameCell"><div class="avatarCircle">' + escapeHTML(initials(d.name)) + '</div><div class="nameStack"><strong>' + escapeHTML(d.name) + '</strong><small>Schuld-ID: S-' + String(1001 + i) + '</small></div></div></td>' +
+        '<td><div class="reasonStack"><strong>' + escapeHTML(d.grund || '–') + '</strong><small>' + escapeHTML(contactInline(normalizeContactData(d)) || 'Kein Ansprechpartner') + '</small></div></td>' +
+        '<td><div class="dateText">' + escapeHTML(d.datum || '–') + '</div></td>' +
+        '<td><div class="amountText ' + amountClass + '">' + escapeHTML(formatEUR(Number(d.betrag) || 0)) + '</div></td>' +
+        '<td><span class="statusBadge ' + badgeClass + '">' + escapeHTML(niceStatusLabel(d.status)) + '</span></td>' +
+        '<td><div class="tableActions">' +
+          '<button class="miniBtn primary" type="button">Info</button>' +
+          '<button class="miniBtn" type="button">Abbau</button>' +
+          '<button class="miniBtn" type="button">Ansprechpartner</button>' +
+          '<button class="miniBtn" type="button">Status</button>' +
+          '<button class="miniBtn" type="button">Historie</button>' +
+          '<button class="miniBtn" type="button">Löschen</button>' +
+        '</div></td>';
+      const btns = row.querySelectorAll('button');
+      btns[0].addEventListener('click', ()=>showInfo(i));
+      btns[1].addEventListener('click', ()=>paySingleDebt(i));
+      btns[2].addEventListener('click', ()=>showContact(i));
+      btns[3].addEventListener('click', ()=>toggleStatus(i));
+      btns[4].addEventListener('click', ()=>showHistory(i));
+      btns[5].addEventListener('click', ()=>removeDebt(i));
+      tbody.appendChild(row);
+
+      const card = document.createElement('div');
+      card.className = 'mobileCard';
+      card.innerHTML =
+        '<div class="mobileTop"><div><strong>' + escapeHTML(d.name) + '</strong><div style="color:var(--muted);margin-top:4px;">' + escapeHTML(d.grund || '–') + '</div></div><span class="statusBadge ' + badgeClass + '">' + escapeHTML(niceStatusLabel(d.status)) + '</span></div>' +
+        '<div class="amount"><div><span style="display:block;color:var(--muted);font-size:12px;margin-bottom:6px;">Restbetrag</span><strong class="' + amountClass + '">' + escapeHTML(formatEUR(Number(d.betrag)||0)) + '</strong></div></div>' +
+        '<div class="mobileMeta"><div class="metaItem"><span>Fällig am</span><strong>' + escapeHTML(d.datum || '–') + '</strong></div><div class="metaItem"><span>Ansprechpartner</span><strong>' + escapeHTML(normalizeContactData(d).representative || '–') + '</strong></div></div>' +
+        '<div class="mobileRow" style="margin-top:14px;">' +
+          '<button class="miniBtn" type="button">Info</button>' +
+          '<button class="miniBtn" type="button">Abbau</button>' +
+          '<button class="miniBtn" type="button">Kontakt</button>' +
+          '<button class="miniBtn" type="button">Status</button>' +
+          '<button class="miniBtn" type="button">Historie</button>' +
+          '<button class="miniBtn" type="button">Löschen</button>' +
+        '</div>';
+      const cbtns = card.querySelectorAll('button');
+      cbtns[0].addEventListener('click', ()=>showInfo(i));
+      cbtns[1].addEventListener('click', ()=>paySingleDebt(i));
+      cbtns[2].addEventListener('click', ()=>showContact(i));
+      cbtns[3].addEventListener('click', ()=>toggleStatus(i));
+      cbtns[4].addEventListener('click', ()=>showHistory(i));
+      cbtns[5].addEventListener('click', ()=>removeDebt(i));
+      mobile.appendChild(card);
+    });
+  };
+
+  document.getElementById('statusFilter')?.addEventListener('change', render);
+  document.getElementById('infoDrawerClose')?.addEventListener('click', closeInfoDrawer);
+  document.getElementById('infoDrawerCancel')?.addEventListener('click', closeInfoDrawer);
+  document.getElementById('infoDrawerOverlay')?.addEventListener('click', (e)=>{ if(e.target.id === 'infoDrawerOverlay') closeInfoDrawer(); });
+  document.getElementById('infoDrawerAddNote')?.addEventListener('click', ()=>{
+    if(infoDrawerIndex == null) return;
+    openActionModal({
+      title: 'Neue Notiz',
+      body: 'Füge eine neue Notiz für diesen Eintrag hinzu.',
+      confirmText: 'Neue Notiz speichern',
+      textareaLabel: 'Neue Notiz',
+      textareaPlaceholder: 'Neue Notiz eintragen...',
+      textareaValue: '',
+      onTextareaConfirm:(value)=>{
+        const text = String(value || '').trim();
+        if(!text){ showToast('Bitte erst eine Notiz eintragen.'); return; }
+        if(!Array.isArray(debts[infoDrawerIndex].notesHistory)) debts[infoDrawerIndex].notesHistory = [];
+        debts[infoDrawerIndex].notesHistory.push({at:new Date().toISOString(), text});
+        debts[infoDrawerIndex].notes = notesText(debts[infoDrawerIndex]);
+        save();
+        closeActionModal();
+        render();
+        openInfoDrawer(infoDrawerIndex);
+        showToast('Neue Notiz gespeichert ✅');
+      }
+    });
+  });
+  document.getElementById('infoDrawerOverlay')?.addEventListener('click', async (e)=>{
+    const btn = e.target.closest('[data-copy]');
+    if(!btn) return;
+    const value = btn.getAttribute('data-copy') || '';
+    try{ await navigator.clipboard.writeText(value); showToast('Kopiert ✅'); }catch(err){ console.error(err); }
+  });
+  document.querySelectorAll('[data-scroll-target]').forEach(btn=>btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.sideNavBtn').forEach(el=>el.classList.remove('active'));
+    btn.classList.add('active');
+    const id = btn.getAttribute('data-scroll-target');
+    const el = document.getElementById(id);
+    if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
+  }));
+
+  const oldRestore = window.restoreBackup;
+  window.restoreBackup = function(event){
+    const file = event.target.files && event.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try{
+        const data = JSON.parse(String(reader.result || ''));
+        const imported = Array.isArray(data) ? data : data.debts;
+        if(!Array.isArray(imported)) throw new Error('Ungültiges Format');
+        debts = imported.map(d => ({
+          name: String(d.name ?? '').trim(),
+          grund: String(d.grund ?? '').trim(),
+          betrag: Number(d.betrag ?? 0),
+          datum: String(d.datum ?? ''),
+          status: ['bezahlt','teilzahlung','klaerung','offen'].includes(String(d.status ?? 'offen')) ? String(d.status ?? 'offen') : 'offen',
+          contactDetails: normalizeContactData(d),
+          contactPerson: contactInline(normalizeContactData(d)),
+          notes: String(d.notes ?? d.notizen ?? ''),
+          notesHistory: Array.isArray(d.notesHistory) ? d.notesHistory.map(n => ({at:String(n.at ?? n.date ?? ''), text:String(n.text ?? n.note ?? n.value ?? '').trim()})).filter(n => n.text) : (String(d.notes ?? d.notizen ?? '').trim() ? [{at:'', text:String(d.notes ?? d.notizen ?? '').trim()}] : []),
+          history: Array.isArray(d.history) ? d.history.map(h => ({date:String(h.date ?? ''), amount:Number(h.amount ?? 0)})) : []
+        }));
+        save();
+        render();
+        showToast('Restore erfolgreich ✅');
+      }catch(err){ console.error(err); alert('Restore fehlgeschlagen ❌ (falsche Datei)'); }
+      finally{ event.target.value=''; }
+    };
+    reader.readAsText(file);
+  };
+  if(oldRestore){ document.getElementById('restoreFile')?.removeEventListener('change', oldRestore); }
+  document.getElementById('restoreFile')?.addEventListener('change', window.restoreBackup);
+
+  updateGreeting();
+  if(window.matchMedia && window.matchMedia('(max-width: 768px)').matches){
+    setView('mobile');
+  }else{
+    setView('desktop');
+  }
+  render();
+})();
+</script>
+
 </body>
 </html>
