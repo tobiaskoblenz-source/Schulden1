@@ -1,4 +1,4 @@
-# Schulden Manager Dark – Railway Version v6
+# Schulden Manager Dark – Railway Version v7
 
 Diese Version ist für Railway vorbereitet und läuft als kleine Node-App.
 
@@ -20,3 +20,10 @@ Diese Version ist für Railway vorbereitet und läuft als kleine Node-App.
 Railway nutzt automatisch die Variable `PORT`. Du musst dafür nichts extra eintragen.
 
 - Neuer Aktionen-Button „Ansprechpartner“ pro Schuld
+
+
+## Änderungen v7
+- Buttons und Schriftgrößen besser lesbar angepasst.
+- Aktionsbuttons größer und ruhiger angeordnet.
+- Info-/Aktion-Fenster sind jetzt scrollbar, wenn Inhalte zu lang werden.
+- Lange Notizen und Ansprechpartner-Daten sprengen das Fenster nicht mehr.
