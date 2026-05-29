@@ -12,7 +12,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="assets/icons/icon-192.png">
 <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
-<title>Schulden Manager – Dark Mode v4</title>
+<title>Schulden Manager – Dark Mode v6</title>
 
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
@@ -235,10 +235,11 @@ button.btn-status{background:linear-gradient(135deg, #60a5fa, #22d3ee); color:#0
 button.btn-pay{background:linear-gradient(135deg, #34d399, #86efac); color:#052015}
 button.btn-history{background:linear-gradient(135deg, #fbbf24, #f59e0b); color:#1f1300}
 button.btn-info{background:linear-gradient(135deg, #a78bfa, #7dd3fc); color:#0b1530}
+button.btn-contact{background:linear-gradient(135deg, #38bdf8, #818cf8); color:#07111f}
 
 .actionRow{
   display:grid;
-  grid-template-columns:repeat(5,minmax(0,1fr));
+  grid-template-columns:repeat(6,minmax(0,1fr));
   gap:10px;
 }
 .actionBtn{
@@ -276,7 +277,8 @@ button.btn-info{background:linear-gradient(135deg, #a78bfa, #7dd3fc); color:#0b1
 .mobileRow .btn-delete{grid-column:2/3}
 .mobileRow .btn-pay{grid-column:1/2}
 .mobileRow .btn-history{grid-column:2/3}
-.mobileRow .btn-info{grid-column:1/3}
+.mobileRow .btn-info{grid-column:1/2}
+.mobileRow .btn-contact{grid-column:2/3}
 
 .activeView{
   background:linear-gradient(135deg, rgba(125,211,252,.95), rgba(167,139,250,.95)) !important;
@@ -839,6 +841,11 @@ body.softlight .stat:hover{
   line-height:1.45;
   box-shadow:inset 0 1px 0 rgba(255,255,255,.08);
 }
+.contactForm{display:grid;gap:10px}
+.contactForm input{width:100%;box-sizing:border-box}
+.contactAddressBox{min-height:88px}
+body.dark .contactForm input, body.dark .contactForm textarea{background:rgba(15,23,42,.88);color:#edf4ff;border-color:rgba(148,163,184,.28)}
+
 .noteBox::placeholder{color:rgba(217,231,251,.55)}
 .infoNoteLabel{
   display:block;
@@ -877,7 +884,7 @@ body.softlight #actionConfirm{
 
   <section class="hero">
     <div class="heroMain">
-      <div class="eyebrow">✦ Dark iPad Edition · v1</div>
+      <div class="eyebrow">✦ Dark iPad Edition · v6</div>
       <h1>Schulden Manager<br>mit mehr iPad-Feeling</h1>
       <p>Mehr Dashboard, weniger Handy-App: großzügige Flächen, dunkle Glas-Panels und ein ruhiger Tablet-Look für bessere Übersicht beim Verwalten deiner offenen und bezahlten Beträge.</p>
       <div class="heroMeta">
@@ -1020,6 +1027,16 @@ body.softlight #actionConfirm{
       <label id="actionTextareaLabel" class="infoNoteLabel" for="actionTextarea">Notizen</label>
       <textarea id="actionTextarea" class="noteBox" placeholder="Notiz eintragen..."></textarea>
     </div>
+    <div id="actionContactWrap" class="contactForm" style="display:none;margin-bottom:16px;">
+      <label class="infoNoteLabel" for="contactRepresentative">Name / Vertreter</label>
+      <input id="contactRepresentative" type="text" placeholder="z. B. Max Mustermann">
+      <label class="infoNoteLabel" for="contactAddress">Anschrift</label>
+      <textarea id="contactAddress" class="noteBox contactAddressBox" placeholder="Straße, Hausnummer, PLZ Ort"></textarea>
+      <label class="infoNoteLabel" for="contactEmail">E-Mail</label>
+      <input id="contactEmail" type="email" placeholder="name@beispiel.de">
+      <label class="infoNoteLabel" for="contactPhone">Telefonnummer</label>
+      <input id="contactPhone" type="tel" placeholder="Telefonnummer">
+    </div>
     <div class="modalActions" style="margin-top:16px;">
       <button id="actionCancel" class="secondary" type="button">Schließen</button>
       <button id="actionConfirm" type="button">Speichern</button>
@@ -1044,7 +1061,7 @@ try {
 
 let currentView = (localStorage.getItem("godmode_view") || "desktop");
 if(currentView !== "desktop" && currentView !== "mobile") currentView = "desktop";
-// Dark-only Version v1: alte Light/Soft-Light-Einstellungen werden überschrieben.
+// Dark-only Version v6: alte Light/Soft-Light-Einstellungen werden überschrieben.
 document.body.classList.remove("softlight");
 document.body.classList.add("dark");
 localStorage.setItem("godmode_dark", "1");
@@ -1152,6 +1169,42 @@ function triggerRestore(){
   document.getElementById("restoreFile").click();
 }
 
+
+function normalizeContactData(d){
+  const fromDetails = (d && typeof d.contactDetails === "object" && d.contactDetails) ? d.contactDetails : {};
+  const fromContact = (d && typeof d.contact === "object" && d.contact) ? d.contact : {};
+  const legacy = String((d && (d.contactPerson ?? d.ansprechpartner ?? d.kontakt)) || "").trim();
+  return {
+    representative: String(fromDetails.representative ?? fromDetails.name ?? fromDetails.vertreter ?? fromContact.representative ?? fromContact.name ?? fromContact.vertreter ?? legacy).trim(),
+    address: String(fromDetails.address ?? fromDetails.anschrift ?? fromContact.address ?? fromContact.anschrift ?? "").trim(),
+    email: String(fromDetails.email ?? fromDetails.mail ?? fromContact.email ?? fromContact.mail ?? "").trim(),
+    phone: String(fromDetails.phone ?? fromDetails.telefon ?? fromDetails.telefonnummer ?? fromContact.phone ?? fromContact.telefon ?? fromContact.telefonnummer ?? "").trim()
+  };
+}
+function contactSummary(contact){
+  const c = contact || {};
+  const lines = [];
+  if(String(c.representative || "").trim()) lines.push("Name/Vertreter: " + String(c.representative).trim());
+  if(String(c.address || "").trim()) lines.push("Anschrift: " + String(c.address).trim());
+  if(String(c.email || "").trim()) lines.push("E-Mail: " + String(c.email).trim());
+  if(String(c.phone || "").trim()) lines.push("Telefon: " + String(c.phone).trim());
+  return lines.length ? lines.join("\n") : "–";
+}
+function contactInline(contact){
+  const c = contact || {};
+  return [c.representative, c.address, c.email, c.phone].map(v => String(v || "").trim()).filter(Boolean).join(" | ");
+}
+function setDebtContact(index, contact){
+  const cleaned = {
+    representative: String(contact.representative || "").trim(),
+    address: String(contact.address || "").trim(),
+    email: String(contact.email || "").trim(),
+    phone: String(contact.phone || "").trim()
+  };
+  debts[index].contactDetails = cleaned;
+  debts[index].contactPerson = contactInline(cleaned);
+}
+
 function restoreBackup(event){
   const file = event.target.files && event.target.files[0];
   if(!file) return;
@@ -1169,6 +1222,8 @@ function restoreBackup(event){
         betrag: Number(d.betrag ?? 0),
         datum: String(d.datum ?? ""),
         status: (d.status === "bezahlt") ? "bezahlt" : "offen",
+        contactDetails: normalizeContactData(d),
+        contactPerson: contactInline(normalizeContactData(d)),
         notes: String(d.notes ?? d.notizen ?? ""),
         notesHistory: Array.isArray(d.notesHistory) ? d.notesHistory.map(n => ({
           at: String(n.at ?? n.date ?? ""),
@@ -1239,7 +1294,7 @@ function addDebtFromInputs(prefix){
     return false;
   }
 
-  debts.push({name,grund,betrag,datum,status,notes:"",notesHistory:[],history:[]});
+  debts.push({name,grund,betrag,datum,status,contactDetails:{representative:"",address:"",email:"",phone:""},contactPerson:"",notes:"",notesHistory:[],history:[]});
   save();
   render();
   return true;
@@ -1254,7 +1309,7 @@ function toggleDark(){
   localStorage.setItem("godmode_dark","1");
   updateThemeButton();
 }
-function openActionModal({title, body, confirmText, inputValue, inputPlaceholder, onConfirm, textareaValue, textareaPlaceholder, textareaLabel, onTextareaConfirm}){
+function openActionModal({title, body, confirmText, inputValue, inputPlaceholder, onConfirm, textareaValue, textareaPlaceholder, textareaLabel, onTextareaConfirm, contactValue, onContactConfirm}){
   const modal = document.getElementById("actionModal");
   const titleEl = document.getElementById("actionTitle");
   const bodyEl = document.getElementById("actionBody");
@@ -1263,6 +1318,11 @@ function openActionModal({title, body, confirmText, inputValue, inputPlaceholder
   const textareaWrap = document.getElementById("actionTextareaWrap");
   const textarea = document.getElementById("actionTextarea");
   const textareaLabelEl = document.getElementById("actionTextareaLabel");
+  const contactWrap = document.getElementById("actionContactWrap");
+  const contactRepresentative = document.getElementById("contactRepresentative");
+  const contactAddress = document.getElementById("contactAddress");
+  const contactEmail = document.getElementById("contactEmail");
+  const contactPhone = document.getElementById("contactPhone");
   const confirmBtn = document.getElementById("actionConfirm");
   const cancelBtn = document.getElementById("actionCancel");
 
@@ -1275,8 +1335,29 @@ function openActionModal({title, body, confirmText, inputValue, inputPlaceholder
   input.value = "";
   textareaWrap.style.display = "none";
   textarea.value = "";
+  contactWrap.style.display = "none";
+  contactRepresentative.value = "";
+  contactAddress.value = "";
+  contactEmail.value = "";
+  contactPhone.value = "";
 
-  if(typeof onTextareaConfirm === "function"){
+  if(typeof onContactConfirm === "function"){
+    const c = contactValue || {};
+    contactWrap.style.display = "grid";
+    contactRepresentative.value = c.representative || "";
+    contactAddress.value = c.address || "";
+    contactEmail.value = c.email || "";
+    contactPhone.value = c.phone || "";
+    confirmBtn.style.display = "inline-flex";
+    confirmBtn.textContent = confirmText || "Ansprechpartner speichern";
+    confirmBtn.onclick = ()=>onContactConfirm({
+      representative: contactRepresentative.value,
+      address: contactAddress.value,
+      email: contactEmail.value,
+      phone: contactPhone.value
+    });
+    setTimeout(()=>contactRepresentative.focus(), 50);
+  }else if(typeof onTextareaConfirm === "function"){
     textareaWrap.style.display = "block";
     textareaLabelEl.textContent = textareaLabel || "Notizen";
     textarea.placeholder = textareaPlaceholder || "Notiz eintragen...";
@@ -1359,6 +1440,23 @@ function showHistory(i){
   const lines=sorted.map(h => h.date + "  –  " + (Number(h.amount)||0).toFixed(2) + " €");
   openActionModal({title:"Historie von " + d.name, body:lines.join("\n")});
 }
+function showContact(i){
+  const d = debts[i];
+  const current = normalizeContactData(d);
+  openActionModal({
+    title:"Ansprechpartner",
+    body:"Hier kannst du die Kontaktdaten zu dieser Schuld speichern.",
+    confirmText:"Ansprechpartner speichern",
+    contactValue: current,
+    onContactConfirm:(contact)=>{
+      setDebtContact(i, contact);
+      save();
+      render();
+      closeActionModal();
+      showToast("Ansprechpartner gespeichert ✅");
+    }
+  });
+}
 function showInfo(i){
   const d=debts[i];
   const paidSum = sumHistory(d);
@@ -1374,6 +1472,7 @@ function showInfo(i){
     "Bereits abgebaut: " + paidSum.toFixed(2) + " €\n" +
     "Restschuld: " + remaining.toFixed(2) + " €\n" +
     "Status: " + (d.status || "–") + "\n" +
+    "Ansprechpartner: " + (String(d.contactPerson || "").trim() || "–") + "\n" +
     "Anzahl Zahlungen: " + count + "\n" +
     "Letzte Zahlung: " + lastDate + "\n\n" +
     "Notiz-Historie:\n" + notesText(d);
@@ -1433,6 +1532,7 @@ function render(){
           "<button class='btn-pay' type='button'>Abbauen</button>" +
           "<button class='btn-history' type='button'>Historie</button>" +
           "<button class='btn-info' type='button'>Info</button>" +
+          "<button class='btn-contact' type='button'>Ansprechpartner</button>" +
         "</div>" +
       "</td>";
     const btns = row.querySelectorAll("button");
@@ -1441,6 +1541,7 @@ function render(){
     btns[2].addEventListener("click", ()=>paySingleDebt(i));
     btns[3].addEventListener("click", ()=>showHistory(i));
     btns[4].addEventListener("click", ()=>showInfo(i));
+    btns[5].addEventListener("click", ()=>showContact(i));
     tbody.appendChild(row);
 
     const card = document.createElement("div");
@@ -1466,6 +1567,7 @@ function render(){
         "<button class='actionBtn btn-pay' type='button'><span class='ico'>€</span><span class='lbl'>Abbau</span></button>" +
         "<button class='actionBtn btn-history' type='button'><span class='ico'>◷</span><span class='lbl'>Historie</span></button>" +
         "<button class='actionBtn btn-info' type='button'><span class='ico'>i</span><span class='lbl'>Info</span></button>" +
+        "<button class='actionBtn btn-contact' type='button'><span class='ico'>☎</span><span class='lbl'>Ansprechpartner</span></button>" +
       "</div>";
     const cbtns = card.querySelectorAll("button");
     cbtns[0].addEventListener("click", ()=>toggleStatus(i));
@@ -1473,6 +1575,7 @@ function render(){
     cbtns[2].addEventListener("click", ()=>paySingleDebt(i));
     cbtns[3].addEventListener("click", ()=>showHistory(i));
     cbtns[4].addEventListener("click", ()=>showInfo(i));
+    cbtns[5].addEventListener("click", ()=>showContact(i));
     mobile.appendChild(card);
   });
 
@@ -1502,7 +1605,22 @@ function escapeHtml(str){
 }
 
 function exportExcel(){
-  const ws=XLSX.utils.json_to_sheet(debts);
+  const excelRows = debts.map(d=>{
+    const c = normalizeContactData(d);
+    return {
+      Name: d.name,
+      Grund: d.grund,
+      Betrag: d.betrag,
+      Datum: d.datum,
+      Status: d.status,
+      "Ansprechpartner Name/Vertreter": c.representative,
+      "Ansprechpartner Anschrift": c.address,
+      "Ansprechpartner E-Mail": c.email,
+      "Ansprechpartner Telefon": c.phone,
+      Notizen: notesText(d)
+    };
+  });
+  const ws=XLSX.utils.json_to_sheet(excelRows);
   const wb=XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb,ws,"Schulden");
   XLSX.writeFile(wb,"godmode_schulden.xlsx");
@@ -1511,8 +1629,8 @@ function exportPDF(){
   const {jsPDF}=window.jspdf;
   const doc=new jsPDF();
   doc.text("Schulden Manager Report",14,15);
-  const rows=debts.map(d=>[d.name,d.grund,(Number(d.betrag)||0).toFixed(2)+"€",d.datum,d.status]);
-  doc.autoTable({head:[["Name","Grund","Betrag","Datum","Status"]],body:rows,startY:20});
+  const rows=debts.map(d=>{ const c=normalizeContactData(d); return [d.name,d.grund,(Number(d.betrag)||0).toFixed(2)+"€",d.datum,d.status,c.representative,c.address,c.email,c.phone]; });
+  doc.autoTable({head:[["Name","Grund","Betrag","Datum","Status","Name/Vertreter","Anschrift","E-Mail","Telefon"]],body:rows,startY:20,styles:{fontSize:8}});
   doc.save("schulden_report.pdf");
 }
 function clearAll(){

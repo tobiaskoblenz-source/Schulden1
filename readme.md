@@ -1,4 +1,4 @@
-# Schulden Manager Dark – Railway Version v4
+# Schulden Manager Dark – Railway Version v6
 
 Diese Version ist für Railway vorbereitet und läuft als kleine Node-App.
 
@@ -18,3 +18,5 @@ Diese Version ist für Railway vorbereitet und läuft als kleine Node-App.
 5. Start-Befehl ist: `npm start`
 
 Railway nutzt automatisch die Variable `PORT`. Du musst dafür nichts extra eintragen.
+
+- Neuer Aktionen-Button „Ansprechpartner“ pro Schuld
