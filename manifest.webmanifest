@@ -8,7 +8,7 @@
   "background_color": "#06101c",
   "theme_color": "#06101c",
   "lang": "de",
-  "description": "Installierbarer Schulden Manager mit Backup, Restore und dauerhaftem Dark Mode. Version v3 mit Notizen im Info-Fenster.",
+  "description": "Installierbarer Schulden Manager mit Backup, Restore und dauerhaftem Dark Mode. Version v4 mit neuer Notiz-Historie im Info-Fenster.",
   "categories": [
     "finance",
     "productivity"

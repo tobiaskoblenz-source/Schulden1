@@ -12,7 +12,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="assets/icons/icon-192.png">
 <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
-<title>Schulden Manager – Dark Mode v3</title>
+<title>Schulden Manager – Dark Mode v4</title>
 
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
@@ -1170,6 +1170,10 @@ function restoreBackup(event){
         datum: String(d.datum ?? ""),
         status: (d.status === "bezahlt") ? "bezahlt" : "offen",
         notes: String(d.notes ?? d.notizen ?? ""),
+        notesHistory: Array.isArray(d.notesHistory) ? d.notesHistory.map(n => ({
+          at: String(n.at ?? n.date ?? ""),
+          text: String(n.text ?? n.note ?? n.value ?? "").trim()
+        })).filter(n => n.text) : (String(d.notes ?? d.notizen ?? "").trim() ? [{at:"", text:String(d.notes ?? d.notizen ?? "").trim()}] : []),
         history: Array.isArray(d.history) ? d.history.map(h => ({
           date: String(h.date ?? ""),
           amount: Number(h.amount ?? 0)
@@ -1201,6 +1205,27 @@ function lastPaymentDate(d){
   }
   return latest || "–";
 }
+function noteEntries(d){
+  const list = Array.isArray(d.notesHistory) ? d.notesHistory : [];
+  const entries = list
+    .map(n => ({at:String(n.at || n.date || ""), text:String(n.text || n.note || n.value || "").trim()}))
+    .filter(n => n.text);
+  if(entries.length === 0 && String(d.notes || "").trim()){
+    entries.push({at:"", text:String(d.notes || "").trim()});
+  }
+  return entries;
+}
+function formatNoteDate(value){
+  if(!value) return "Ohne Datum";
+  const d = new Date(value);
+  if(Number.isNaN(d.getTime())) return value;
+  return d.toLocaleString("de-DE", {day:"2-digit", month:"2-digit", year:"numeric", hour:"2-digit", minute:"2-digit"});
+}
+function notesText(d){
+  const entries = noteEntries(d).slice().reverse();
+  if(entries.length === 0) return "Keine Notizen vorhanden.";
+  return entries.map(n => formatNoteDate(n.at) + " – " + n.text).join("\n");
+}
 
 function addDebtFromInputs(prefix){
   const name = document.getElementById(prefix + "name").value.trim();
@@ -1214,7 +1239,7 @@ function addDebtFromInputs(prefix){
     return false;
   }
 
-  debts.push({name,grund,betrag,datum,status,notes:"",history:[]});
+  debts.push({name,grund,betrag,datum,status,notes:"",notesHistory:[],history:[]});
   save();
   render();
   return true;
@@ -1350,21 +1375,29 @@ function showInfo(i){
     "Restschuld: " + remaining.toFixed(2) + " €\n" +
     "Status: " + (d.status || "–") + "\n" +
     "Anzahl Zahlungen: " + count + "\n" +
-    "Letzte Zahlung: " + lastDate;
+    "Letzte Zahlung: " + lastDate + "\n\n" +
+    "Notiz-Historie:\n" + notesText(d);
 
   openActionModal({
     title:"Info",
     body:msg,
-    confirmText:"Notiz speichern",
-    textareaLabel:"Notizen",
-    textareaPlaceholder:"Hier kannst du Notizen zu dieser Schuld speichern...",
-    textareaValue:d.notes || "",
+    confirmText:"Neue Notiz speichern",
+    textareaLabel:"Neue Notiz",
+    textareaPlaceholder:"Neue Notiz eintragen...",
+    textareaValue:"",
     onTextareaConfirm:(value)=>{
-      debts[i].notes = String(value || "").trim();
+      const text = String(value || "").trim();
+      if(!text){
+        showToast("Bitte erst eine Notiz eintragen.");
+        return;
+      }
+      if(!Array.isArray(debts[i].notesHistory)) debts[i].notesHistory = [];
+      debts[i].notesHistory.push({at:new Date().toISOString(), text});
+      debts[i].notes = notesText(debts[i]);
       save();
       render();
       closeActionModal();
-      showToast("Notiz gespeichert ✅");
+      showToast("Neue Notiz gespeichert ✅");
     }
   });
 }
