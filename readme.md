@@ -1,3 +1,3 @@
-# Schulden v13
+# Schulden v14
 
-Railway-Version mit automatischer Größenanpassung und repariertem Neue-Schuld-Formular.
+Railway-Version. Tablet nutzt jetzt die Desktop-Ansicht mit Tabelle und rechter Detailseite. Handy bleibt mobil optimiert.

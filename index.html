@@ -12,7 +12,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="assets/icons/icon-192.png">
 <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
-<title>Schulden Manager – Dashboard Dark v13</title>
+<title>Schulden Manager – Dashboard Dark v14</title>
 
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
@@ -1431,6 +1431,176 @@ body.dark tbody tr.selectedRow td{
 }
 </style>
 
+
+<style id="v14-tablet-desktop-view">
+/* v14 – Tablet soll wie Desktop aussehen */
+@media (min-width:769px){
+  body.dark .container{
+    padding:0 !important;
+    max-width:none !important;
+    width:100% !important;
+  }
+
+  .dashboardShell{
+    display:grid !important;
+    grid-template-columns: clamp(176px, 16vw, 216px) minmax(0,1fr) !important;
+    min-height:100dvh !important;
+  }
+
+  .sidebar{
+    display:flex !important;
+    position:sticky !important;
+    top:0 !important;
+    height:100dvh !important;
+  }
+
+  .contentArea{
+    padding:clamp(14px, 2vw, 30px) !important;
+    min-width:0 !important;
+  }
+
+  .dashboardContentGrid{
+    display:grid !important;
+    grid-template-columns:minmax(0,1fr) clamp(320px, 30vw, 430px) !important;
+    gap:clamp(12px, 1.5vw, 20px) !important;
+    align-items:start !important;
+  }
+
+  .dashboardMainColumn{
+    min-width:0 !important;
+  }
+
+  .desktopDetailPanel{
+    display:flex !important;
+    position:sticky !important;
+    top:clamp(12px, 2vw, 24px) !important;
+    width:100% !important;
+    min-height:620px !important;
+  }
+
+  #desktopTable{
+    display:block !important;
+  }
+
+  #mobileList,
+  .mobileBottomNav,
+  #fabAdd{
+    display:none !important;
+  }
+
+  .heroTopActions{
+    display:flex !important;
+  }
+
+  .dashboardStats{
+    grid-template-columns:repeat(4,minmax(150px,1fr)) !important;
+  }
+
+  .actionToolbarGrid{
+    grid-template-columns:repeat(3,minmax(120px,1fr)) !important;
+  }
+
+  .boardToolbar{
+    grid-template-columns:minmax(0,1fr) minmax(145px,190px) !important;
+  }
+
+  body.dark tbody td{
+    padding:clamp(10px, 1.15vw, 16px) !important;
+  }
+
+  body.dark tbody td:last-child{
+    min-width:clamp(280px, 28vw, 390px) !important;
+  }
+
+  .tableActions{
+    grid-template-columns:repeat(3,max-content) !important;
+    gap:7px !important;
+  }
+
+  .tableUtilityActions{
+    grid-column:1 / -1;
+    justify-content:flex-start !important;
+  }
+
+  .tableActions .miniBtn{
+    min-height:38px !important;
+    padding:0 10px !important;
+    font-size:12.5px !important;
+  }
+
+  .tableActions .tinyBtn{
+    width:38px !important;
+    height:38px !important;
+    min-width:38px !important;
+  }
+
+  .brandTitle,
+  .brandSub{
+    font-size:clamp(15px, 1.6vw, 18px) !important;
+  }
+
+  .sideNavBtn{
+    font-size:clamp(13px, 1.35vw, 16px) !important;
+    padding:0 clamp(9px, 1.1vw, 14px) !important;
+  }
+
+  .desktopPanelBody{
+    max-height:calc(100dvh - 112px) !important;
+  }
+}
+
+/* Sehr schmale Tablets: Desktop-Look behalten, aber rechte Seite unter die Liste setzen */
+@media (min-width:769px) and (max-width:980px){
+  .dashboardContentGrid{
+    grid-template-columns:1fr !important;
+  }
+
+  .desktopDetailPanel{
+    position:relative !important;
+    top:auto !important;
+    min-height:auto !important;
+    order:-1;
+  }
+
+  .desktopPanelBody{
+    max-height:440px !important;
+  }
+
+  .dashboardStats{
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  }
+
+  .actionToolbarGrid{
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  }
+}
+
+/* Handy bleibt Handy-Ansicht */
+@media (max-width:768px){
+  .dashboardShell{
+    grid-template-columns:1fr !important;
+  }
+  .sidebar{
+    display:none !important;
+  }
+  .dashboardContentGrid{
+    grid-template-columns:1fr !important;
+  }
+  .desktopDetailPanel{
+    display:none !important;
+  }
+  #desktopTable{
+    display:none !important;
+  }
+  #mobileList{
+    display:grid !important;
+  }
+  .mobileBottomNav{
+    display:flex !important;
+  }
+}
+</style>
+
 </head>
 <body class="dark">
 <div class="container">
@@ -1471,7 +1641,7 @@ body.dark tbody tr.selectedRow td{
     <section class="hero heroDashboard">
       <div class="heroMain dashboardHeader">
         <div class="dashboardGreetingWrap">
-          <div class="eyebrow">Dark Dashboard · v13</div>
+          <div class="eyebrow">Dark Dashboard · v14</div>
           <h1 id="greetingTitle">Guten Abend!</h1>
           <p id="greetingText">Hier ist die Übersicht deiner Schulden.</p>
         </div>
@@ -3244,6 +3414,42 @@ if ('serviceWorker' in navigator) {
   window.addEventListener("resize", responsiveView);
   bindFormButtons();
   responsiveView();
+})();
+</script>
+
+
+<script id="v14-tablet-desktop-script">
+(function(){
+  function applyTabletDesktopView(){
+    const isPhone = window.matchMedia("(max-width: 768px)").matches;
+    const desktop = document.getElementById("desktopTable");
+    const mobile = document.getElementById("mobileList");
+
+    if(isPhone){
+      if(desktop) desktop.style.display = "none";
+      if(mobile) mobile.style.display = "grid";
+      try { localStorage.setItem("godmode_view", "mobile"); } catch(e){}
+    }else{
+      if(desktop) desktop.style.display = "block";
+      if(mobile) mobile.style.display = "none";
+      try { localStorage.setItem("godmode_view", "desktop"); } catch(e){}
+    }
+  }
+
+  window.addEventListener("resize", applyTabletDesktopView);
+  window.addEventListener("orientationchange", () => setTimeout(applyTabletDesktopView, 250));
+  applyTabletDesktopView();
+
+  const oldSetView = window.setView;
+  window.setView = function(v){
+    if(window.matchMedia("(min-width: 769px)").matches){
+      v = "desktop";
+    }
+    if(typeof oldSetView === "function"){
+      oldSetView(v);
+      applyTabletDesktopView();
+    }
+  };
 })();
 </script>
 
