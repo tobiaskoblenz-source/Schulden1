@@ -2924,81 +2924,81 @@ body.force-mobile-view .dashboardShell{
       <div id="mobileList"></div>
     </section>
       </div>
-      <aside class="desktopDetailPanel" id="desktopDetailPanel">
-        <div class="desktopPanelHead desktopAkteHead">
-          <div>
-            <span class="drawerEyebrow">📎 Daten</span>
-            <h3>Daten – Schuld-Akte</h3>
-            <p class="desktopAkteSub">Alle wichtigen Infos, Dateien und Verlauf auf einen Blick.</p>
-          </div>
-          <button id="desktopNewNoteBtn" class="secondary smallSideBtn" type="button">＋ Notiz</button>
+      <aside class="desktopDetailPanel desktopAktePanel" id="desktopDetailPanel">
+        <div class="desktopPanelHead desktopAkteTopbar">
+          <span class="desktopAkteBadge">◔ DATEN</span>
+          <button id="desktopNewNoteBtn" class="secondary smallSideBtn desktopTopNoteBtn" type="button">＋ Notiz</button>
         </div>
-        <div class="desktopPanelBody desktopAkteBody">
-          <section class="desktopPanelSection desktopIdentityCard">
-            <div class="desktopIdentityTop">
-              <div class="desktopIdentityAvatar" id="sideIdentityAvatar">S</div>
+        <div class="desktopAkteTitleBlock">
+          <h3>Daten – Schuld-Akte</h3>
+          <p>Alle wichtigen Infos, Dateien und Verlauf auf einen Blick.</p>
+        </div>
+        <div class="desktopPanelBody desktopAkteBodyV30">
+          <section class="desktopPanelSection desktopHeroCard">
+            <div class="desktopHeroHead">
+              <div class="desktopHeroAvatar" id="sideIdentityAvatar">S</div>
               <div>
-                <div id="sideNameValue" class="drawerBigValue">–</div>
-                <div id="sideIdentityMeta" class="desktopIdentityMeta">Schuld-ID: –</div>
+                <div id="sideNameValue" class="desktopHeroName">–</div>
+                <div id="sideIdentityMeta" class="desktopHeroMeta">Schuld-ID: –</div>
               </div>
             </div>
-            <div class="desktopIdentityGrid">
-              <div class="desktopMiniFact"><span>Grund</span><strong id="sideReasonValue">–</strong></div>
-              <div class="desktopMiniFact"><span>Betrag</span><strong id="sideAmountValue">–</strong></div>
-              <div class="desktopMiniFact"><span>Status</span><strong id="sideStatusValue">–</strong></div>
-              <div class="desktopMiniFact"><span>Nächste Frist</span><strong id="sideDateValue">–</strong></div>
+            <div class="desktopHeroFacts">
+              <div class="desktopFactTile"><span>Grund</span><strong id="sideReasonValue">–</strong></div>
+              <div class="desktopFactTile"><span>Betrag</span><strong id="sideAmountValue">–</strong></div>
+              <div class="desktopFactTile"><span>Status</span><strong id="sideStatusValue">–</strong></div>
+              <div class="desktopFactTile"><span>Nächste Frist</span><strong id="sideDateValue">–</strong></div>
             </div>
           </section>
 
-          <div class="desktopAkteGrid2">
-            <section class="desktopPanelSection">
+          <div class="desktopInfoGridV30">
+            <section class="desktopPanelSection desktopMiniInfoCard">
               <div class="drawerSectionHead"><span>1</span><strong>Ansprechpartner</strong></div>
-              <div class="drawerList desktopContactList">
-                <div class="drawerRow"><span>Name / Vertreter</span><strong id="sideContactRepresentative">–</strong></div>
-                <div class="drawerRow"><span>Anschrift</span><strong id="sideContactAddress">–</strong></div>
-                <div class="drawerRow drawerRowActions"><span>E-Mail</span><div class="drawerValueActions"><strong id="sideContactEmail">–</strong><div id="sideContactEmailActions" class="miniActions"></div></div></div>
-                <div class="drawerRow drawerRowActions"><span>Telefonnummer</span><div class="drawerValueActions"><strong id="sideContactPhone">–</strong><div id="sideContactPhoneActions" class="miniActions"></div></div></div>
+              <div class="desktopInfoRows">
+                <div class="desktopInfoRow"><span>Name / Vertreter</span><strong id="sideContactRepresentative">–</strong></div>
+                <div class="desktopInfoRow"><span>Anschrift</span><strong id="sideContactAddress">–</strong></div>
+                <div class="desktopInfoRow desktopInfoRowActions"><span>E-Mail</span><div class="drawerValueActions"><strong id="sideContactEmail">–</strong><div id="sideContactEmailActions" class="miniActions"></div></div></div>
+                <div class="desktopInfoRow desktopInfoRowActions"><span>Telefonnummer</span><div class="drawerValueActions"><strong id="sideContactPhone">–</strong><div id="sideContactPhoneActions" class="miniActions"></div></div></div>
               </div>
             </section>
 
-            <section class="desktopPanelSection">
+            <section class="desktopPanelSection desktopMiniInfoCard">
               <div class="drawerSectionHead"><span>2</span><strong>Aktenzeichen</strong></div>
-              <div class="drawerBigValue drawerBigValueCompact" id="sideCaseValue">–</div>
-              <div class="drawerMutedText">Falls vorhanden, erscheint hier dein Aktenzeichen oder die Referenznummer.</div>
+              <div class="desktopInfoRows">
+                <div class="desktopInfoRow"><span>Aktenzeichen</span><strong id="sideCaseValue">–</strong></div>
+                <div class="desktopInfoRow"><span>Referenznummer</span><strong id="sideReferenceValue">–</strong></div>
+                <div class="desktopInfoRow"><span>Kundennummer</span><strong id="sideCustomerValue">–</strong></div>
+                <div class="desktopInfoRow"><span>Notiz</span><strong id="sideCaseNote">Falls vorhanden, erscheint hier dein Aktenzeichen oder die Referenznummer.</strong></div>
+              </div>
             </section>
-          </div>
 
-          <div class="desktopAkteGrid2">
-            <section class="desktopPanelSection">
+            <section class="desktopPanelSection desktopMiniInfoCard">
               <div class="drawerSectionHead"><span>3</span><strong>Notizen</strong></div>
-              <div id="sideNotesList" class="notesTimeline sideNotesTimeline"></div>
+              <div id="sideNotesList" class="desktopNotesPreview"></div>
+              <button id="desktopInlineNoteBtn" class="secondary desktopCardActionBtn" type="button">＋ Notiz hinzufügen</button>
             </section>
 
-            <div class="desktopStatsStack">
-              <section class="desktopPanelSection">
-                <div class="drawerSectionHead"><span>4</span><strong>Letzte Zahlung</strong></div>
-                <div class="desktopHighlightValue" id="sideLastPaymentValue">–</div>
-                <div class="desktopHighlightSub" id="sidePaidValue">Bereits abgebaut: –</div>
-              </section>
-              <section class="desktopPanelSection">
-                <div class="drawerSectionHead"><span>5</span><strong>Nächste Frist</strong></div>
-                <div class="desktopHighlightValue" id="sideNextDueValue">–</div>
-                <div id="sideDueHint" class="desktopDueHint">Keine Frist hinterlegt</div>
-              </section>
-            </div>
+            <section class="desktopPanelSection desktopMiniInfoCard">
+              <div class="drawerSectionHead"><span>4</span><strong>Letzte Zahlung</strong></div>
+              <div class="desktopInfoRows">
+                <div class="desktopInfoRow"><span>Letzter Betrag</span><strong id="sideLastAmountValue">–</strong></div>
+                <div class="desktopInfoRow"><span>Letztes Datum</span><strong id="sideLastDateOnlyValue">–</strong></div>
+                <div class="desktopInfoRow"><span>Zahlungsart</span><strong id="sidePaymentTypeValue">–</strong></div>
+              </div>
+              <button id="desktopAddPaymentBtn" class="secondary desktopCardActionBtn" type="button">＋ Zahlung erfassen</button>
+            </section>
           </div>
 
           <section class="desktopPanelSection">
-            <div class="drawerSectionHead"><span>6</span><strong>Korrespondenz</strong></div>
+            <div class="drawerSectionHead"><span>5</span><strong>Korrespondenz</strong></div>
             <div id="sideCorrespondenceList" class="desktopCorrList"></div>
           </section>
 
           <section class="desktopPanelSection">
-            <div class="drawerSectionHead"><span>7</span><strong>Verlauf</strong></div>
+            <div class="drawerSectionHead"><span>6</span><strong>Verlauf</strong></div>
             <div id="sideTimelineList" class="desktopTimelineList"></div>
           </section>
         </div>
-        <div class="desktopPanelFooter desktopAkteFooter">
+        <div class="desktopPanelFooter desktopAkteFooterV30">
           <button id="desktopUploadFileBtn" type="button">📎 Datei hochladen</button>
           <button id="desktopDriveSaveBtn" class="secondary" type="button">☁️ In Drive speichern</button>
           <button id="desktopDriveLoadBtn" class="secondary" type="button">⬇️ Aus Drive laden</button>
@@ -4286,12 +4286,12 @@ if ('serviceWorker' in navigator) {
     if(i == null || i < 0 || !debts[i]){
       nameEl.textContent = 'Keine Daten';
       setText('sideIdentityMeta', 'Schuld-ID: –');
-      ['sideContactRepresentative','sideContactAddress','sideContactEmail','sideContactPhone','sideReasonValue','sideAmountValue','sideDateValue','sidePaidValue','sideLastPaymentValue','sideCaseValue','sideNextDueValue'].forEach(id=>setText(id,'–'));
+      ['sideContactRepresentative','sideContactAddress','sideContactEmail','sideContactPhone','sideReasonValue','sideAmountValue','sideDateValue','sideCaseValue','sideReferenceValue','sideCustomerValue','sideLastAmountValue','sideLastDateOnlyValue','sidePaymentTypeValue'].forEach(id=>setText(id,'–'));
       const status = document.getElementById('sideStatusValue'); if(status) status.textContent = '–';
-      if(notesBox) notesBox.innerHTML = '<div class="desktopEmptyState">Noch keine Schuld ausgewählt.</div>';
-      if(corrBox) corrBox.innerHTML = '<div class="desktopEmptyState">Noch keine Dateien hinterlegt.</div>';
+      setText('sideCaseNote', 'Falls vorhanden, erscheint hier dein Aktenzeichen oder die Referenznummer.');
+      if(notesBox) notesBox.innerHTML = '<div class="desktopEmptyState">Noch keine Notizen vorhanden.<br>Hier kannst du wichtige Infos und Erinnerungen speichern.</div>';
+      if(corrBox) corrBox.innerHTML = '<div class="desktopEmptyState">Noch keine Korrespondenz hinterlegt.</div>';
       if(timelineBox) timelineBox.innerHTML = '<div class="desktopEmptyState">Noch kein Verlauf vorhanden.</div>';
-      const due = document.getElementById('sideDueHint'); if(due){ due.className='desktopDueHint'; due.textContent='Keine Frist hinterlegt'; }
       if(avatar) avatar.textContent = 'S';
       buildMiniActions('sideContactEmailActions','');
       buildMiniActions('sideContactPhoneActions','');
@@ -4302,24 +4302,8 @@ if ('serviceWorker' in navigator) {
     const contact = normalizeContactData(d);
     const correspondence = Array.isArray(d.correspondence) ? d.correspondence : [];
     const notes = noteEntries(d).slice().reverse();
-    const payments = Array.isArray(d.history) ? d.history.slice().reverse() : [];
-    const paidTotal = formatEUR(sumHistory(d));
-    const dueRaw = d.datum || '';
-    let dueLabel = dueRaw || '–';
-    let dueHintText = 'Keine Frist hinterlegt';
-    let dueClass = 'desktopDueHint';
-    if(dueRaw){
-      const dueDate = new Date(dueRaw + 'T00:00:00');
-      const now = new Date();
-      now.setHours(0,0,0,0);
-      const diff = Math.round((dueDate - now) / 86400000);
-      if(Number.isFinite(diff)){
-        if(diff < 0){ dueHintText = '⚠️ Überfällig seit ' + Math.abs(diff) + ' Tag' + (Math.abs(diff)===1?'':'en'); dueClass += ' warn'; }
-        else if(diff === 0){ dueHintText = '⚠️ Heute fällig'; dueClass += ' warn'; }
-        else if(diff <= 7){ dueHintText = '⚠️ In ' + diff + ' Tag' + (diff===1?'':'en') + ' fällig'; dueClass += ' warn'; }
-        else { dueHintText = '✓ In ' + diff + ' Tagen fällig'; dueClass += ' ok'; }
-      }
-    }
+    const payments = Array.isArray(d.history) ? d.history.slice() : [];
+    const lastPay = payments.length ? payments[payments.length - 1] : null;
 
     nameEl.textContent = d.name || '–';
     if(avatar) avatar.textContent = initials2(d.name || 'S');
@@ -4331,33 +4315,36 @@ if ('serviceWorker' in navigator) {
     setText('sideReasonValue', d.grund || '–');
     setText('sideAmountValue', formatEUR(Number(d.betrag) || 0));
     setHTML('sideStatusValue', '<span class="statusBadge ' + statusCss(d.status) + '">' + prettyStatus(d.status) + '</span>');
-    setText('sideDateValue', dueRaw || '–');
-    setText('sidePaidValue', 'Bereits abgebaut: ' + paidTotal);
-    setText('sideLastPaymentValue', lastPaymentDate(d) || '–');
-    setText('sideCaseValue', d.aktenzeichen || d.caseNumber || d.referenceNumber || d.ref || '–');
-    setText('sideNextDueValue', dueLabel);
-    const due = document.getElementById('sideDueHint'); if(due){ due.className = dueClass; due.textContent = dueHintText; }
+    setText('sideDateValue', d.datum || '–');
+    setText('sideCaseValue', d.aktenzeichen || d.caseNumber || '–');
+    setText('sideReferenceValue', d.referenceNumber || d.ref || '–');
+    setText('sideCustomerValue', d.customerNumber || d.kundennummer || d.customerId || '–');
+    setText('sideCaseNote', (d.caseNote || '').trim() || 'Falls vorhanden, erscheint hier dein Aktenzeichen oder die Referenznummer.');
+    setText('sideLastAmountValue', lastPay ? formatEUR(Number(lastPay.amount) || 0) : '–');
+    setText('sideLastDateOnlyValue', lastPay ? (lastPay.date || formatNoteDate(lastPay.at || '')) : '–');
+    setText('sidePaymentTypeValue', lastPay && lastPay.type ? lastPay.type : '–');
     buildMiniActions('sideContactEmailActions', contact.email, 'email');
     buildMiniActions('sideContactPhoneActions', contact.phone, 'phone');
 
     if(notesBox){
-      notesBox.innerHTML = notes.length ? notes.map(n => '<div class="noteTimelineItem"><time>' + escapeHTML2(formatNoteDate(n.at)) + '</time><p>' + nl2br2(n.text) + '</p></div>').join('') : '<div class="desktopEmptyState">Keine Notizen vorhanden.</div>';
+      notesBox.innerHTML = notes.length ? notes.slice(0,3).map(n => '<div class="desktopNoteItem"><strong>' + escapeHTML2(formatNoteDate(n.at)) + '</strong><span>' + nl2br2(n.text) + '</span></div>').join('') : '<div class="desktopEmptyState">Noch keine Notizen vorhanden.<br>Hier kannst du wichtige Infos und Erinnerungen speichern.</div>';
     }
 
     if(corrBox){
       corrBox.innerHTML = correspondence.length ? correspondence.slice().reverse().map(item=>{
         const link = item.webViewLink || (item.driveFileId ? 'https://drive.google.com/file/d/' + encodeURIComponent(item.driveFileId) + '/view' : '');
-        return '<div class="desktopCorrItem"><div class="desktopCorrMeta"><strong>' + escapeHTML2(item.name || item.driveName || 'Datei') + '</strong><span>' + escapeHTML2((item.date || '').split('-').reverse().join('.') || 'Ohne Datum') + ' · ' + escapeHTML2(item.mimeType || 'Datei') + '</span></div><div class="desktopCorrLinks">' + (link ? '<a class="desktopTinyLink" target="_blank" rel="noopener" href="' + escapeHTML2(link) + '">Öffnen</a>' : '') + '</div></div>';
+        const labelDate = item.date ? item.date.split('-').reverse().join('.') : 'Ohne Datum';
+        return '<div class="desktopCorrItem"><div class="desktopCorrMeta"><strong>' + escapeHTML2(item.name || item.driveName || 'Datei') + '</strong><span>' + escapeHTML2(labelDate) + ' · ' + escapeHTML2(item.mimeType || 'Datei') + '</span></div><div class="desktopCorrLinks">' + (link ? '<a class="desktopTinyLink" target="_blank" rel="noopener" href="' + escapeHTML2(link) + '">Öffnen</a>' : '') + '</div></div>';
       }).join('') : '<div class="desktopEmptyState">Noch keine Korrespondenz hinterlegt.</div>';
     }
 
     const timelineItems = [];
-    notes.forEach(n=> timelineItems.push({date:n.at || '', title:'Notiz gespeichert', sub:n.text || '', kind:'note'}));
-    payments.forEach(h=> timelineItems.push({date:h.date || h.at || '', title: formatEUR(Number(h.amount)||0) + ' bezahlt', sub:'Zahlung eingetragen', kind:'pay'}));
-    correspondence.forEach(c=> timelineItems.push({date:c.uploadedAt || c.date || '', title:'Datei hochgeladen', sub:(c.name || c.driveName || 'Datei') + ((c.date && c.uploadedAt)?' · Datum ' + c.date.split('-').reverse().join('.'):'') , kind:'file'}));
+    notes.forEach(n=> timelineItems.push({date:n.at || '', title:'Notiz gespeichert', sub:n.text || ''}));
+    payments.forEach(h=> timelineItems.push({date:h.date || h.at || '', title: formatEUR(Number(h.amount)||0) + ' bezahlt', sub:'Zahlung eingetragen'}));
+    correspondence.forEach(c=> timelineItems.push({date:c.uploadedAt || c.date || '', title:'Datei hochgeladen', sub:(c.name || c.driveName || 'Datei')}));
     timelineItems.sort((a,b)=> new Date(b.date || 0) - new Date(a.date || 0));
     if(timelineBox){
-      timelineBox.innerHTML = timelineItems.length ? timelineItems.slice(0,12).map(item => '<div class="desktopTimelineItemV26"><div class="desktopTimelineShell"><div class="desktopTimelineDot"></div><div class="desktopTimelineMain"><strong>' + escapeHTML2(item.title) + '</strong><span>' + nl2br2(item.sub) + '</span></div></div><div class="desktopTimelineTime">' + escapeHTML2(formatNoteDate(item.date || '')) + '</div></div>').join('') : '<div class="desktopEmptyState">Noch kein Verlauf vorhanden.</div>';
+      timelineBox.innerHTML = timelineItems.length ? timelineItems.slice(0,12).map(item => '<div class="desktopTimelineItemV30"><div class="desktopTimelineDot"></div><div class="desktopTimelineMain"><strong>' + escapeHTML2(item.title) + '</strong><span>' + nl2br2(item.sub) + '</span></div><div class="desktopTimelineTime">' + escapeHTML2(formatNoteDate(item.date || '')) + '</div></div>').join('') : '<div class="desktopEmptyState">Noch kein Verlauf vorhanden.</div>';
     }
   }
   window.showInfo = function(i){
@@ -4490,6 +4477,8 @@ if ('serviceWorker' in navigator) {
   document.getElementById('desktopUploadFileBtn')?.addEventListener('click', ()=>{ if(selectedDebtIndex == null || selectedDebtIndex < 0) return; if(typeof window.showCorrespondence === 'function') window.showCorrespondence(selectedDebtIndex); });
   document.getElementById('desktopDriveSaveBtn')?.addEventListener('click', ()=>{ document.getElementById('btnDriveSave')?.click(); });
   document.getElementById('desktopDriveLoadBtn')?.addEventListener('click', ()=>{ document.getElementById('btnDriveLoad')?.click(); });
+  document.getElementById('desktopInlineNoteBtn')?.addEventListener('click', ()=>{ document.getElementById('desktopNewNoteBtn')?.click(); });
+  document.getElementById('desktopAddPaymentBtn')?.addEventListener('click', ()=>{ if(selectedDebtIndex == null || selectedDebtIndex < 0) return; paySingleDebt(selectedDebtIndex); });
 
   document.addEventListener('click', async (e)=>{
     const btn = e.target.closest('[data-copy]');
@@ -5972,74 +5961,64 @@ if ('serviceWorker' in navigator) {
 </script>
 
 
-<style id="v26-desktop-akte-style">
-.desktopAkteHead{padding-bottom:14px;}
-.desktopAkteHead h3{margin:8px 0 4px;font-size:30px;line-height:1.1;}
-.desktopAkteSub{margin:0;color:#90a4c0;font-size:13px;line-height:1.45;}
-.desktopAkteBody{display:grid;gap:14px;}
-.desktopIdentityCard{background:linear-gradient(180deg, rgba(123,92,255,.14), rgba(255,255,255,.03));}
-.desktopIdentityTop{display:flex;align-items:center;gap:14px;margin-bottom:14px;}
-.desktopIdentityAvatar{width:58px;height:58px;border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;background:linear-gradient(180deg,#6d5cff,#4b3bdb);color:#fff;box-shadow:0 14px 28px rgba(78,59,219,.28);}
-.desktopIdentityMeta{color:#9db0ca;font-size:13px;margin-top:4px;}
-.desktopIdentityGrid,.desktopAkteGrid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;}
-.desktopMiniFact{padding:12px 14px;border-radius:16px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);}
-.desktopMiniFact span{display:block;color:#89a0bf;font-size:12px;margin-bottom:6px;}
-.desktopMiniFact strong{display:block;color:#fff;font-size:16px;line-height:1.35;}
-.drawerBigValueCompact{font-size:20px;}
-.drawerMutedText{margin-top:8px;color:#8fa4c0;font-size:13px;line-height:1.45;}
-.desktopStatsStack{display:grid;gap:14px;}
-.desktopHighlightValue{font-size:24px;font-weight:900;color:#fff;line-height:1.2;}
-.desktopHighlightSub{margin-top:8px;color:#7fdca8;font-size:14px;font-weight:700;}
-.desktopDueHint{margin-top:10px;display:inline-flex;align-items:center;gap:8px;border-radius:12px;padding:10px 12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);color:#c5d3e8;font-size:13px;font-weight:700;}
-.desktopDueHint.warn{background:rgba(255,183,77,.12);border-color:rgba(255,183,77,.28);color:#ffc870;}
-.desktopDueHint.ok{background:rgba(77,201,124,.12);border-color:rgba(77,201,124,.24);color:#93e2af;}
+
+
+
+
+
+
+
+
+<style id="v30-desktop-akte-approved-look">
+.desktopAktePanel{position:sticky;top:24px;border-radius:28px;padding:22px;background:linear-gradient(180deg, rgba(9,18,32,.985), rgba(6,14,26,.985));border:1px solid rgba(255,255,255,.08);box-shadow:0 26px 50px rgba(0,0,0,.28);min-height:620px;display:flex;flex-direction:column;}
+.desktopAkteTopbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 0 10px;border-bottom:0;}
+.desktopAkteBadge{display:inline-flex;align-items:center;justify-content:center;padding:8px 14px;border-radius:999px;background:#14294a;border:1px solid rgba(255,255,255,.08);color:#e8f0ff;font-size:12px;font-weight:900;letter-spacing:.08em;}
+.desktopTopNoteBtn{min-height:42px;padding:0 16px;border-radius:14px;font-weight:800;}
+.desktopAkteTitleBlock h3{margin:0;color:#fff;font-size:30px;line-height:1.1;letter-spacing:-.02em;}
+.desktopAkteTitleBlock p{margin:10px 0 0;color:#8ea4c3;font-size:14px;line-height:1.45;}
+.desktopAkteBodyV30{display:grid;gap:14px;padding-top:16px;max-height:calc(100vh - 180px);overflow:auto;padding-right:2px;}
+.desktopHeroCard{padding:18px;border-radius:22px;background:linear-gradient(180deg, rgba(45,44,92,.62), rgba(28,34,64,.52));border:1px solid rgba(126,115,255,.18);}
+.desktopHeroHead{display:flex;align-items:center;gap:14px;margin-bottom:16px;}
+.desktopHeroAvatar{width:56px;height:56px;border-radius:18px;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#7c5cff,#5a40f1);color:#fff;font-size:22px;font-weight:900;box-shadow:0 16px 30px rgba(90,64,241,.35);}
+.desktopHeroName{color:#fff;font-size:22px;font-weight:900;line-height:1.15;}
+.desktopHeroMeta{color:#98acd0;font-size:13px;margin-top:4px;}
+.desktopHeroFacts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}
+.desktopFactTile{padding:14px 16px;border-radius:16px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.07);}
+.desktopFactTile span{display:block;color:#8ea4c3;font-size:12px;margin-bottom:6px;}
+.desktopFactTile strong{display:block;color:#fff;font-size:16px;line-height:1.35;word-break:break-word;}
+.desktopInfoGridV30{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;}
+.desktopMiniInfoCard{padding:16px;border-radius:20px;background:rgba(255,255,255,.028);border:1px solid rgba(255,255,255,.07);display:flex;flex-direction:column;gap:12px;min-height:220px;}
+.desktopInfoRows{display:grid;gap:10px;}
+.desktopInfoRow{display:grid;grid-template-columns:116px minmax(0,1fr);gap:10px;align-items:start;}
+.desktopInfoRow span{color:#8ea4c3;font-size:12px;line-height:1.35;}
+.desktopInfoRow strong{color:#eef3ff;font-size:13px;line-height:1.45;word-break:break-word;}
+.desktopInfoRowActions .drawerValueActions{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;min-width:0;}
+.desktopNotesPreview{display:grid;gap:10px;flex:1 1 auto;}
+.desktopNoteItem{padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);display:grid;gap:6px;}
+.desktopNoteItem strong{color:#dce7fb;font-size:12px;}
+.desktopNoteItem span{color:#97aace;font-size:13px;line-height:1.45;}
+.desktopCardActionBtn{margin-top:auto;min-height:42px;border-radius:14px;font-weight:800;}
 .desktopCorrList,.desktopTimelineList{display:grid;gap:10px;}
-.desktopCorrItem,.desktopTimelineItemV26{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.06);}
+.desktopCorrItem,.desktopTimelineItemV30{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:start;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.06);}
 .desktopCorrMeta strong,.desktopTimelineMain strong{display:block;color:#fff;font-size:14px;line-height:1.35;}
 .desktopCorrMeta span,.desktopTimelineMain span,.desktopTimelineTime{display:block;color:#8ea4c3;font-size:12px;line-height:1.45;}
 .desktopCorrLinks{display:flex;gap:8px;flex-wrap:wrap;}
 .desktopTinyLink{display:inline-flex;align-items:center;justify-content:center;padding:8px 10px;border-radius:10px;background:#102039;color:#e9f1ff;text-decoration:none;border:1px solid rgba(255,255,255,.08);font-size:12px;font-weight:800;}
-.desktopTimelineItemV26{position:relative;}
-.desktopTimelineDot{width:10px;height:10px;border-radius:50%;background:#7b5cff;box-shadow:0 0 0 6px rgba(123,92,255,.12);margin-top:6px;flex:0 0 auto;}
-.desktopTimelineMain{flex:1 1 auto;}
-.desktopTimelineShell{display:flex;align-items:flex-start;gap:12px;}
-.desktopEmptyState{padding:16px;border-radius:14px;background:rgba(255,255,255,.03);border:1px dashed rgba(255,255,255,.09);color:#8fa4c0;font-size:13px;}
-.desktopPanelFooter.desktopAkteFooter{display:grid;grid-template-columns:1.1fr 1fr 1fr;gap:10px;margin-top:14px;}
-.desktopPanelFooter.desktopAkteFooter button{min-height:46px;border-radius:14px;font-weight:800;}
-.desktopPanelFooter.desktopAkteFooter .secondary{background:#102039!important;border:1px solid rgba(255,255,255,.08)!important;color:#edf3ff!important;}
-@media (max-width:1380px){.desktopAkteGrid2,.desktopIdentityGrid{grid-template-columns:1fr;}.desktopPanelFooter.desktopAkteFooter{grid-template-columns:1fr;}}
-</style>
-
-
-
-
-
-
-<style id="v29-right-panel-wider-like-marked">
-/* v29 – rechte Daten-Spalte deutlich breiter wie im markierten Bereich */
-.dashboardContentGrid{
-  grid-template-columns:minmax(0,0.86fr) 640px !important;
-  gap:18px !important;
-  align-items:start;
-}
+.desktopTimelineItemV30{grid-template-columns:10px minmax(0,1fr) auto;}
+.desktopTimelineDot{width:10px;height:10px;border-radius:50%;background:#7b5cff;box-shadow:0 0 0 6px rgba(123,92,255,.12);margin-top:5px;}
+.desktopTimelineMain{min-width:0;}
+.desktopTimelineTime{white-space:nowrap;}
+.desktopEmptyState{padding:16px;border-radius:14px;background:rgba(255,255,255,.03);border:1px dashed rgba(255,255,255,.09);color:#8fa4c0;font-size:13px;line-height:1.55;}
+.desktopAkteFooterV30{display:grid;grid-template-columns:1.15fr 1fr 1fr;gap:10px;margin-top:14px;}
+.desktopAkteFooterV30 button{min-height:46px;border-radius:14px;font-weight:800;}
+.desktopAkteFooterV30 .secondary{background:#102039!important;border:1px solid rgba(255,255,255,.08)!important;color:#edf3ff!important;}
+.dashboardContentGrid{grid-template-columns:minmax(0,.92fr) 610px !important;gap:18px !important;align-items:start;}
 #desktopTable.dashboardTableWrap{min-width:0;}
-.desktopDetailPanel{padding:20px !important;}
-.desktopAkteGrid2{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;}
-@media (max-width:1650px){
-  .dashboardContentGrid{grid-template-columns:minmax(0,0.92fr) 600px !important;}
-}
-@media (max-width:1500px){
-  .dashboardContentGrid{grid-template-columns:minmax(0,1fr) 560px !important;}
-}
-@media (max-width:1380px){
-  .dashboardContentGrid{grid-template-columns:minmax(0,1fr) 520px !important;}
-}
-@media (max-width:1320px){
-  .dashboardContentGrid{grid-template-columns:minmax(0,1fr) 460px !important;}
-}
-@media (max-width:1120px){
-  .dashboardContentGrid{grid-template-columns:1fr !important;}
-}
+@media (max-width:1580px){.dashboardContentGrid{grid-template-columns:minmax(0,1fr) 570px !important;}}
+@media (max-width:1440px){.dashboardContentGrid{grid-template-columns:minmax(0,1fr) 520px !important;}}
+@media (max-width:1320px){.dashboardContentGrid{grid-template-columns:minmax(0,1fr) 470px !important;}}
+@media (max-width:1180px){.desktopInfoGridV30{grid-template-columns:1fr;}.desktopAkteFooterV30{grid-template-columns:1fr;}}
+@media (max-width:1120px){.dashboardContentGrid{grid-template-columns:1fr !important;}.desktopAktePanel{display:none;}}
 </style>
 
 </body>
