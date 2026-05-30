@@ -1,15 +1,16 @@
-# Schulden v21
+# Schulden v37
 
-Railway-Version mit automatischer Synchronisierung.
+Basis: Schulden v36.
 
-Die App speichert lokal und synchronisiert zusätzlich über `/api/sync` auf dem Railway-Server.
+Neu in v37:
 
-Wichtig für dauerhafte Daten: In Railway am besten ein Volume einrichten und als Variable `DATA_DIR=/data` setzen. Ohne Volume können die Serverdaten bei Redeploy/Neustart verloren gehen; die lokalen Daten im Browser bleiben trotzdem erhalten.
+- Gläubiger-Verwaltung hinzugefügt
+- Gläubiger können aus vorhandenen Schulden übernommen werden
+- Beim Anlegen einer neuen Schuld kann ein Gläubiger ausgewählt werden
+- QR-Bogen pro Gläubiger im Stil der großen PDF
+- QR-Codes enthalten Gläubiger-ID, Name und Dokumenttyp
+- Dokumenttypen: Brief, Bescheid, Mahnung, Vollstreckung
+- QR-Button direkt in der Schulden-Tabelle
 
-
-## Version v24
-- Google Drive/Korrespondenz aus v22 enthalten.
-- Service-Worker-Cache aktualisiert, damit Railway nach Deploy die neue Oberfläche ausliefert.
-
-
-V24: Korrespondenz-Button wird nach jedem Rendern sichtbar nachgerüstet.
+Hinweis:
+Für die QR-Code-Erstellung wird im Browser die QR-Bibliothek von jsDelivr geladen. PDF-Erstellung nutzt wie vorher jsPDF.

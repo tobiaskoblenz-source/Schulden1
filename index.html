@@ -5995,8 +5995,8 @@ if ('serviceWorker' in navigator) {
 
 <script id="v33-loaded-marker">
 (function(){
-  document.documentElement.setAttribute("data-schulden-version","v36");
-  window.SCHULDEN_APP_VERSION = "v36-drive-less-prompts-dataakte-polish";
+  document.documentElement.setAttribute("data-schulden-version","v37");
+  window.SCHULDEN_APP_VERSION = "v37-creditor-qr-module";
 })();
 </script>
 
@@ -6220,6 +6220,204 @@ if ('serviceWorker' in navigator) {
   }
   document.addEventListener("DOMContentLoaded", setStatus);
   setTimeout(setStatus, 500);
+})();
+</script>
+
+
+<style id="v37-creditor-qr-style">
+.creditorBtn{background:linear-gradient(135deg,rgba(89,246,167,.14),rgba(79,140,255,.14))!important;border-color:rgba(89,246,167,.28)!important;color:#eafff4!important;font-weight:900!important;}
+.creditorOverlay{position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,.64);backdrop-filter:blur(14px);display:none;padding:18px;overflow:auto;}
+.creditorOverlay.show{display:block;}
+.creditorModal{width:min(1180px,100%);margin:20px auto;border-radius:32px;background:linear-gradient(180deg,rgba(9,18,32,.98),rgba(5,13,25,.98));border:1px solid rgba(255,255,255,.12);box-shadow:0 38px 90px rgba(0,0,0,.5);color:#edf4ff;overflow:hidden;}
+.creditorHead{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:24px;border-bottom:1px solid rgba(255,255,255,.08);background:radial-gradient(circle at 10% 0%,rgba(89,246,167,.16),transparent 34%),radial-gradient(circle at 80% 0%,rgba(124,113,255,.18),transparent 34%);}
+.creditorHead h3{margin:0;font-size:27px;letter-spacing:-.03em}.creditorHead p{margin:7px 0 0;color:#9eb0cc;line-height:1.45}.creditorClose{min-width:52px;border-radius:18px!important}
+.creditorBody{display:grid;grid-template-columns:390px minmax(0,1fr);gap:18px;padding:20px;}.creditorForm,.creditorListPanel{border-radius:24px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.08);padding:18px;}
+.creditorForm h4,.creditorListPanel h4{margin:0 0 14px;font-size:16px}.creditorGrid{display:grid;gap:10px}.creditorGrid label{display:grid;gap:7px;color:#9fb0cc;font-size:12px;font-weight:800}.creditorGrid input,.creditorGrid select,.creditorGrid textarea{width:100%;min-width:0;background:#0f1c2f!important;color:#edf4ff!important;border-color:rgba(255,255,255,.10)!important}.creditorGrid textarea{min-height:88px;padding:12px 14px;border-radius:18px;resize:vertical}.creditorActions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:13px}.creditorActions .wide{grid-column:1/-1}.creditorListTools{display:flex;gap:10px;margin-bottom:13px}.creditorListTools input{background:#0f1c2f!important;color:#edf4ff!important;border-color:rgba(255,255,255,.10)!important;width:100%;}
+.creditorList{display:grid;gap:10px;max-height:650px;overflow:auto;padding-right:4px}.creditorItem{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;padding:14px;border-radius:18px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.08)}.creditorItem strong{display:block;font-size:15px}.creditorItem span{display:block;color:#9fb0cc;font-size:12px;margin-top:3px}.creditorItemActions{display:flex;flex-wrap:wrap;gap:7px;justify-content:flex-end}.creditorItemActions button{min-height:38px;border-radius:13px!important;padding:0 11px!important;font-size:13px!important}.creditorBadge{display:inline-flex;align-items:center;gap:6px;padding:4px 9px;border-radius:999px;background:rgba(89,246,167,.10);border:1px solid rgba(89,246,167,.20);color:#a9ffd0;font-weight:900;font-size:11px;margin-top:7px}.debtQrBtn{background:rgba(89,246,167,.12)!important;border-color:rgba(89,246,167,.25)!important;color:#adffd1!important;}.creditorHint{margin-top:12px;padding:12px;border-radius:16px;background:rgba(79,140,255,.08);border:1px solid rgba(79,140,255,.14);color:#b9c8e8;font-size:13px;line-height:1.5}.qrTypePreview{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}.qrTypePreview span{border-radius:12px;padding:8px 7px;font-size:11px;text-align:center;font-weight:950;color:#07111f}.qtBrief{background:#8df2b5}.qtBescheid{background:#9fc6ff}.qtMahnung{background:#ffd36a}.qtVollstreckung{background:#ff8fa0}
+@media(max-width:900px){.creditorBody{grid-template-columns:1fr}.creditorItem{grid-template-columns:1fr}.creditorItemActions{justify-content:flex-start}.qrTypePreview{grid-template-columns:repeat(2,1fr)}}
+</style>
+
+<script id="v37-creditor-qr-module">
+(function(){
+  document.documentElement.setAttribute("data-schulden-version","v37");
+  window.SCHULDEN_APP_VERSION = "v37-creditor-qr-module";
+  const LS = "schulden_creditors_v37";
+  const TYPES = [
+    {key:"brief", label:"Brief", short:"Br", color:[141,242,181]},
+    {key:"bescheid", label:"Bescheid", short:"B", color:[159,198,255]},
+    {key:"mahnung", label:"Mahnung", short:"M", color:[255,211,106]},
+    {key:"vollstreckung", label:"Vollstreckung", short:"V", color:[255,143,160]}
+  ];
+  let editId = null;
+  function $(id){return document.getElementById(id)}
+  function esc(v){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m]));}
+  function toast(m){ if(typeof showToast === "function") showToast(m); else alert(m); }
+  function uid(){ return "cred_"+Date.now().toString(36)+"_"+Math.random().toString(36).slice(2,8); }
+  function getDebtsSafe(){ return Array.isArray(window.debts) ? window.debts : (typeof debts !== "undefined" && Array.isArray(debts) ? debts : []); }
+  function saveDebtsSafe(){ if(typeof save === "function") save(); else localStorage.setItem("godmode_debts", JSON.stringify(getDebtsSafe())); }
+  function read(){ try{ const a=JSON.parse(localStorage.getItem(LS)||"[]"); return Array.isArray(a)?a:[]; }catch(e){ return []; } }
+  function write(a){ localStorage.setItem(LS, JSON.stringify(a)); }
+  function normalize(s){return String(s||"").trim().toLowerCase().replace(/\s+/g," ");}
+  function label(c){ return [c.name,c.extra].filter(Boolean).join(" ").trim() || "Ohne Name"; }
+  function payload(c,type){
+    return ["SCHULDENAPP", "v37", "creditor:"+(c.id||""), "name:"+label(c), "type:"+type.label.toLowerCase()].join("|");
+  }
+  function ensureOverlay(){
+    if($("creditorOverlay")) return;
+    document.body.insertAdjacentHTML("beforeend", `
+      <div id="creditorOverlay" class="creditorOverlay" aria-hidden="true">
+        <div class="creditorModal" role="dialog" aria-modal="true" aria-labelledby="creditorTitle">
+          <div class="creditorHead">
+            <div><h3 id="creditorTitle">Gläubiger & QR-Codes</h3><p>Hier legst du AOK, Finanzamt, Gericht usw. an. Danach kannst du QR-Bögen im Stil deiner großen PDF drucken.</p></div>
+            <button id="creditorClose" class="secondary creditorClose" type="button">✕</button>
+          </div>
+          <div class="creditorBody">
+            <section class="creditorForm">
+              <h4 id="creditorFormTitle">Neuen Gläubiger anlegen</h4>
+              <div class="creditorGrid">
+                <label>Name *<input id="credName" placeholder="z. B. AOK"></label>
+                <label>Zusatz / Region<input id="credExtra" placeholder="z. B. Niedersachsen"></label>
+                <label>Kategorie<select id="credCategory"><option>Krankenkasse</option><option>Amt / Behörde</option><option>Gericht</option><option>Inkasso</option><option>Versicherung</option><option>Privatperson</option><option>Sonstiges</option></select></label>
+                <label>Aktenzeichen<input id="credAz" placeholder="optional"></label>
+                <label>Telefon<input id="credPhone" type="tel" placeholder="optional"></label>
+                <label>E-Mail<input id="credEmail" type="email" placeholder="optional"></label>
+                <label>Adresse<textarea id="credAddress" placeholder="optional"></textarea></label>
+                <label>Notiz<textarea id="credNotes" placeholder="optional"></textarea></label>
+              </div>
+              <div class="qrTypePreview"><span class="qtBrief">Brief</span><span class="qtBescheid">Bescheid</span><span class="qtMahnung">Mahnung</span><span class="qtVollstreckung">Vollstreckung</span></div>
+              <div class="creditorActions"><button id="credSave" type="button">Speichern</button><button id="credReset" class="secondary" type="button">Neu</button><button id="credImportDebts" class="secondary wide" type="button">Aus vorhandenen Schulden übernehmen</button></div>
+              <div class="creditorHint">Tipp: Erst alle Gläubiger anlegen. Danach kannst du pro Gläubiger einen kompletten QR-Bogen erstellen und auf Briefe kleben.</div>
+            </section>
+            <section class="creditorListPanel">
+              <h4>Gespeicherte Gläubiger</h4>
+              <div class="creditorListTools"><input id="credSearch" placeholder="Gläubiger suchen..."></div>
+              <div id="creditorList" class="creditorList"></div>
+            </section>
+          </div>
+        </div>
+      </div>`);
+    $("creditorClose").onclick=close;
+    $("creditorOverlay").addEventListener("click",e=>{ if(e.target.id==="creditorOverlay") close(); });
+    $("credSave").onclick=saveCreditor;
+    $("credReset").onclick=resetForm;
+    $("credImportDebts").onclick=importFromDebts;
+    $("credSearch").addEventListener("input",renderList);
+  }
+  function open(){ ensureOverlay(); renderList(); $("creditorOverlay").classList.add("show"); $("creditorOverlay").setAttribute("aria-hidden","false"); document.body.classList.add("modalOpen"); setTimeout(()=>$("credName")?.focus(),50); }
+  function close(){ $("creditorOverlay")?.classList.remove("show"); $("creditorOverlay")?.setAttribute("aria-hidden","true"); document.body.classList.remove("modalOpen"); }
+  function resetForm(){ editId=null; ["credName","credExtra","credAz","credPhone","credEmail","credAddress","credNotes"].forEach(id=>{const el=$(id); if(el) el.value="";}); if($("credCategory")) $("credCategory").value="Krankenkasse"; if($("creditorFormTitle")) $("creditorFormTitle").textContent="Neuen Gläubiger anlegen"; }
+  function formData(){ return { name:$("credName")?.value.trim()||"", extra:$("credExtra")?.value.trim()||"", category:$("credCategory")?.value||"Sonstiges", aktenzeichen:$("credAz")?.value.trim()||"", phone:$("credPhone")?.value.trim()||"", email:$("credEmail")?.value.trim()||"", address:$("credAddress")?.value.trim()||"", notes:$("credNotes")?.value.trim()||"" }; }
+  function fill(c){ editId=c.id; $("credName").value=c.name||""; $("credExtra").value=c.extra||""; $("credCategory").value=c.category||"Sonstiges"; $("credAz").value=c.aktenzeichen||""; $("credPhone").value=c.phone||""; $("credEmail").value=c.email||""; $("credAddress").value=c.address||""; $("credNotes").value=c.notes||""; $("creditorFormTitle").textContent="Gläubiger bearbeiten"; }
+  function saveCreditor(){
+    const data=formData(); if(!data.name){ toast("Bitte Gläubiger-Name eintragen."); $("credName")?.focus(); return; }
+    const arr=read();
+    if(editId){ const i=arr.findIndex(x=>x.id===editId); if(i>=0) arr[i]={...arr[i],...data, updatedAt:new Date().toISOString()}; }
+    else { arr.push({id:uid(),...data,createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()}); }
+    write(arr); renderList(); resetForm(); toast("Gläubiger gespeichert ✅"); patchAddFormSelect();
+  }
+  function del(id){ if(!confirm("Diesen Gläubiger löschen? Die Schulden bleiben erhalten.")) return; write(read().filter(c=>c.id!==id)); renderList(); patchAddFormSelect(); toast("Gläubiger gelöscht."); }
+  function renderList(){
+    const box=$("creditorList"); if(!box) return; const q=normalize($("credSearch")?.value||"");
+    const arr=read().filter(c=>!q || normalize(JSON.stringify(c)).includes(q)).sort((a,b)=>label(a).localeCompare(label(b),"de"));
+    if(!arr.length){ box.innerHTML='<div class="creditorHint">Noch keine Gläubiger gespeichert.</div>'; return; }
+    box.innerHTML=arr.map(c=>`<article class="creditorItem" data-id="${esc(c.id)}"><div><strong>${esc(label(c))}</strong><span>${esc(c.category||"Sonstiges")}${c.aktenzeichen?" · AZ: "+esc(c.aktenzeichen):""}</span><em class="creditorBadge">QR-Bogen bereit</em></div><div class="creditorItemActions"><button class="secondary" data-act="edit">Bearbeiten</button><button class="creditorBtn" data-act="qr">QR-Bogen</button><button class="btn-delete" data-act="del">Löschen</button></div></article>`).join("");
+    box.querySelectorAll("button").forEach(btn=>btn.onclick=()=>{ const id=btn.closest(".creditorItem")?.dataset.id; const c=read().find(x=>x.id===id); if(!c) return; const act=btn.dataset.act; if(act==="edit") fill(c); if(act==="qr") generateSheet(c); if(act==="del") del(id); });
+  }
+  function importFromDebts(){
+    const arr=read(); const seen=new Set(arr.map(c=>normalize(label(c)))); let added=0;
+    getDebtsSafe().forEach(d=>{ const name=String(d.name||"").trim(); if(!name) return; const key=normalize(name); if(seen.has(key)) return; arr.push({id:uid(),name,extra:"",category:"Sonstiges",aktenzeichen:d.aktenzeichen||"",phone:"",email:"",address:"",notes:"Aus vorhandener Schuld übernommen",createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()}); seen.add(key); added++; });
+    write(arr); renderList(); patchAddFormSelect(); toast(added?added+" Gläubiger übernommen ✅":"Keine neuen Gläubiger gefunden.");
+  }
+  function loadQrLib(){
+    return new Promise((resolve,reject)=>{
+      if(window.QRCode && typeof window.QRCode.toDataURL === "function") return resolve();
+      const s=document.createElement("script"); s.src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"; s.onload=resolve; s.onerror=()=>reject(new Error("QR-Code-Bibliothek konnte nicht geladen werden.")); document.head.appendChild(s);
+    });
+  }
+  async function qrDataUrl(text){ await loadQrLib(); return await window.QRCode.toDataURL(text,{errorCorrectionLevel:"M",margin:1,width:360,color:{dark:"#000000",light:"#ffffff"}}); }
+  async function generateSheet(c){
+    try{
+      if(!window.jspdf || !window.jspdf.jsPDF){ toast("PDF-Bibliothek fehlt. Bitte Internetverbindung prüfen."); return; }
+      toast("QR-Bogen wird erstellt…");
+      const {jsPDF}=window.jspdf; const doc=new jsPDF({unit:"mm",format:"a4",orientation:"portrait"});
+      const pageW=210, pageH=297, margin=10, cols=4, rows=6, gap=3;
+      const w=(pageW-margin*2-gap*(cols-1))/cols; const h=(pageH-margin*2-gap*(rows-1))/rows;
+      const qrs={}; for(const t of TYPES){ qrs[t.key]=await qrDataUrl(payload(c,t)); }
+      let n=0;
+      for(let r=0;r<rows;r++){
+        for(let col=0;col<cols;col++){
+          const t=TYPES[n%TYPES.length]; const x=margin+col*(w+gap), y=margin+r*(h+gap);
+          doc.setDrawColor(t.color[0],t.color[1],t.color[2]); doc.setLineWidth(1.2); doc.roundedRect(x,y,w,h,2.5,2.5,"S");
+          doc.setFillColor(255,255,255); doc.roundedRect(x+1.7,y+1.7,w-3.4,h-3.4,2,2,"F");
+          const qrSize=Math.min(24,w-10); doc.addImage(qrs[t.key],"PNG",x+(w-qrSize)/2,y+3,qrSize,qrSize);
+          doc.setTextColor(18,28,44); doc.setFont("helvetica","bold"); doc.setFontSize(label(c).length>18?8.2:9.2);
+          const parts=[c.name||"Gläubiger", c.extra||""]; let ty=y+31;
+          parts.filter(Boolean).forEach(line=>{ doc.text(String(line),x+w/2,ty,{align:"center",maxWidth:w-6}); ty+=4.2; });
+          doc.setFontSize(9.5); doc.setTextColor(t.color[0]*0.35,t.color[1]*0.35,t.color[2]*0.35); doc.text(t.label,x+w/2,y+h-5,{align:"center",maxWidth:w-6});
+          n++;
+        }
+      }
+      const safe=label(c).replace(/[^a-z0-9äöüß_-]+/gi,"_").replace(/^_+|_+$/g,"") || "Glaeubiger";
+      doc.save("QR_Bogen_"+safe+".pdf");
+      toast("QR-Bogen erstellt ✅");
+    }catch(err){ console.error(err); toast("QR-Bogen konnte nicht erstellt werden: "+(err.message||err)); }
+  }
+  function insertButtons(){
+    if(!$("btnCreditors")){
+      const grid=document.querySelector(".actionToolbarGrid");
+      if(grid){ const b=document.createElement("button"); b.id="btnCreditors"; b.type="button"; b.className="secondary creditorBtn"; b.textContent="🏢 Gläubiger / QR"; b.onclick=open; grid.appendChild(b); }
+    }
+    if(!$("btnCreditorsTop")){
+      const top=document.querySelector(".heroTopActions");
+      if(top){ const b=document.createElement("button"); b.id="btnCreditorsTop"; b.type="button"; b.className="secondary creditorBtn"; b.textContent="🏢 Gläubiger"; b.onclick=open; top.insertBefore(b,$("btnInstall")); }
+    }
+    const side=document.querySelector(".sideNav");
+    if(side && !$("sideCreditors")){ const b=document.createElement("button"); b.id="sideCreditors"; b.className="sideNavBtn"; b.type="button"; b.innerHTML='<span class="navIco">🏢</span><span>Gläubiger</span>'; b.onclick=open; side.appendChild(b); }
+  }
+  function patchAddFormSelect(){
+    const nameEl=$("m_name"); if(!nameEl || $("m_creditor_wrap")) return;
+    const wrap=document.createElement("div"); wrap.id="m_creditor_wrap"; wrap.innerHTML='<label class="fieldLabel" for="m_creditor_select">Gläubiger auswählen</label><select id="m_creditor_select"><option value="">Manuell eingeben</option></select>';
+    nameEl.closest("section")?.insertBefore(wrap,nameEl.closest("label")||nameEl);
+    const sel=$("m_creditor_select");
+    sel.addEventListener("change",()=>{ const c=read().find(x=>x.id===sel.value); if(c){ nameEl.value=label(c); const az=$("m_aktenzeichen"); if(az && c.aktenzeichen && !az.value) az.value=c.aktenzeichen; } });
+    refreshCreditorSelect();
+  }
+  function refreshCreditorSelect(){
+    const sel=$("m_creditor_select"); if(!sel) return;
+    const current=sel.value; sel.innerHTML='<option value="">Manuell eingeben</option>'+read().sort((a,b)=>label(a).localeCompare(label(b),"de")).map(c=>`<option value="${esc(c.id)}">${esc(label(c))}</option>`).join(""); sel.value=current;
+  }
+  function findCreditorForDebt(d){ const n=normalize(d?.name); if(!n) return null; return read().find(c=>normalize(label(c))===n || normalize(c.name)===n) || null; }
+  function patchDebtQrButtons(){
+    const rows=Array.from(document.querySelectorAll("#tbody tr")); if(!rows.length) return;
+    const visible=[]; const search=normalize($("search")?.value||"");
+    getDebtsSafe().forEach((d,i)=>{ if(!search || normalize(JSON.stringify(d)).includes(search)) visible.push({d,i}); });
+    rows.forEach((tr,rowIndex)=>{
+      if(tr.querySelector(".debtQrBtn")) return;
+      const pair=visible[rowIndex]; if(!pair) return;
+      const holder=tr.querySelector(".actionRow") || tr.querySelector("td:last-child"); if(!holder) return;
+      const b=document.createElement("button"); b.type="button"; b.className="debtQrBtn"; b.textContent="QR"; b.title="QR-Bogen für diesen Gläubiger";
+      b.onclick=()=>{
+        let c=findCreditorForDebt(pair.d);
+        if(!c){
+          const arr=read(); c={id:uid(),name:pair.d.name||"Gläubiger",extra:"",category:"Sonstiges",aktenzeichen:pair.d.aktenzeichen||"",phone:"",email:"",address:"",notes:"Automatisch aus Schuld erstellt",createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()}; arr.push(c); write(arr); patchAddFormSelect(); toast("Gläubiger wurde automatisch angelegt.");
+        }
+        generateSheet(c);
+      };
+      holder.appendChild(b);
+    });
+  }
+  function patchRender(){
+    const old=window.render;
+    if(typeof old === "function" && !old.__v37patched){
+      const wrapped=function(){ const res=old.apply(this,arguments); setTimeout(()=>{insertButtons(); patchDebtQrButtons();},0); return res; };
+      wrapped.__v37patched=true; window.render=wrapped;
+      try{ render=wrapped; }catch(e){}
+    }
+  }
+  window.openCreditorsV37=open;
+  window.generateCreditorQrSheetV37=generateSheet;
+  document.addEventListener("DOMContentLoaded",()=>{ ensureOverlay(); insertButtons(); patchAddFormSelect(); refreshCreditorSelect(); patchRender(); setTimeout(()=>{ if(typeof window.render==="function") window.render(); else patchDebtQrButtons(); },120); });
+  setTimeout(()=>{ ensureOverlay(); insertButtons(); patchAddFormSelect(); refreshCreditorSelect(); patchRender(); patchDebtQrButtons(); },500);
 })();
 </script>
 
