@@ -1,4 +1,4 @@
-const VERSION = 'dark-v27-layout-width';
+const VERSION = 'dark-v28-right-panel-broader';
 const CACHE_STATIC = `schulden-manager-static-${VERSION}`;
 const CACHE_RUNTIME = `schulden-manager-runtime-${VERSION}`;
 const APP_SHELL = [
