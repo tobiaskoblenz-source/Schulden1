@@ -2931,7 +2931,7 @@ body.force-mobile-view .dashboardShell{
         </div>
         <div class="desktopAkteTitleBlock">
           <h3>Daten – Schuld-Akte</h3>
-          <p>Alle wichtigen Infos, Dateien und Verlauf auf einen Blick.</p>
+          <p>Alle wichtigen Infos, Dateien und Verlauf auf einen Blick. <b class="v31Marker">V31 TEST</b></p>
         </div>
         <div class="desktopPanelBody desktopAkteBodyV30">
           <section class="desktopPanelSection desktopHeroCard">
@@ -5969,57 +5969,121 @@ if ('serviceWorker' in navigator) {
 
 
 
-<style id="v30-desktop-akte-approved-look">
-.desktopAktePanel{position:sticky;top:24px;border-radius:28px;padding:22px;background:linear-gradient(180deg, rgba(9,18,32,.985), rgba(6,14,26,.985));border:1px solid rgba(255,255,255,.08);box-shadow:0 26px 50px rgba(0,0,0,.28);min-height:620px;display:flex;flex-direction:column;}
-.desktopAkteTopbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 0 10px;border-bottom:0;}
-.desktopAkteBadge{display:inline-flex;align-items:center;justify-content:center;padding:8px 14px;border-radius:999px;background:#14294a;border:1px solid rgba(255,255,255,.08);color:#e8f0ff;font-size:12px;font-weight:900;letter-spacing:.08em;}
-.desktopTopNoteBtn{min-height:42px;padding:0 16px;border-radius:14px;font-weight:800;}
-.desktopAkteTitleBlock h3{margin:0;color:#fff;font-size:30px;line-height:1.1;letter-spacing:-.02em;}
-.desktopAkteTitleBlock p{margin:10px 0 0;color:#8ea4c3;font-size:14px;line-height:1.45;}
-.desktopAkteBodyV30{display:grid;gap:14px;padding-top:16px;max-height:calc(100vh - 180px);overflow:auto;padding-right:2px;}
-.desktopHeroCard{padding:18px;border-radius:22px;background:linear-gradient(180deg, rgba(45,44,92,.62), rgba(28,34,64,.52));border:1px solid rgba(126,115,255,.18);}
-.desktopHeroHead{display:flex;align-items:center;gap:14px;margin-bottom:16px;}
-.desktopHeroAvatar{width:56px;height:56px;border-radius:18px;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#7c5cff,#5a40f1);color:#fff;font-size:22px;font-weight:900;box-shadow:0 16px 30px rgba(90,64,241,.35);}
-.desktopHeroName{color:#fff;font-size:22px;font-weight:900;line-height:1.15;}
-.desktopHeroMeta{color:#98acd0;font-size:13px;margin-top:4px;}
-.desktopHeroFacts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}
-.desktopFactTile{padding:14px 16px;border-radius:16px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.07);}
-.desktopFactTile span{display:block;color:#8ea4c3;font-size:12px;margin-bottom:6px;}
-.desktopFactTile strong{display:block;color:#fff;font-size:16px;line-height:1.35;word-break:break-word;}
-.desktopInfoGridV30{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;}
-.desktopMiniInfoCard{padding:16px;border-radius:20px;background:rgba(255,255,255,.028);border:1px solid rgba(255,255,255,.07);display:flex;flex-direction:column;gap:12px;min-height:220px;}
-.desktopInfoRows{display:grid;gap:10px;}
-.desktopInfoRow{display:grid;grid-template-columns:116px minmax(0,1fr);gap:10px;align-items:start;}
-.desktopInfoRow span{color:#8ea4c3;font-size:12px;line-height:1.35;}
-.desktopInfoRow strong{color:#eef3ff;font-size:13px;line-height:1.45;word-break:break-word;}
-.desktopInfoRowActions .drawerValueActions{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;min-width:0;}
-.desktopNotesPreview{display:grid;gap:10px;flex:1 1 auto;}
-.desktopNoteItem{padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);display:grid;gap:6px;}
-.desktopNoteItem strong{color:#dce7fb;font-size:12px;}
-.desktopNoteItem span{color:#97aace;font-size:13px;line-height:1.45;}
-.desktopCardActionBtn{margin-top:auto;min-height:42px;border-radius:14px;font-weight:800;}
-.desktopCorrList,.desktopTimelineList{display:grid;gap:10px;}
-.desktopCorrItem,.desktopTimelineItemV30{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:start;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.06);}
-.desktopCorrMeta strong,.desktopTimelineMain strong{display:block;color:#fff;font-size:14px;line-height:1.35;}
-.desktopCorrMeta span,.desktopTimelineMain span,.desktopTimelineTime{display:block;color:#8ea4c3;font-size:12px;line-height:1.45;}
-.desktopCorrLinks{display:flex;gap:8px;flex-wrap:wrap;}
-.desktopTinyLink{display:inline-flex;align-items:center;justify-content:center;padding:8px 10px;border-radius:10px;background:#102039;color:#e9f1ff;text-decoration:none;border:1px solid rgba(255,255,255,.08);font-size:12px;font-weight:800;}
-.desktopTimelineItemV30{grid-template-columns:10px minmax(0,1fr) auto;}
-.desktopTimelineDot{width:10px;height:10px;border-radius:50%;background:#7b5cff;box-shadow:0 0 0 6px rgba(123,92,255,.12);margin-top:5px;}
-.desktopTimelineMain{min-width:0;}
-.desktopTimelineTime{white-space:nowrap;}
-.desktopEmptyState{padding:16px;border-radius:14px;background:rgba(255,255,255,.03);border:1px dashed rgba(255,255,255,.09);color:#8fa4c0;font-size:13px;line-height:1.55;}
-.desktopAkteFooterV30{display:grid;grid-template-columns:1.15fr 1fr 1fr;gap:10px;margin-top:14px;}
-.desktopAkteFooterV30 button{min-height:46px;border-radius:14px;font-weight:800;}
-.desktopAkteFooterV30 .secondary{background:#102039!important;border:1px solid rgba(255,255,255,.08)!important;color:#edf3ff!important;}
-.dashboardContentGrid{grid-template-columns:minmax(0,.92fr) 610px !important;gap:18px !important;align-items:start;}
-#desktopTable.dashboardTableWrap{min-width:0;}
-@media (max-width:1580px){.dashboardContentGrid{grid-template-columns:minmax(0,1fr) 570px !important;}}
-@media (max-width:1440px){.dashboardContentGrid{grid-template-columns:minmax(0,1fr) 520px !important;}}
-@media (max-width:1320px){.dashboardContentGrid{grid-template-columns:minmax(0,1fr) 470px !important;}}
-@media (max-width:1180px){.desktopInfoGridV30{grid-template-columns:1fr;}.desktopAkteFooterV30{grid-template-columns:1fr;}}
-@media (max-width:1120px){.dashboardContentGrid{grid-template-columns:1fr !important;}.desktopAktePanel{display:none;}}
+
+
+<style id="v31-visible-wide-right-panel-test">
+/* V31 TEST – sichtbare Änderung: rechte Daten-Spalte wirklich breit, Mittelteil schmaler */
+.v31Marker{
+  display:inline-flex;
+  margin-left:8px;
+  padding:4px 9px;
+  border-radius:999px;
+  background:#ffcf33;
+  color:#0b1220;
+  font-size:11px;
+  font-weight:1000;
+  letter-spacing:.06em;
+  vertical-align:middle;
+}
+.dashboardContentGrid{
+  display:grid !important;
+  grid-template-columns:minmax(0, 0.78fr) minmax(640px, 720px) !important;
+  gap:22px !important;
+  align-items:start !important;
+}
+.dashboardContentGrid > section{
+  min-width:0 !important;
+}
+#desktopTable.dashboardTableWrap,
+.dashboardTableWrap{
+  min-width:0 !important;
+  overflow:hidden !important;
+}
+.desktopDetailPanel,
+.desktopAktePanel{
+  width:100% !important;
+  min-width:640px !important;
+  max-width:none !important;
+  padding:24px !important;
+  border-radius:30px !important;
+}
+.desktopHeroCard{
+  width:100% !important;
+  padding:22px !important;
+  border-radius:24px !important;
+}
+.desktopHeroFacts{
+  display:grid !important;
+  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  gap:14px !important;
+}
+.desktopFactTile{
+  min-height:78px !important;
+  padding:16px 18px !important;
+}
+.desktopInfoGridV30{
+  display:grid !important;
+  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  gap:16px !important;
+}
+.desktopMiniInfoCard{
+  min-height:220px !important;
+  padding:18px !important;
+}
+.desktopAkteTitleBlock h3{
+  font-size:34px !important;
+  line-height:1.08 !important;
+  letter-spacing:-.025em !important;
+}
+.desktopAkteTitleBlock p{
+  font-size:15px !important;
+}
+@media (max-width:1700px){
+  .dashboardContentGrid{
+    grid-template-columns:minmax(0,0.75fr) minmax(610px,660px) !important;
+  }
+  .desktopDetailPanel,
+  .desktopAktePanel{
+    min-width:610px !important;
+  }
+}
+@media (max-width:1500px){
+  .dashboardContentGrid{
+    grid-template-columns:minmax(0,0.70fr) minmax(580px,620px) !important;
+  }
+  .desktopDetailPanel,
+  .desktopAktePanel{
+    min-width:580px !important;
+  }
+}
+@media (max-width:1320px){
+  .dashboardContentGrid{
+    grid-template-columns:minmax(0,1fr) minmax(520px,560px) !important;
+  }
+  .desktopDetailPanel,
+  .desktopAktePanel{
+    min-width:520px !important;
+  }
+}
+@media (max-width:1120px){
+  .dashboardContentGrid{
+    grid-template-columns:1fr !important;
+  }
+  .desktopDetailPanel,
+  .desktopAktePanel{
+    display:none !important;
+    min-width:0 !important;
+  }
+}
 </style>
+
+
+<script id="v31-loaded-marker">
+(function(){
+  document.documentElement.setAttribute("data-schulden-version","v31");
+  window.SCHULDEN_APP_VERSION = "v31-test-wide-right-panel";
+})();
+</script>
 
 </body>
 </html>
