@@ -6241,7 +6241,7 @@ if ('serviceWorker' in navigator) {
 <script id="v39-creditor-qr-module">
 (function(){
   document.documentElement.setAttribute("data-schulden-version","v39");
-  window.SCHULDEN_APP_VERSION = "v40-qr-button-dashboard-fix";
+  window.SCHULDEN_APP_VERSION = "v41-button-layout-nebeneinander";
   const LS = "schulden_creditors_v37";
   const FORMAT_LS = "schulden_qr_label_format_v39";
   const TYPES = [
@@ -6546,5 +6546,52 @@ if ('serviceWorker' in navigator) {
 })();
 </script>
 
+<style id="v41-button-layout-polish">
+.v19Actions{
+  display:flex !important;
+  flex-wrap:wrap !important;
+  gap:10px !important;
+  align-items:stretch !important;
+  justify-content:flex-start !important;
+}
+.v19Actions button{
+  flex:0 0 auto !important;
+  min-width:94px !important;
+  min-height:56px !important;
+  padding:0 16px !important;
+  border-radius:18px !important;
+  font-size:15px !important;
+  font-weight:900 !important;
+  line-height:1.05 !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  text-align:center !important;
+  white-space:normal !important;
+  box-shadow:0 10px 22px rgba(0,0,0,.16) !important;
+  border:1px solid rgba(255,255,255,.10) !important;
+}
+.v19Actions .btn-status{background:linear-gradient(135deg,#42c8ff,#63b4ff) !important;color:#07111f !important;}
+.v19Actions .btn-delete{background:linear-gradient(135deg,#ff9a52,#ff6d3e) !important;color:#ffffff !important;}
+.v19Actions .btn-pay{background:linear-gradient(135deg,#39dca2,#82efb9) !important;color:#052015 !important;}
+.v19Actions .btn-history{background:linear-gradient(135deg,#ffd24d,#f7b500) !important;color:#1f1300 !important;}
+.v19Actions .btn-info{background:linear-gradient(135deg,#b7b9ff,#8bb8ff) !important;color:#0b1530 !important;}
+.v19Actions .btn-contact{background:linear-gradient(135deg,#5ab5ff,#79a9ff) !important;color:#07111f !important;min-width:128px !important;}
+.v19Actions .btn-correspondence{background:linear-gradient(135deg,#e0b8ff,#b7c8ff) !important;color:#12203a !important;min-width:128px !important;}
+.v19Actions .debtQrBtn{
+  min-width:78px !important;
+  background:linear-gradient(180deg,#142947,#0d1d34) !important;
+  color:#edf5ff !important;
+  border:1px solid rgba(255,255,255,.10) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06) !important;
+  gap:8px !important;
+}
+.v19Actions .debtQrBtn .qrIco{font-size:14px !important;}
+@media (max-width:640px){
+  .v19Actions{gap:8px !important;}
+  .v19Actions button{min-width:calc(50% - 4px) !important; min-height:52px !important; font-size:14px !important;}
+  .v19Actions .debtQrBtn{min-width:calc(50% - 4px) !important;}
+}
+</style>
 </body>
 </html>
