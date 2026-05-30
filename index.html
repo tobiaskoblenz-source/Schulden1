@@ -6013,14 +6013,33 @@ if ('serviceWorker' in navigator) {
 
 
 
-<style id="v28-right-panel-broader">
-/* v28 – rechte Daten-Spalte noch etwas breiter */
-.dashboardContentGrid{grid-template-columns:minmax(0,0.98fr) 540px!important;gap:18px!important;align-items:start;}
+
+
+<style id="v29-right-panel-wider-like-marked">
+/* v29 – rechte Daten-Spalte deutlich breiter wie im markierten Bereich */
+.dashboardContentGrid{
+  grid-template-columns:minmax(0,0.86fr) 640px !important;
+  gap:18px !important;
+  align-items:start;
+}
 #desktopTable.dashboardTableWrap{min-width:0;}
-.desktopDetailPanel{padding:20px!important;}
-@media (max-width:1500px){.dashboardContentGrid{grid-template-columns:minmax(0,1fr) 500px!important;}}
-@media (max-width:1320px){.dashboardContentGrid{grid-template-columns:minmax(0,1fr) 450px!important;}}
-@media (max-width:1120px){.dashboardContentGrid{grid-template-columns:1fr!important;}}
+.desktopDetailPanel{padding:20px !important;}
+.desktopAkteGrid2{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;}
+@media (max-width:1650px){
+  .dashboardContentGrid{grid-template-columns:minmax(0,0.92fr) 600px !important;}
+}
+@media (max-width:1500px){
+  .dashboardContentGrid{grid-template-columns:minmax(0,1fr) 560px !important;}
+}
+@media (max-width:1380px){
+  .dashboardContentGrid{grid-template-columns:minmax(0,1fr) 520px !important;}
+}
+@media (max-width:1320px){
+  .dashboardContentGrid{grid-template-columns:minmax(0,1fr) 460px !important;}
+}
+@media (max-width:1120px){
+  .dashboardContentGrid{grid-template-columns:1fr !important;}
+}
 </style>
 
 </body>
