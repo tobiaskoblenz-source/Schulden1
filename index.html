@@ -2931,7 +2931,7 @@ body.force-mobile-view .dashboardShell{
         </div>
         <div class="desktopAkteTitleBlock">
           <h3>Daten – Schuld-Akte</h3>
-          <p>Alle wichtigen Infos, Dateien und Verlauf auf einen Blick. <b class="v31Marker">V31 TEST</b></p>
+          <p>Alle wichtigen Infos, Dateien und Verlauf auf einen Blick. <b class="v31Marker">V32 TEST</b></p>
         </div>
         <div class="desktopPanelBody desktopAkteBodyV30">
           <section class="desktopPanelSection desktopHeroCard">
@@ -5971,46 +5971,101 @@ if ('serviceWorker' in navigator) {
 
 
 
-<style id="v31-visible-wide-right-panel-test">
-/* V31 TEST – sichtbare Änderung: rechte Daten-Spalte wirklich breit, Mittelteil schmaler */
+
+
+
+
+<style id="v32-no-overlap-wide-right-panel">
+/* V32 TEST – rechte Daten-Spalte breit, aber ohne Überlappung mit dem Mittelteil */
 .v31Marker{
   display:inline-flex;
   margin-left:8px;
   padding:4px 9px;
   border-radius:999px;
-  background:#ffcf33;
-  color:#0b1220;
+  background:#35f29a;
+  color:#07111f;
   font-size:11px;
   font-weight:1000;
   letter-spacing:.06em;
   vertical-align:middle;
 }
+
+/* Das komplette Raster bekommt klare Spalten: links flexibel, rechts breit */
 .dashboardContentGrid{
   display:grid !important;
-  grid-template-columns:minmax(0, 0.78fr) minmax(640px, 720px) !important;
+  grid-template-columns:minmax(0, calc(100% - 660px)) 640px !important;
   gap:22px !important;
   align-items:start !important;
+  width:100% !important;
+  max-width:100% !important;
 }
-.dashboardContentGrid > section{
+
+/* Linke Spalte wirklich schrumpfbar machen, damit sie nicht unter die rechte Spalte läuft */
+.dashboardContentGrid > *:first-child,
+.dashboardContentGrid > section,
+.dashboardMainColumn,
+.dashboardTableWrap,
+#desktopTable{
   min-width:0 !important;
-}
-#desktopTable.dashboardTableWrap,
-.dashboardTableWrap{
-  min-width:0 !important;
+  max-width:100% !important;
   overflow:hidden !important;
 }
+
+/* Quick-Actions und Karten innerhalb der linken Spalte an die kleinere Breite anpassen */
+.quickActions,
+.quickActionsCard,
+.actionPanel,
+.dashboardCard,
+.tableWrap{
+  max-width:100% !important;
+  min-width:0 !important;
+  box-sizing:border-box !important;
+}
+
+.actionToolbarGrid,
+.driveToolbarGrid{
+  display:grid !important;
+  grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  gap:10px !important;
+}
+.actionToolbarGrid button,
+.driveToolbarGrid button{
+  min-width:0 !important;
+  width:100% !important;
+  padding-left:10px !important;
+  padding-right:10px !important;
+  box-sizing:border-box !important;
+}
+
+.dashboardStats{
+  display:grid !important;
+  grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+  gap:12px !important;
+}
+.stat{
+  min-width:0 !important;
+}
+
+/* Rechte Spalte: breit und sauber */
 .desktopDetailPanel,
 .desktopAktePanel{
-  width:100% !important;
+  position:sticky !important;
+  top:24px !important;
+  width:640px !important;
   min-width:640px !important;
-  max-width:none !important;
+  max-width:640px !important;
+  justify-self:end !important;
   padding:24px !important;
   border-radius:30px !important;
+  box-sizing:border-box !important;
+  z-index:1 !important;
 }
+
 .desktopHeroCard{
   width:100% !important;
   padding:22px !important;
   border-radius:24px !important;
+  box-sizing:border-box !important;
 }
 .desktopHeroFacts{
   display:grid !important;
@@ -6020,7 +6075,9 @@ if ('serviceWorker' in navigator) {
 .desktopFactTile{
   min-height:78px !important;
   padding:16px 18px !important;
+  box-sizing:border-box !important;
 }
+
 .desktopInfoGridV30{
   display:grid !important;
   grid-template-columns:repeat(2,minmax(0,1fr)) !important;
@@ -6029,42 +6086,58 @@ if ('serviceWorker' in navigator) {
 .desktopMiniInfoCard{
   min-height:220px !important;
   padding:18px !important;
+  box-sizing:border-box !important;
 }
+
 .desktopAkteTitleBlock h3{
   font-size:34px !important;
   line-height:1.08 !important;
-  letter-spacing:-.025em !important;
 }
 .desktopAkteTitleBlock p{
   font-size:15px !important;
 }
-@media (max-width:1700px){
+
+/* Etwas kleinere Desktop-Breiten */
+@media (max-width:1600px){
   .dashboardContentGrid{
-    grid-template-columns:minmax(0,0.75fr) minmax(610px,660px) !important;
+    grid-template-columns:minmax(0, calc(100% - 610px)) 590px !important;
   }
   .desktopDetailPanel,
   .desktopAktePanel{
-    min-width:610px !important;
+    width:590px !important;
+    min-width:590px !important;
+    max-width:590px !important;
   }
 }
-@media (max-width:1500px){
+@media (max-width:1450px){
   .dashboardContentGrid{
-    grid-template-columns:minmax(0,0.70fr) minmax(580px,620px) !important;
+    grid-template-columns:minmax(0, calc(100% - 560px)) 540px !important;
   }
   .desktopDetailPanel,
   .desktopAktePanel{
-    min-width:580px !important;
+    width:540px !important;
+    min-width:540px !important;
+    max-width:540px !important;
+  }
+  .desktopInfoGridV30{
+    grid-template-columns:1fr !important;
   }
 }
-@media (max-width:1320px){
+@media (max-width:1280px){
   .dashboardContentGrid{
-    grid-template-columns:minmax(0,1fr) minmax(520px,560px) !important;
+    grid-template-columns:1fr !important;
   }
   .desktopDetailPanel,
   .desktopAktePanel{
-    min-width:520px !important;
+    position:relative !important;
+    width:100% !important;
+    min-width:0 !important;
+    max-width:100% !important;
+    justify-self:stretch !important;
   }
 }
+
+/* Handy/Tablet bleibt wie vorher */
 @media (max-width:1120px){
   .dashboardContentGrid{
     grid-template-columns:1fr !important;
@@ -6072,16 +6145,15 @@ if ('serviceWorker' in navigator) {
   .desktopDetailPanel,
   .desktopAktePanel{
     display:none !important;
-    min-width:0 !important;
   }
 }
 </style>
 
 
-<script id="v31-loaded-marker">
+<script id="v32-loaded-marker">
 (function(){
-  document.documentElement.setAttribute("data-schulden-version","v31");
-  window.SCHULDEN_APP_VERSION = "v31-test-wide-right-panel";
+  document.documentElement.setAttribute("data-schulden-version","v32");
+  window.SCHULDEN_APP_VERSION = "v32-no-overlap-wide-right-panel";
 })();
 </script>
 

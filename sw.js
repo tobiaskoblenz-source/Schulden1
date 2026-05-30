@@ -1,4 +1,4 @@
-const VERSION = 'dark-v31-visible-wide-right-panel-test';
+const VERSION = 'dark-v32-no-overlap-wide-right-panel';
 const CACHE_STATIC = `schulden-manager-static-${VERSION}`;
 const CACHE_RUNTIME = `schulden-manager-runtime-${VERSION}`;
 const APP_SHELL = [
