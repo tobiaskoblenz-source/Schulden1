@@ -6328,13 +6328,79 @@ if ('serviceWorker' in navigator) {
     getDebtsSafe().forEach(d=>{ const name=String(d.name||"").trim(); if(!name) return; const key=normalize(name); if(seen.has(key)) return; arr.push({id:uid(),name,extra:"",category:"Sonstiges",aktenzeichen:d.aktenzeichen||"",phone:"",email:"",address:"",notes:"Aus vorhandener Schuld übernommen",createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()}); seen.add(key); added++; });
     write(arr); renderList(); patchAddFormSelect(); toast(added?added+" Gläubiger übernommen ✅":"Keine neuen Gläubiger gefunden.");
   }
-  function loadQrLib(){
-    return new Promise((resolve,reject)=>{
-      if(window.QRCode && typeof window.QRCode.toDataURL === "function") return resolve();
-      const s=document.createElement("script"); s.src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"; s.onload=resolve; s.onerror=()=>reject(new Error("QR-Code-Bibliothek konnte nicht geladen werden.")); document.head.appendChild(s);
-    });
+  function qrDataUrl(text){
+    // Offline-QR-Erzeugung: keine externe QR-Bibliothek / kein CDN nötig.
+    // Erzeugt QR Code Model 2, Byte Mode, Fehlerkorrektur L. Für unsere Schulden-App-Payloads reicht das stabil aus.
+    return Promise.resolve(makeLocalQrPng(String(text||""), 360));
   }
-  async function qrDataUrl(text){ await loadQrLib(); return await window.QRCode.toDataURL(text,{errorCorrectionLevel:"M",margin:1,width:360,color:{dark:"#000000",light:"#ffffff"}}); }
+  function makeLocalQrPng(text, size){
+    const bytes = (window.TextEncoder ? Array.from(new TextEncoder().encode(text)) : Array.from(unescape(encodeURIComponent(text))).map(ch=>ch.charCodeAt(0)));
+    const RS = {
+      1:[[1,26,19]], 2:[[1,44,34]], 3:[[1,70,55]], 4:[[1,100,80]], 5:[[1,134,108]],
+      6:[[2,86,68]], 7:[[2,98,78]], 8:[[2,121,97]], 9:[[2,146,116]], 10:[[2,86,68],[2,87,69]]
+    };
+    function capacity(v){ return RS[v].reduce((a,b)=>a+b[0]*b[2],0); }
+    let version=1; while(version<10 && capacity(version) < bytes.length+2) version++;
+    if(capacity(version) < bytes.length+2) throw new Error("QR-Text ist zu lang. Bitte Namen/Zusatz kürzen.");
+    const n=version*4+17;
+    const modules=Array.from({length:n},()=>Array(n).fill(null));
+    function set(r,c,v){ if(r>=0&&r<n&&c>=0&&c<n) modules[r][c]=!!v; }
+    function isEmpty(r,c){ return modules[r][c]===null; }
+    function finder(r,c){
+      for(let y=-1;y<=7;y++) for(let x=-1;x<=7;x++){
+        const rr=r+y, cc=c+x; if(rr<0||rr>=n||cc<0||cc>=n) continue;
+        const dark = (y>=0&&y<=6&&x>=0&&x<=6) && (y===0||y===6||x===0||x===6||(y>=2&&y<=4&&x>=2&&x<=4));
+        set(rr,cc,dark);
+      }
+    }
+    finder(0,0); finder(n-7,0); finder(0,n-7);
+    const AP={1:[],2:[6,18],3:[6,22],4:[6,26],5:[6,30],6:[6,34],7:[6,22,38],8:[6,24,42],9:[6,26,46],10:[6,28,50]}[version];
+    for(const r of AP) for(const c of AP){
+      if((r===6&&c===6)||(r===6&&c===n-7)||(r===n-7&&c===6)) continue;
+      for(let y=-2;y<=2;y++) for(let x=-2;x<=2;x++) set(r+y,c+x, Math.max(Math.abs(x),Math.abs(y))!==1);
+    }
+    for(let i=8;i<n-8;i++){ set(6,i,i%2===0); set(i,6,i%2===0); }
+    set(n-8,8,true);
+    function bchDigit(d){ let digit=0; while(d!==0){digit++; d>>>=1;} return digit; }
+    function bchTypeInfo(data){ let d=data<<10, g=0x537; while(bchDigit(d)-bchDigit(g)>=0) d^=(g<<(bchDigit(d)-bchDigit(g))); return ((data<<10)|d)^0x5412; }
+    function bchVersion(data){ let d=data<<12, g=0x1f25; while(bchDigit(d)-bchDigit(g)>=0) d^=(g<<(bchDigit(d)-bchDigit(g))); return (data<<12)|d; }
+    function setTypeInfo(mask){
+      const bits=bchTypeInfo((1<<3)|mask); // Fehlerkorrektur L = 1
+      for(let i=0;i<15;i++){
+        const mod=((bits>>i)&1)===1;
+        if(i<6) set(i,8,mod); else if(i<8) set(i+1,8,mod); else set(n-15+i,8,mod);
+        if(i<8) set(8,n-i-1,mod); else if(i<9) set(8,15-i-1+1,mod); else set(8,15-i-1,mod);
+      }
+    }
+    function setVersionInfo(){
+      if(version<7) return; const bits=bchVersion(version);
+      for(let i=0;i<18;i++){ const mod=((bits>>i)&1)===1; const r=Math.floor(i/3), c=i%3; set(r,n-11+c,mod); set(n-11+c,r,mod); }
+    }
+    setTypeInfo(0); setVersionInfo();
+    const glog=Array(256).fill(0), gexp=Array(512).fill(0); let x=1;
+    for(let i=0;i<255;i++){ gexp[i]=x; glog[x]=i; x<<=1; if(x&0x100) x^=0x11d; }
+    for(let i=255;i<512;i++) gexp[i]=gexp[i-255];
+    const gfMul=(a,b)=> a&&b ? gexp[glog[a]+glog[b]] : 0;
+    function rsGen(ec){ let poly=[1]; for(let i=0;i<ec;i++){ const next=Array(poly.length+1).fill(0); for(let j=0;j<poly.length;j++){ next[j]^=poly[j]; next[j+1]^=gfMul(poly[j],gexp[i]); } poly=next; } return poly; }
+    function rsRemainder(data, ec){ const gen=rsGen(ec); const res=Array(ec).fill(0); for(const b of data){ const factor=b^res.shift(); res.push(0); for(let i=0;i<ec;i++) res[i]^=gfMul(gen[i+1],factor); } return res; }
+    const bit=[]; const push=(val,len)=>{ for(let i=len-1;i>=0;i--) bit.push((val>>>i)&1); };
+    push(4,4); push(bytes.length,8); bytes.forEach(b=>push(b,8));
+    const maxBits=capacity(version)*8; for(let i=0;i<4 && bit.length<maxBits;i++) bit.push(0); while(bit.length%8) bit.push(0);
+    const data=[]; for(let i=0;i<bit.length;i+=8) data.push(bit.slice(i,i+8).reduce((a,b)=>(a<<1)|b,0));
+    for(let pad=0; data.length<capacity(version); pad^=1) data.push(pad?0x11:0xec);
+    const blocks=[]; let off=0;
+    for(const [count,total,dc] of RS[version]) for(let i=0;i<count;i++){ const d=data.slice(off,off+dc); off+=dc; blocks.push({d, e:rsRemainder(d,total-dc)}); }
+    const code=[]; const maxDc=Math.max(...blocks.map(b=>b.d.length)), maxEc=Math.max(...blocks.map(b=>b.e.length));
+    for(let i=0;i<maxDc;i++) for(const b of blocks) if(i<b.d.length) code.push(b.d[i]);
+    for(let i=0;i<maxEc;i++) for(const b of blocks) if(i<b.e.length) code.push(b.e[i]);
+    let inc=-1, row=n-1, bitIndex=0;
+    for(let col=n-1; col>0; col-=2){ if(col===6) col--; while(true){ for(let c=0;c<2;c++){ const cc=col-c; if(isEmpty(row,cc)){ const dark = bitIndex<code.length*8 && (((code[Math.floor(bitIndex/8)] >>> (7-bitIndex%8))&1)===1); const mask=((row+cc)%2)===0; set(row,cc,dark!==mask); bitIndex++; } } row+=inc; if(row<0||row>=n){ row-=inc; inc=-inc; break; } } }
+    const quiet=4, scale=Math.floor(size/(n+quiet*2)), canvas=document.createElement("canvas");
+    canvas.width=canvas.height=(n+quiet*2)*scale; const ctx=canvas.getContext("2d");
+    ctx.fillStyle="#fff"; ctx.fillRect(0,0,canvas.width,canvas.height); ctx.fillStyle="#000";
+    for(let r=0;r<n;r++) for(let c=0;c<n;c++) if(modules[r][c]) ctx.fillRect((c+quiet)*scale,(r+quiet)*scale,scale,scale);
+    return canvas.toDataURL("image/png");
+  }
   async function generateSheet(c){
     try{
       if(!window.jspdf || !window.jspdf.jsPDF){ toast("PDF-Bibliothek fehlt. Bitte Internetverbindung prüfen."); return; }
