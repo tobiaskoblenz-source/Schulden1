@@ -1,4 +1,4 @@
-const VERSION = 'dark-v46-sidebar-logo-cleanup';
+const VERSION = 'dark-v47-logo-brighter';
 const CACHE_STATIC = `schulden-manager-static-${VERSION}`;
 const CACHE_RUNTIME = `schulden-manager-runtime-${VERSION}`;
 const APP_SHELL = [

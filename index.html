@@ -6230,7 +6230,7 @@ if ('serviceWorker' in navigator) {
 <script id="v39-creditor-qr-module">
 (function(){
   document.documentElement.setAttribute("data-schulden-version","v39");
-  window.SCHULDEN_APP_VERSION = "v46-sidebar-logo-cleanup";
+  window.SCHULDEN_APP_VERSION = "v47-logo-brighter";
   const LS = "schulden_creditors_v37";
   const FORMAT_LS = "schulden_qr_label_format_v39";
   const TYPES = [
@@ -6580,8 +6580,8 @@ if ('serviceWorker' in navigator) {
 .tableActions .debtQrBtn,
 .actionRow .debtQrBtn{background:linear-gradient(180deg,#1e3b61,#132846)!important;color:#eef5ff!important;border-color:rgba(255,255,255,.14)!important;}
 </style>
-<style id="v46-sidebar-logo-cleanup">
-/* v46: altes App-Kärtchen unten entfernt und neues Logo oben eingesetzt */
+<style id="v47-sidebar-logo-brighter">
+/* v47: Logo oben links heller gemacht */
 .brandCardLogoOnly{
   padding:14px 8px 24px !important;
   justify-content:flex-start !important;
@@ -6593,7 +6593,7 @@ if ('serviceWorker' in navigator) {
   height:auto;
   display:block;
   object-fit:contain;
-  filter:drop-shadow(0 12px 26px rgba(0,120,255,.18));
+  filter:brightness(1.16) saturate(1.08) contrast(1.04) drop-shadow(0 12px 28px rgba(70,150,255,.26));
 }
 .sidebarBottom{
   gap:14px !important;
