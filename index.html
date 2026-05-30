@@ -6230,7 +6230,7 @@ if ('serviceWorker' in navigator) {
 <script id="v39-creditor-qr-module">
 (function(){
   document.documentElement.setAttribute("data-schulden-version","v39");
-  window.SCHULDEN_APP_VERSION = "v48-greeting-shift-hide-eyebrow";
+  window.SCHULDEN_APP_VERSION = "v49-schnellaktionen-eine-reihe";
   const LS = "schulden_creditors_v37";
   const FORMAT_LS = "schulden_qr_label_format_v39";
   const TYPES = [
@@ -6613,6 +6613,58 @@ if ('serviceWorker' in navigator) {
 }
 .dashboardGreetingWrap h1{
   margin-top:6px !important;
+}
+</style>
+
+<style id="v49-schnellaktionen-eine-reihe">
+/* v49: Schnellaktionen kompakter und in einer Reihe */
+@media (min-width: 900px){
+  .actionToolbarGrid,
+  .driveToolbarGrid{
+    display:flex !important;
+    flex-wrap:nowrap !important;
+    gap:8px !important;
+    overflow-x:auto !important;
+    scrollbar-width:thin;
+    padding-bottom:4px !important;
+  }
+  .actionToolbarGrid button,
+  .driveToolbarGrid button{
+    flex:0 0 auto !important;
+    width:auto !important;
+    min-width:148px !important;
+    min-height:42px !important;
+    padding:0 14px !important;
+    border-radius:14px !important;
+    font-size:13px !important;
+    line-height:1.05 !important;
+  }
+  .driveToolbarGrid .driveBtn{
+    min-width:160px !important;
+    gap:7px !important;
+  }
+  .driveToolbarGrid .driveBtn .driveIcon{font-size:16px !important;}
+  .driveToolbarGrid .driveBtn .driveText{line-height:1.02 !important;}
+  .actionToolbarCard .sectionTitle.compactTitle{
+    margin-bottom:10px !important;
+  }
+  .actionToolbarCard .sectionTitle.compactTitle h2{
+    font-size:18px !important;
+  }
+  .actionToolbarCard .sectionTitle.compactTitle span{
+    font-size:12px !important;
+  }
+  #backupStatus, #syncStatus, #driveStatus{
+    display:inline-flex !important;
+    align-items:center !important;
+    min-height:38px !important;
+    padding:0 14px !important;
+    margin-top:8px !important;
+  }
+  #installHint{
+    margin-top:8px !important;
+    font-size:12px !important;
+  }
 }
 </style>
 </body>
