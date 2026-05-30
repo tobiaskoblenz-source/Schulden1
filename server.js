@@ -107,7 +107,7 @@ function serveStatic(req, res){
     const ext = path.extname(filePath).toLowerCase();
     res.writeHead(200, {
       "Content-Type": MIME[ext] || "application/octet-stream",
-      "Cache-Control": ext === ".html" ? "no-store" : "public, max-age=3600"
+      "Cache-Control": [".html", ".js", ".css", ".webmanifest"].includes(ext) || path.basename(filePath) === "sw.js" ? "no-store" : "public, max-age=3600"
     });
     fs.createReadStream(filePath).pipe(res);
   });
@@ -118,7 +118,7 @@ const server = http.createServer(async (req, res)=>{
     const url = new URL(req.url, `http://${req.headers.host || "localhost"}`);
 
     if(url.pathname === "/api/health"){
-      return sendJson(res, 200, {ok:true, service:"schulden-manager", version:"v21"});
+      return sendJson(res, 200, {ok:true, service:"schulden-manager", version:"v24"});
     }
 
     if(url.pathname === "/api/config"){

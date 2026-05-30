@@ -1,4 +1,4 @@
-const VERSION = 'dark-v21';
+const VERSION = 'dark-v24-google-drive-cachefix';
 const CACHE_STATIC = `schulden-manager-static-${VERSION}`;
 const CACHE_RUNTIME = `schulden-manager-runtime-${VERSION}`;
 const APP_SHELL = [
@@ -18,10 +18,37 @@ self.addEventListener('install', (event) => {
 self.addEventListener('activate', (event) => {
   event.waitUntil((async () => {
     const keys = await caches.keys();
-    await Promise.all(keys.filter((key) => ![CACHE_STATIC, CACHE_RUNTIME].includes(key)).map((key) => caches.delete(key)));
+    await Promise.all(keys
+      .filter((key) => key.startsWith('schulden-manager-') && ![CACHE_STATIC, CACHE_RUNTIME].includes(key))
+      .map((key) => caches.delete(key))
+    );
     await self.clients.claim();
   })());
 });
+
+async function networkFirst(request){
+  try{
+    const fresh = await fetch(request, {cache: 'no-store'});
+    const cache = await caches.open(CACHE_RUNTIME);
+    cache.put(request, fresh.clone());
+    return fresh;
+  }catch(err){
+    return (await caches.match(request)) || (await caches.match('/index.html'));
+  }
+}
+
+async function cacheFirst(request){
+  const cached = await caches.match(request);
+  if(cached) return cached;
+  try{
+    const fresh = await fetch(request);
+    const cache = await caches.open(CACHE_RUNTIME);
+    cache.put(request, fresh.clone());
+    return fresh;
+  }catch(err){
+    return caches.match('/index.html');
+  }
+}
 
 self.addEventListener('fetch', (event) => {
   const { request } = event;
@@ -30,31 +57,16 @@ self.addEventListener('fetch', (event) => {
   if (url.pathname.startsWith('/api/')) return;
 
   if (request.mode === 'navigate') {
-    event.respondWith((async () => {
-      try {
-        const fresh = await fetch(request);
-        const cache = await caches.open(CACHE_RUNTIME);
-        cache.put(request, fresh.clone());
-        return fresh;
-      } catch {
-        return (await caches.match(request)) || (await caches.match('/index.html'));
-      }
-    })());
+    event.respondWith(networkFirst(request));
     return;
   }
 
   if (url.origin === location.origin) {
-    event.respondWith((async () => {
-      const cached = await caches.match(request);
-      if (cached) return cached;
-      try {
-        const fresh = await fetch(request);
-        const cache = await caches.open(CACHE_RUNTIME);
-        cache.put(request, fresh.clone());
-        return fresh;
-      } catch {
-        return caches.match('/index.html');
-      }
-    })());
+    const noStoreFiles = ['/', '/index.html', '/sw.js', '/manifest.webmanifest'];
+    if(noStoreFiles.includes(url.pathname)){
+      event.respondWith(networkFirst(request));
+      return;
+    }
+    event.respondWith(cacheFirst(request));
   }
 });

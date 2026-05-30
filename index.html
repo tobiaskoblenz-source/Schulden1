@@ -12,7 +12,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="assets/icons/icon-192.png">
 <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
-<title>Schulden Manager – Dashboard Dark v21</title>
+<title>Schulden Manager – Dashboard Dark v23</title>
 
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
@@ -544,7 +544,7 @@ body.softlight .toast,body.dark .toast{background:rgba(10,18,30,.94)}
   #addModal{display:none !important}
 }
 
-/* v22 Google Drive + Korrespondenz */
+/* v24 Google Drive + Korrespondenz + Button-Fix */
 .driveToolbarGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:12px}
 .drivePill{display:inline-flex;align-items:center;gap:8px;margin-top:10px;padding:9px 12px;border-radius:999px;background:rgba(79,140,255,.14);border:1px solid rgba(125,165,255,.22);font-size:13px;color:var(--muted);font-weight:700}
 .drivePill.drive-ok{color:#86efac;background:rgba(39,182,110,.13);border-color:rgba(39,182,110,.28)}
@@ -5513,14 +5513,14 @@ if ('serviceWorker' in navigator) {
 </script>
 
 
-<script id="v22-google-drive-correspondence">
+<script id="v23-google-drive-correspondence">
 (function(){
   const DRIVE_SCOPE = "https://www.googleapis.com/auth/drive.file";
   const ROOT_FOLDER = "Schulden-App";
   const CORR_FOLDER = "Korrespondenz";
   const SYNC_FILE = "schulden-sync.json";
-  const CLIENT_KEY = "schulden_google_client_id_v22";
-  const META_KEY = "schulden_google_drive_meta_v22";
+  const CLIENT_KEY = "schulden_google_client_id_v24";
+  const META_KEY = "schulden_google_drive_meta_v24";
   const AUTO_DELAY = 1600;
 
   let accessToken = "";
@@ -5667,7 +5667,7 @@ if ('serviceWorker' in navigator) {
     const root = await rootFolder();
     const meta = readMeta();
     const payload = {
-      version:22,
+      version:24,
       app:"Schulden Manager",
       savedAt:new Date().toISOString(),
       debts:currentDebts()
@@ -5800,6 +5800,72 @@ if ('serviceWorker' in navigator) {
   };
 
   loadConfig().then(id=>{ if(id) driveStatus("Google Drive: bereit, noch nicht verbunden", ""); }).catch(()=>{});
+})();
+</script>
+
+
+
+<script id="v24-korrespondenz-button-fix">
+(function(){
+  function getDebts(){ return Array.isArray(window.debts) ? window.debts : (typeof debts !== "undefined" && Array.isArray(debts) ? debts : []); }
+  function filteredIndexes(){
+    const all = getDebts();
+    const search = (document.getElementById("search")?.value || "").toLowerCase();
+    const filter = document.getElementById("statusFilter")?.value || "alle";
+    return all.map((d,index)=>({d,index})).filter(({d})=>{
+      const okSearch = !search || JSON.stringify(d || {}).toLowerCase().includes(search);
+      const okFilter = filter === "alle" ? true : String((d && d.status) || "offen") === filter;
+      return okSearch && okFilter;
+    }).map(x=>x.index);
+  }
+  function indexFromElement(el, fallbackPosition){
+    const rowWithIndex = el.closest("[data-index]");
+    if(rowWithIndex && rowWithIndex.dataset.index != null) return Number(rowWithIndex.dataset.index);
+    const row = el.closest("tr");
+    if(row){
+      const m = row.textContent.match(/S-(\d+)/);
+      if(m) return Number(m[1]) - 1001;
+      const rows = Array.from(row.parentElement ? row.parentElement.children : []);
+      const pos = rows.indexOf(row);
+      const indexes = filteredIndexes();
+      if(indexes[pos] != null) return indexes[pos];
+    }
+    const indexes = filteredIndexes();
+    return indexes[fallbackPosition] != null ? indexes[fallbackPosition] : fallbackPosition;
+  }
+  function makeButton(index, isAction){
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = isAction ? "actionBtn btn-correspondence" : "miniBtn btn-correspondence";
+    btn.innerHTML = isAction ? "<span class='ico'>📎</span><span class='lbl'>Korrespondenz</span>" : "Korrespondenz";
+    btn.dataset.action = "corr";
+    btn.addEventListener("click", function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      if(typeof window.showCorrespondence === "function") window.showCorrespondence(index);
+      else alert("Korrespondenz ist noch nicht geladen. Bitte Seite neu laden.");
+    });
+    return btn;
+  }
+  function patchKorrespondenzButtons(){
+    document.querySelectorAll(".tableActions, .mobileRow, .v19Actions").forEach((box, pos)=>{
+      if(box.querySelector(".btn-correspondence,[data-action='corr']")) return;
+      const index = indexFromElement(box, pos);
+      const isAction = box.classList.contains("mobileRow") || box.classList.contains("v19Actions");
+      box.appendChild(makeButton(index, isAction));
+    });
+    document.querySelectorAll(".btn-contact .lbl").forEach(lbl=>{
+      if(lbl.textContent.trim() === "Ansprechpartner") lbl.innerHTML = "Ansprech<br>partner";
+    });
+  }
+  const previousRender = window.render;
+  window.render = function(){
+    const result = typeof previousRender === "function" ? previousRender.apply(this, arguments) : undefined;
+    setTimeout(patchKorrespondenzButtons, 0);
+    return result;
+  };
+  document.addEventListener("DOMContentLoaded", ()=>setTimeout(patchKorrespondenzButtons, 50));
+  setTimeout(patchKorrespondenzButtons, 150);
 })();
 </script>
 
