@@ -1,4 +1,4 @@
-const VERSION = 'dark-v49-schnellaktionen-eine-reihe';
+const VERSION = 'dark-v50-schnellaktionen-buttons-entfernt';
 const CACHE_STATIC = `schulden-manager-static-${VERSION}`;
 const CACHE_RUNTIME = `schulden-manager-runtime-${VERSION}`;
 const APP_SHELL = [

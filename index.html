@@ -6230,7 +6230,7 @@ if ('serviceWorker' in navigator) {
 <script id="v39-creditor-qr-module">
 (function(){
   document.documentElement.setAttribute("data-schulden-version","v39");
-  window.SCHULDEN_APP_VERSION = "v49-schnellaktionen-eine-reihe";
+  window.SCHULDEN_APP_VERSION = "v50-schnellaktionen-buttons-entfernt";
   const LS = "schulden_creditors_v37";
   const FORMAT_LS = "schulden_qr_label_format_v39";
   const TYPES = [
@@ -6665,6 +6665,17 @@ if ('serviceWorker' in navigator) {
     margin-top:8px !important;
     font-size:12px !important;
   }
+}
+</style>
+
+<style id="v50-schnellaktionen-buttons-entfernt">
+/* v50: ausgewählte Schnellaktions-Buttons ausblenden */
+#btnBackup,
+#btnBackupPick,
+#btnRestore,
+#btnExcel,
+#btnClear{
+  display:none !important;
 }
 </style>
 </body>
