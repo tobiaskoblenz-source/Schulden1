@@ -1,4 +1,4 @@
-const VERSION = 'dark-v25-google-drive-cachefix';
+const VERSION = 'dark-v26-desktop-akte';
 const CACHE_STATIC = `schulden-manager-static-${VERSION}`;
 const CACHE_RUNTIME = `schulden-manager-runtime-${VERSION}`;
 const APP_SHELL = [

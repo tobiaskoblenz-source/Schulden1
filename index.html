@@ -2925,45 +2925,83 @@ body.force-mobile-view .dashboardShell{
     </section>
       </div>
       <aside class="desktopDetailPanel" id="desktopDetailPanel">
-        <div class="desktopPanelHead">
+        <div class="desktopPanelHead desktopAkteHead">
           <div>
-            <span class="drawerEyebrow">Info</span>
-            <h3>Details</h3>
+            <span class="drawerEyebrow">📎 Daten</span>
+            <h3>Daten – Schuld-Akte</h3>
+            <p class="desktopAkteSub">Alle wichtigen Infos, Dateien und Verlauf auf einen Blick.</p>
           </div>
           <button id="desktopNewNoteBtn" class="secondary smallSideBtn" type="button">＋ Notiz</button>
         </div>
-        <div class="desktopPanelBody">
-          <section class="desktopPanelSection">
-            <div class="drawerSectionHead"><span>1</span><strong>Name</strong></div>
-            <div id="sideNameValue" class="drawerBigValue">–</div>
-          </section>
-
-          <section class="desktopPanelSection">
-            <div class="drawerSectionHead"><span>2</span><strong>Ansprechpartner</strong></div>
-            <div class="drawerList">
-              <div class="drawerRow"><span>Name / Vertreter</span><strong id="sideContactRepresentative">–</strong></div>
-              <div class="drawerRow"><span>Anschrift</span><strong id="sideContactAddress">–</strong></div>
-              <div class="drawerRow drawerRowActions"><span>E-Mail</span><div class="drawerValueActions"><strong id="sideContactEmail">–</strong><div id="sideContactEmailActions" class="miniActions"></div></div></div>
-              <div class="drawerRow drawerRowActions"><span>Telefonnummer</span><div class="drawerValueActions"><strong id="sideContactPhone">–</strong><div id="sideContactPhoneActions" class="miniActions"></div></div></div>
+        <div class="desktopPanelBody desktopAkteBody">
+          <section class="desktopPanelSection desktopIdentityCard">
+            <div class="desktopIdentityTop">
+              <div class="desktopIdentityAvatar" id="sideIdentityAvatar">S</div>
+              <div>
+                <div id="sideNameValue" class="drawerBigValue">–</div>
+                <div id="sideIdentityMeta" class="desktopIdentityMeta">Schuld-ID: –</div>
+              </div>
+            </div>
+            <div class="desktopIdentityGrid">
+              <div class="desktopMiniFact"><span>Grund</span><strong id="sideReasonValue">–</strong></div>
+              <div class="desktopMiniFact"><span>Betrag</span><strong id="sideAmountValue">–</strong></div>
+              <div class="desktopMiniFact"><span>Status</span><strong id="sideStatusValue">–</strong></div>
+              <div class="desktopMiniFact"><span>Nächste Frist</span><strong id="sideDateValue">–</strong></div>
             </div>
           </section>
 
+          <div class="desktopAkteGrid2">
+            <section class="desktopPanelSection">
+              <div class="drawerSectionHead"><span>1</span><strong>Ansprechpartner</strong></div>
+              <div class="drawerList desktopContactList">
+                <div class="drawerRow"><span>Name / Vertreter</span><strong id="sideContactRepresentative">–</strong></div>
+                <div class="drawerRow"><span>Anschrift</span><strong id="sideContactAddress">–</strong></div>
+                <div class="drawerRow drawerRowActions"><span>E-Mail</span><div class="drawerValueActions"><strong id="sideContactEmail">–</strong><div id="sideContactEmailActions" class="miniActions"></div></div></div>
+                <div class="drawerRow drawerRowActions"><span>Telefonnummer</span><div class="drawerValueActions"><strong id="sideContactPhone">–</strong><div id="sideContactPhoneActions" class="miniActions"></div></div></div>
+              </div>
+            </section>
+
+            <section class="desktopPanelSection">
+              <div class="drawerSectionHead"><span>2</span><strong>Aktenzeichen</strong></div>
+              <div class="drawerBigValue drawerBigValueCompact" id="sideCaseValue">–</div>
+              <div class="drawerMutedText">Falls vorhanden, erscheint hier dein Aktenzeichen oder die Referenznummer.</div>
+            </section>
+          </div>
+
+          <div class="desktopAkteGrid2">
+            <section class="desktopPanelSection">
+              <div class="drawerSectionHead"><span>3</span><strong>Notizen</strong></div>
+              <div id="sideNotesList" class="notesTimeline sideNotesTimeline"></div>
+            </section>
+
+            <div class="desktopStatsStack">
+              <section class="desktopPanelSection">
+                <div class="drawerSectionHead"><span>4</span><strong>Letzte Zahlung</strong></div>
+                <div class="desktopHighlightValue" id="sideLastPaymentValue">–</div>
+                <div class="desktopHighlightSub" id="sidePaidValue">Bereits abgebaut: –</div>
+              </section>
+              <section class="desktopPanelSection">
+                <div class="drawerSectionHead"><span>5</span><strong>Nächste Frist</strong></div>
+                <div class="desktopHighlightValue" id="sideNextDueValue">–</div>
+                <div id="sideDueHint" class="desktopDueHint">Keine Frist hinterlegt</div>
+              </section>
+            </div>
+          </div>
+
           <section class="desktopPanelSection">
-            <div class="drawerSectionHead"><span>3</span><strong>Notizen</strong></div>
-            <div id="sideNotesList" class="notesTimeline sideNotesTimeline"></div>
+            <div class="drawerSectionHead"><span>6</span><strong>Korrespondenz</strong></div>
+            <div id="sideCorrespondenceList" class="desktopCorrList"></div>
           </section>
 
           <section class="desktopPanelSection">
-            <div class="drawerSectionHead"><span>4</span><strong>Weitere Informationen</strong></div>
-            <div class="drawerFacts">
-              <div class="drawerFact"><span>Grund</span><strong id="sideReasonValue">–</strong></div>
-              <div class="drawerFact"><span>Betrag</span><strong id="sideAmountValue">–</strong></div>
-              <div class="drawerFact"><span>Status</span><strong id="sideStatusValue">–</strong></div>
-              <div class="drawerFact"><span>Fällig am</span><strong id="sideDateValue">–</strong></div>
-              <div class="drawerFact"><span>Bereits abgebaut</span><strong id="sidePaidValue">–</strong></div>
-              <div class="drawerFact"><span>Letzte Zahlung</span><strong id="sideLastPaymentValue">–</strong></div>
-            </div>
+            <div class="drawerSectionHead"><span>7</span><strong>Verlauf</strong></div>
+            <div id="sideTimelineList" class="desktopTimelineList"></div>
           </section>
+        </div>
+        <div class="desktopPanelFooter desktopAkteFooter">
+          <button id="desktopUploadFileBtn" type="button">📎 Datei hochladen</button>
+          <button id="desktopDriveSaveBtn" class="secondary" type="button">☁️ In Drive speichern</button>
+          <button id="desktopDriveLoadBtn" class="secondary" type="button">⬇️ Aus Drive laden</button>
         </div>
       </aside>
     </div>
@@ -4238,33 +4276,89 @@ if ('serviceWorker' in navigator) {
   function fillSidePanel(i){
     const nameEl = document.getElementById('sideNameValue');
     if(!nameEl) return;
+    const setText = (id, value) => { const el = document.getElementById(id); if(el) el.textContent = value; };
+    const setHTML = (id, value) => { const el = document.getElementById(id); if(el) el.innerHTML = value; };
+    const avatar = document.getElementById('sideIdentityAvatar');
+    const corrBox = document.getElementById('sideCorrespondenceList');
+    const timelineBox = document.getElementById('sideTimelineList');
+    const notesBox = document.getElementById('sideNotesList');
+
     if(i == null || i < 0 || !debts[i]){
       nameEl.textContent = 'Keine Daten';
-      ['sideContactRepresentative','sideContactAddress','sideContactEmail','sideContactPhone','sideReasonValue','sideAmountValue','sideDateValue','sidePaidValue','sideLastPaymentValue'].forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent='–'; });
+      setText('sideIdentityMeta', 'Schuld-ID: –');
+      ['sideContactRepresentative','sideContactAddress','sideContactEmail','sideContactPhone','sideReasonValue','sideAmountValue','sideDateValue','sidePaidValue','sideLastPaymentValue','sideCaseValue','sideNextDueValue'].forEach(id=>setText(id,'–'));
       const status = document.getElementById('sideStatusValue'); if(status) status.textContent = '–';
-      const notes = document.getElementById('sideNotesList'); if(notes) notes.innerHTML = '<div class="noteTimelineEmpty">Noch keine Schuld ausgewählt.</div>';
+      if(notesBox) notesBox.innerHTML = '<div class="desktopEmptyState">Noch keine Schuld ausgewählt.</div>';
+      if(corrBox) corrBox.innerHTML = '<div class="desktopEmptyState">Noch keine Dateien hinterlegt.</div>';
+      if(timelineBox) timelineBox.innerHTML = '<div class="desktopEmptyState">Noch kein Verlauf vorhanden.</div>';
+      const due = document.getElementById('sideDueHint'); if(due){ due.className='desktopDueHint'; due.textContent='Keine Frist hinterlegt'; }
+      if(avatar) avatar.textContent = 'S';
       buildMiniActions('sideContactEmailActions','');
       buildMiniActions('sideContactPhoneActions','');
       return;
     }
+
     const d = debts[i];
     const contact = normalizeContactData(d);
-    document.getElementById('sideNameValue').textContent = d.name || '–';
-    document.getElementById('sideContactRepresentative').textContent = contact.representative || '–';
-    document.getElementById('sideContactAddress').innerHTML = nl2br2(contact.address || '–');
-    document.getElementById('sideContactEmail').textContent = contact.email || '–';
-    document.getElementById('sideContactPhone').textContent = contact.phone || '–';
-    document.getElementById('sideReasonValue').textContent = d.grund || '–';
-    document.getElementById('sideAmountValue').textContent = formatEUR(Number(d.betrag) || 0);
-    document.getElementById('sideStatusValue').innerHTML = '<span class="statusBadge ' + statusCss(d.status) + '">' + prettyStatus(d.status) + '</span>';
-    document.getElementById('sideDateValue').textContent = d.datum || '–';
-    document.getElementById('sidePaidValue').textContent = formatEUR(sumHistory(d));
-    document.getElementById('sideLastPaymentValue').textContent = lastPaymentDate(d);
+    const correspondence = Array.isArray(d.correspondence) ? d.correspondence : [];
+    const notes = noteEntries(d).slice().reverse();
+    const payments = Array.isArray(d.history) ? d.history.slice().reverse() : [];
+    const paidTotal = formatEUR(sumHistory(d));
+    const dueRaw = d.datum || '';
+    let dueLabel = dueRaw || '–';
+    let dueHintText = 'Keine Frist hinterlegt';
+    let dueClass = 'desktopDueHint';
+    if(dueRaw){
+      const dueDate = new Date(dueRaw + 'T00:00:00');
+      const now = new Date();
+      now.setHours(0,0,0,0);
+      const diff = Math.round((dueDate - now) / 86400000);
+      if(Number.isFinite(diff)){
+        if(diff < 0){ dueHintText = '⚠️ Überfällig seit ' + Math.abs(diff) + ' Tag' + (Math.abs(diff)===1?'':'en'); dueClass += ' warn'; }
+        else if(diff === 0){ dueHintText = '⚠️ Heute fällig'; dueClass += ' warn'; }
+        else if(diff <= 7){ dueHintText = '⚠️ In ' + diff + ' Tag' + (diff===1?'':'en') + ' fällig'; dueClass += ' warn'; }
+        else { dueHintText = '✓ In ' + diff + ' Tagen fällig'; dueClass += ' ok'; }
+      }
+    }
+
+    nameEl.textContent = d.name || '–';
+    if(avatar) avatar.textContent = initials2(d.name || 'S');
+    setText('sideIdentityMeta', 'Schuld-ID: S-' + String(1001 + i));
+    setText('sideContactRepresentative', contact.representative || '–');
+    setHTML('sideContactAddress', nl2br2(contact.address || '–'));
+    setText('sideContactEmail', contact.email || '–');
+    setText('sideContactPhone', contact.phone || '–');
+    setText('sideReasonValue', d.grund || '–');
+    setText('sideAmountValue', formatEUR(Number(d.betrag) || 0));
+    setHTML('sideStatusValue', '<span class="statusBadge ' + statusCss(d.status) + '">' + prettyStatus(d.status) + '</span>');
+    setText('sideDateValue', dueRaw || '–');
+    setText('sidePaidValue', 'Bereits abgebaut: ' + paidTotal);
+    setText('sideLastPaymentValue', lastPaymentDate(d) || '–');
+    setText('sideCaseValue', d.aktenzeichen || d.caseNumber || d.referenceNumber || d.ref || '–');
+    setText('sideNextDueValue', dueLabel);
+    const due = document.getElementById('sideDueHint'); if(due){ due.className = dueClass; due.textContent = dueHintText; }
     buildMiniActions('sideContactEmailActions', contact.email, 'email');
     buildMiniActions('sideContactPhoneActions', contact.phone, 'phone');
-    const entries = noteEntries(d).slice().reverse();
-    const notesBox = document.getElementById('sideNotesList');
-    notesBox.innerHTML = entries.length ? entries.map(n => '<div class="noteTimelineItem"><time>' + escapeHTML2(formatNoteDate(n.at)) + '</time><p>' + nl2br2(n.text) + '</p></div>').join('') : '<div class="noteTimelineEmpty">Keine Notizen vorhanden.</div>';
+
+    if(notesBox){
+      notesBox.innerHTML = notes.length ? notes.map(n => '<div class="noteTimelineItem"><time>' + escapeHTML2(formatNoteDate(n.at)) + '</time><p>' + nl2br2(n.text) + '</p></div>').join('') : '<div class="desktopEmptyState">Keine Notizen vorhanden.</div>';
+    }
+
+    if(corrBox){
+      corrBox.innerHTML = correspondence.length ? correspondence.slice().reverse().map(item=>{
+        const link = item.webViewLink || (item.driveFileId ? 'https://drive.google.com/file/d/' + encodeURIComponent(item.driveFileId) + '/view' : '');
+        return '<div class="desktopCorrItem"><div class="desktopCorrMeta"><strong>' + escapeHTML2(item.name || item.driveName || 'Datei') + '</strong><span>' + escapeHTML2((item.date || '').split('-').reverse().join('.') || 'Ohne Datum') + ' · ' + escapeHTML2(item.mimeType || 'Datei') + '</span></div><div class="desktopCorrLinks">' + (link ? '<a class="desktopTinyLink" target="_blank" rel="noopener" href="' + escapeHTML2(link) + '">Öffnen</a>' : '') + '</div></div>';
+      }).join('') : '<div class="desktopEmptyState">Noch keine Korrespondenz hinterlegt.</div>';
+    }
+
+    const timelineItems = [];
+    notes.forEach(n=> timelineItems.push({date:n.at || '', title:'Notiz gespeichert', sub:n.text || '', kind:'note'}));
+    payments.forEach(h=> timelineItems.push({date:h.date || h.at || '', title: formatEUR(Number(h.amount)||0) + ' bezahlt', sub:'Zahlung eingetragen', kind:'pay'}));
+    correspondence.forEach(c=> timelineItems.push({date:c.uploadedAt || c.date || '', title:'Datei hochgeladen', sub:(c.name || c.driveName || 'Datei') + ((c.date && c.uploadedAt)?' · Datum ' + c.date.split('-').reverse().join('.'):'') , kind:'file'}));
+    timelineItems.sort((a,b)=> new Date(b.date || 0) - new Date(a.date || 0));
+    if(timelineBox){
+      timelineBox.innerHTML = timelineItems.length ? timelineItems.slice(0,12).map(item => '<div class="desktopTimelineItemV26"><div class="desktopTimelineShell"><div class="desktopTimelineDot"></div><div class="desktopTimelineMain"><strong>' + escapeHTML2(item.title) + '</strong><span>' + nl2br2(item.sub) + '</span></div></div><div class="desktopTimelineTime">' + escapeHTML2(formatNoteDate(item.date || '')) + '</div></div>').join('') : '<div class="desktopEmptyState">Noch kein Verlauf vorhanden.</div>';
+    }
   }
   window.showInfo = function(i){
     selectedDebtIndex = i;
@@ -4391,6 +4485,11 @@ if ('serviceWorker' in navigator) {
       }
     });
   });
+
+
+  document.getElementById('desktopUploadFileBtn')?.addEventListener('click', ()=>{ if(selectedDebtIndex == null || selectedDebtIndex < 0) return; if(typeof window.showCorrespondence === 'function') window.showCorrespondence(selectedDebtIndex); });
+  document.getElementById('desktopDriveSaveBtn')?.addEventListener('click', ()=>{ document.getElementById('btnDriveSave')?.click(); });
+  document.getElementById('desktopDriveLoadBtn')?.addEventListener('click', ()=>{ document.getElementById('btnDriveLoad')?.click(); });
 
   document.addEventListener('click', async (e)=>{
     const btn = e.target.closest('[data-copy]');
@@ -5522,8 +5621,8 @@ if ('serviceWorker' in navigator) {
   const ROOT_FOLDER = "Schulden-App";
   const CORR_FOLDER = "Korrespondenz";
   const SYNC_FILE = "schulden-sync.json";
-  const CLIENT_KEY = "schulden_google_client_id_v24";
-  const META_KEY = "schulden_google_drive_meta_v24";
+  const CLIENT_KEY = "schulden_google_client_id_v26";
+  const META_KEY = "schulden_google_drive_meta_v26";
   const AUTO_DELAY = 1600;
 
   let accessToken = "";
@@ -5670,7 +5769,7 @@ if ('serviceWorker' in navigator) {
     const root = await rootFolder();
     const meta = readMeta();
     const payload = {
-      version:24,
+      version:26,
       app:"Schulden Manager",
       savedAt:new Date().toISOString(),
       debts:currentDebts()
@@ -5871,6 +5970,45 @@ if ('serviceWorker' in navigator) {
   setTimeout(patchKorrespondenzButtons, 150);
 })();
 </script>
+
+
+<style id="v26-desktop-akte-style">
+.desktopAkteHead{padding-bottom:14px;}
+.desktopAkteHead h3{margin:8px 0 4px;font-size:30px;line-height:1.1;}
+.desktopAkteSub{margin:0;color:#90a4c0;font-size:13px;line-height:1.45;}
+.desktopAkteBody{display:grid;gap:14px;}
+.desktopIdentityCard{background:linear-gradient(180deg, rgba(123,92,255,.14), rgba(255,255,255,.03));}
+.desktopIdentityTop{display:flex;align-items:center;gap:14px;margin-bottom:14px;}
+.desktopIdentityAvatar{width:58px;height:58px;border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;background:linear-gradient(180deg,#6d5cff,#4b3bdb);color:#fff;box-shadow:0 14px 28px rgba(78,59,219,.28);}
+.desktopIdentityMeta{color:#9db0ca;font-size:13px;margin-top:4px;}
+.desktopIdentityGrid,.desktopAkteGrid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;}
+.desktopMiniFact{padding:12px 14px;border-radius:16px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);}
+.desktopMiniFact span{display:block;color:#89a0bf;font-size:12px;margin-bottom:6px;}
+.desktopMiniFact strong{display:block;color:#fff;font-size:16px;line-height:1.35;}
+.drawerBigValueCompact{font-size:20px;}
+.drawerMutedText{margin-top:8px;color:#8fa4c0;font-size:13px;line-height:1.45;}
+.desktopStatsStack{display:grid;gap:14px;}
+.desktopHighlightValue{font-size:24px;font-weight:900;color:#fff;line-height:1.2;}
+.desktopHighlightSub{margin-top:8px;color:#7fdca8;font-size:14px;font-weight:700;}
+.desktopDueHint{margin-top:10px;display:inline-flex;align-items:center;gap:8px;border-radius:12px;padding:10px 12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);color:#c5d3e8;font-size:13px;font-weight:700;}
+.desktopDueHint.warn{background:rgba(255,183,77,.12);border-color:rgba(255,183,77,.28);color:#ffc870;}
+.desktopDueHint.ok{background:rgba(77,201,124,.12);border-color:rgba(77,201,124,.24);color:#93e2af;}
+.desktopCorrList,.desktopTimelineList{display:grid;gap:10px;}
+.desktopCorrItem,.desktopTimelineItemV26{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.06);}
+.desktopCorrMeta strong,.desktopTimelineMain strong{display:block;color:#fff;font-size:14px;line-height:1.35;}
+.desktopCorrMeta span,.desktopTimelineMain span,.desktopTimelineTime{display:block;color:#8ea4c3;font-size:12px;line-height:1.45;}
+.desktopCorrLinks{display:flex;gap:8px;flex-wrap:wrap;}
+.desktopTinyLink{display:inline-flex;align-items:center;justify-content:center;padding:8px 10px;border-radius:10px;background:#102039;color:#e9f1ff;text-decoration:none;border:1px solid rgba(255,255,255,.08);font-size:12px;font-weight:800;}
+.desktopTimelineItemV26{position:relative;}
+.desktopTimelineDot{width:10px;height:10px;border-radius:50%;background:#7b5cff;box-shadow:0 0 0 6px rgba(123,92,255,.12);margin-top:6px;flex:0 0 auto;}
+.desktopTimelineMain{flex:1 1 auto;}
+.desktopTimelineShell{display:flex;align-items:flex-start;gap:12px;}
+.desktopEmptyState{padding:16px;border-radius:14px;background:rgba(255,255,255,.03);border:1px dashed rgba(255,255,255,.09);color:#8fa4c0;font-size:13px;}
+.desktopPanelFooter.desktopAkteFooter{display:grid;grid-template-columns:1.1fr 1fr 1fr;gap:10px;margin-top:14px;}
+.desktopPanelFooter.desktopAkteFooter button{min-height:46px;border-radius:14px;font-weight:800;}
+.desktopPanelFooter.desktopAkteFooter .secondary{background:#102039!important;border:1px solid rgba(255,255,255,.08)!important;color:#edf3ff!important;}
+@media (max-width:1380px){.desktopAkteGrid2,.desktopIdentityGrid{grid-template-columns:1fr;}.desktopPanelFooter.desktopAkteFooter{grid-template-columns:1fr;}}
+</style>
 
 </body>
 </html>
