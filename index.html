@@ -6224,7 +6224,7 @@ if ('serviceWorker' in navigator) {
 </script>
 
 
-<style id="v37-creditor-qr-style">
+<style id="v39-creditor-qr-style">
 .creditorBtn{background:linear-gradient(135deg,rgba(89,246,167,.14),rgba(79,140,255,.14))!important;border-color:rgba(89,246,167,.28)!important;color:#eafff4!important;font-weight:900!important;}
 .creditorOverlay{position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,.64);backdrop-filter:blur(14px);display:none;padding:18px;overflow:auto;}
 .creditorOverlay.show{display:block;}
@@ -6234,20 +6234,33 @@ if ('serviceWorker' in navigator) {
 .creditorBody{display:grid;grid-template-columns:390px minmax(0,1fr);gap:18px;padding:20px;}.creditorForm,.creditorListPanel{border-radius:24px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.08);padding:18px;}
 .creditorForm h4,.creditorListPanel h4{margin:0 0 14px;font-size:16px}.creditorGrid{display:grid;gap:10px}.creditorGrid label{display:grid;gap:7px;color:#9fb0cc;font-size:12px;font-weight:800}.creditorGrid input,.creditorGrid select,.creditorGrid textarea{width:100%;min-width:0;background:#0f1c2f!important;color:#edf4ff!important;border-color:rgba(255,255,255,.10)!important}.creditorGrid textarea{min-height:88px;padding:12px 14px;border-radius:18px;resize:vertical}.creditorActions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:13px}.creditorActions .wide{grid-column:1/-1}.creditorListTools{display:flex;gap:10px;margin-bottom:13px}.creditorListTools input{background:#0f1c2f!important;color:#edf4ff!important;border-color:rgba(255,255,255,.10)!important;width:100%;}
 .creditorList{display:grid;gap:10px;max-height:650px;overflow:auto;padding-right:4px}.creditorItem{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;padding:14px;border-radius:18px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.08)}.creditorItem strong{display:block;font-size:15px}.creditorItem span{display:block;color:#9fb0cc;font-size:12px;margin-top:3px}.creditorItemActions{display:flex;flex-wrap:wrap;gap:7px;justify-content:flex-end}.creditorItemActions button{min-height:38px;border-radius:13px!important;padding:0 11px!important;font-size:13px!important}.creditorBadge{display:inline-flex;align-items:center;gap:6px;padding:4px 9px;border-radius:999px;background:rgba(89,246,167,.10);border:1px solid rgba(89,246,167,.20);color:#a9ffd0;font-weight:900;font-size:11px;margin-top:7px}.debtQrBtn{background:rgba(89,246,167,.12)!important;border-color:rgba(89,246,167,.25)!important;color:#adffd1!important;}.creditorHint{margin-top:12px;padding:12px;border-radius:16px;background:rgba(79,140,255,.08);border:1px solid rgba(79,140,255,.14);color:#b9c8e8;font-size:13px;line-height:1.5}.qrTypePreview{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}.qrTypePreview span{border-radius:12px;padding:8px 7px;font-size:11px;text-align:center;font-weight:950;color:#07111f}.qtBrief{background:#8df2b5}.qtBescheid{background:#9fc6ff}.qtMahnung{background:#ffd36a}.qtVollstreckung{background:#ff8fa0}
+.qrFormatPick{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 13px}.qrFormatPick button{min-height:38px;border-radius:13px!important;padding:0 12px!important;font-size:13px!important}.qrFormatPick button.active{background:rgba(89,246,167,.18)!important;border-color:rgba(89,246,167,.36)!important;color:#baffd8!important}.formatMini{font-size:11px!important;min-height:34px!important;padding:0 9px!important}.creditorItemActions .formatMini{background:rgba(255,255,255,.06)!important;color:#dce8ff!important}
 @media(max-width:900px){.creditorBody{grid-template-columns:1fr}.creditorItem{grid-template-columns:1fr}.creditorItemActions{justify-content:flex-start}.qrTypePreview{grid-template-columns:repeat(2,1fr)}}
 </style>
 
-<script id="v37-creditor-qr-module">
+<script id="v39-creditor-qr-module">
 (function(){
-  document.documentElement.setAttribute("data-schulden-version","v37");
-  window.SCHULDEN_APP_VERSION = "v37-creditor-qr-module";
+  document.documentElement.setAttribute("data-schulden-version","v39");
+  window.SCHULDEN_APP_VERSION = "v39-creditor-qr-label-formats";
   const LS = "schulden_creditors_v37";
+  const FORMAT_LS = "schulden_qr_label_format_v39";
   const TYPES = [
     {key:"brief", label:"Brief", short:"Br", color:[141,242,181]},
     {key:"bescheid", label:"Bescheid", short:"B", color:[159,198,255]},
     {key:"mahnung", label:"Mahnung", short:"M", color:[255,211,106]},
     {key:"vollstreckung", label:"Vollstreckung", short:"V", color:[255,143,160]}
   ];
+  const FORMATS = {
+    "30": {key:"30", label:"30×30 mm", size:30, cols:6, rows:8, marginX:10, marginY:8, gapX:0, gapY:4, qr:19},
+    "35": {key:"35", label:"35×35 mm", size:35, cols:5, rows:7, marginX:10, marginY:8, gapX:3.75, gapY:2.3, qr:23}
+  };
+  function getFormatKey(){ return localStorage.getItem(FORMAT_LS) || "35"; }
+  function getFormat(key){ return FORMATS[key] || FORMATS[getFormatKey()] || FORMATS["35"]; }
+  function setFormat(key){ localStorage.setItem(FORMAT_LS, getFormat(key).key); updateFormatButtons(); }
+  function updateFormatButtons(){
+    const key=getFormatKey();
+    document.querySelectorAll("[data-format-pick]").forEach(b=>b.classList.toggle("active", b.dataset.formatPick===key));
+  }
   let editId = null;
   function $(id){return document.getElementById(id)}
   function esc(v){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m]));}
@@ -6268,7 +6281,7 @@ if ('serviceWorker' in navigator) {
       <div id="creditorOverlay" class="creditorOverlay" aria-hidden="true">
         <div class="creditorModal" role="dialog" aria-modal="true" aria-labelledby="creditorTitle">
           <div class="creditorHead">
-            <div><h3 id="creditorTitle">Gläubiger & QR-Codes</h3><p>Hier legst du AOK, Finanzamt, Gericht usw. an. Danach kannst du QR-Bögen im Stil deiner großen PDF drucken.</p></div>
+            <div><h3 id="creditorTitle">Gläubiger & QR-Codes</h3><p>Hier legst du AOK, Finanzamt, Gericht usw. an. Danach kannst du QR-Bögen im Stil deiner großen PDF drucken – wahlweise 30×30 mm oder 35×35 mm.</p></div>
             <button id="creditorClose" class="secondary creditorClose" type="button">✕</button>
           </div>
           <div class="creditorBody">
@@ -6285,6 +6298,7 @@ if ('serviceWorker' in navigator) {
                 <label>Notiz<textarea id="credNotes" placeholder="optional"></textarea></label>
               </div>
               <div class="qrTypePreview"><span class="qtBrief">Brief</span><span class="qtBescheid">Bescheid</span><span class="qtMahnung">Mahnung</span><span class="qtVollstreckung">Vollstreckung</span></div>
+              <div class="qrFormatPick" aria-label="Etikettenformat wählen"><button type="button" data-format-pick="30">30×30 mm</button><button type="button" data-format-pick="35">35×35 mm</button></div>
               <div class="creditorActions"><button id="credSave" type="button">Speichern</button><button id="credReset" class="secondary" type="button">Neu</button><button id="credImportDebts" class="secondary wide" type="button">Aus vorhandenen Schulden übernehmen</button></div>
               <div class="creditorHint">Tipp: Erst alle Gläubiger anlegen. Danach kannst du pro Gläubiger einen kompletten QR-Bogen erstellen und auf Briefe kleben.</div>
             </section>
@@ -6302,6 +6316,8 @@ if ('serviceWorker' in navigator) {
     $("credReset").onclick=resetForm;
     $("credImportDebts").onclick=importFromDebts;
     $("credSearch").addEventListener("input",renderList);
+    document.querySelectorAll("[data-format-pick]").forEach(b=>b.onclick=()=>setFormat(b.dataset.formatPick));
+    updateFormatButtons();
   }
   function open(){ ensureOverlay(); renderList(); $("creditorOverlay").classList.add("show"); $("creditorOverlay").setAttribute("aria-hidden","false"); document.body.classList.add("modalOpen"); setTimeout(()=>$("credName")?.focus(),50); }
   function close(){ $("creditorOverlay")?.classList.remove("show"); $("creditorOverlay")?.setAttribute("aria-hidden","true"); document.body.classList.remove("modalOpen"); }
@@ -6320,8 +6336,8 @@ if ('serviceWorker' in navigator) {
     const box=$("creditorList"); if(!box) return; const q=normalize($("credSearch")?.value||"");
     const arr=read().filter(c=>!q || normalize(JSON.stringify(c)).includes(q)).sort((a,b)=>label(a).localeCompare(label(b),"de"));
     if(!arr.length){ box.innerHTML='<div class="creditorHint">Noch keine Gläubiger gespeichert.</div>'; return; }
-    box.innerHTML=arr.map(c=>`<article class="creditorItem" data-id="${esc(c.id)}"><div><strong>${esc(label(c))}</strong><span>${esc(c.category||"Sonstiges")}${c.aktenzeichen?" · AZ: "+esc(c.aktenzeichen):""}</span><em class="creditorBadge">QR-Bogen bereit</em></div><div class="creditorItemActions"><button class="secondary" data-act="edit">Bearbeiten</button><button class="creditorBtn" data-act="qr">QR-Bogen</button><button class="btn-delete" data-act="del">Löschen</button></div></article>`).join("");
-    box.querySelectorAll("button").forEach(btn=>btn.onclick=()=>{ const id=btn.closest(".creditorItem")?.dataset.id; const c=read().find(x=>x.id===id); if(!c) return; const act=btn.dataset.act; if(act==="edit") fill(c); if(act==="qr") generateSheet(c); if(act==="del") del(id); });
+    box.innerHTML=arr.map(c=>`<article class="creditorItem" data-id="${esc(c.id)}"><div><strong>${esc(label(c))}</strong><span>${esc(c.category||"Sonstiges")}${c.aktenzeichen?" · AZ: "+esc(c.aktenzeichen):""}</span><em class="creditorBadge">QR-Bogen bereit</em></div><div class="creditorItemActions"><button class="secondary" data-act="edit">Bearbeiten</button><button class="formatMini" data-act="qr30">30×30</button><button class="formatMini" data-act="qr35">35×35</button><button class="creditorBtn" data-act="qr">QR Standard</button><button class="btn-delete" data-act="del">Löschen</button></div></article>`).join("");
+    box.querySelectorAll("button").forEach(btn=>btn.onclick=()=>{ const id=btn.closest(".creditorItem")?.dataset.id; const c=read().find(x=>x.id===id); if(!c) return; const act=btn.dataset.act; if(act==="edit") fill(c); if(act==="qr") generateSheet(c); if(act==="qr30") generateSheet(c,"30"); if(act==="qr35") generateSheet(c,"35"); if(act==="del") del(id); });
   }
   function importFromDebts(){
     const arr=read(); const seen=new Set(arr.map(c=>normalize(label(c)))); let added=0;
@@ -6401,30 +6417,33 @@ if ('serviceWorker' in navigator) {
     for(let r=0;r<n;r++) for(let c=0;c<n;c++) if(modules[r][c]) ctx.fillRect((c+quiet)*scale,(r+quiet)*scale,scale,scale);
     return canvas.toDataURL("image/png");
   }
-  async function generateSheet(c){
+  async function generateSheet(c, formatKey){
     try{
       if(!window.jspdf || !window.jspdf.jsPDF){ toast("PDF-Bibliothek fehlt. Bitte Internetverbindung prüfen."); return; }
       toast("QR-Bogen wird erstellt…");
       const {jsPDF}=window.jspdf; const doc=new jsPDF({unit:"mm",format:"a4",orientation:"portrait"});
-      const pageW=210, pageH=297, margin=10, cols=4, rows=6, gap=3;
-      const w=(pageW-margin*2-gap*(cols-1))/cols; const h=(pageH-margin*2-gap*(rows-1))/rows;
+      const pageW=210, pageH=297, fmt=getFormat(formatKey);
+      const cols=fmt.cols, rows=fmt.rows, w=fmt.size, h=fmt.size;
+      const marginX=fmt.marginX, marginY=fmt.marginY, gapX=fmt.gapX, gapY=fmt.gapY;
       const qrs={}; for(const t of TYPES){ qrs[t.key]=await qrDataUrl(payload(c,t)); }
       let n=0;
       for(let r=0;r<rows;r++){
         for(let col=0;col<cols;col++){
-          const t=TYPES[n%TYPES.length]; const x=margin+col*(w+gap), y=margin+r*(h+gap);
-          doc.setDrawColor(t.color[0],t.color[1],t.color[2]); doc.setLineWidth(1.2); doc.roundedRect(x,y,w,h,2.5,2.5,"S");
-          doc.setFillColor(255,255,255); doc.roundedRect(x+1.7,y+1.7,w-3.4,h-3.4,2,2,"F");
-          const qrSize=Math.min(24,w-10); doc.addImage(qrs[t.key],"PNG",x+(w-qrSize)/2,y+3,qrSize,qrSize);
-          doc.setTextColor(18,28,44); doc.setFont("helvetica","bold"); doc.setFontSize(label(c).length>18?8.2:9.2);
-          const parts=[c.name||"Gläubiger", c.extra||""]; let ty=y+31;
-          parts.filter(Boolean).forEach(line=>{ doc.text(String(line),x+w/2,ty,{align:"center",maxWidth:w-6}); ty+=4.2; });
-          doc.setFontSize(9.5); doc.setTextColor(t.color[0]*0.35,t.color[1]*0.35,t.color[2]*0.35); doc.text(t.label,x+w/2,y+h-5,{align:"center",maxWidth:w-6});
+          const t=TYPES[n%TYPES.length]; const x=marginX+col*(w+gapX), y=marginY+r*(h+gapY);
+          doc.setDrawColor(t.color[0],t.color[1],t.color[2]); doc.setLineWidth(fmt.key==="30"?0.9:1.05); doc.roundedRect(x,y,w,h,2.2,2.2,"S");
+          doc.setFillColor(255,255,255); doc.roundedRect(x+1.1,y+1.1,w-2.2,h-2.2,1.8,1.8,"F");
+          const qrSize=Math.min(fmt.qr,w-7); doc.addImage(qrs[t.key],"PNG",x+(w-qrSize)/2,y+2.1,qrSize,qrSize);
+          doc.setTextColor(18,28,44); doc.setFont("helvetica","bold");
+          const full=label(c); const fs=fmt.key==="30" ? (full.length>18?5.2:5.9) : (full.length>18?6.2:7.0);
+          doc.setFontSize(fs);
+          const parts=[c.name||"Gläubiger", c.extra||""]; let ty=y+qrSize+4.2;
+          parts.filter(Boolean).slice(0,2).forEach(line=>{ doc.text(String(line),x+w/2,ty,{align:"center",maxWidth:w-3.5}); ty+=fmt.key==="30"?3.0:3.5; });
+          doc.setFontSize(fmt.key==="30"?6.2:7.2); doc.setTextColor(t.color[0]*0.35,t.color[1]*0.35,t.color[2]*0.35); doc.text(t.label,x+w/2,y+h-2.6,{align:"center",maxWidth:w-3.5});
           n++;
         }
       }
       const safe=label(c).replace(/[^a-z0-9äöüß_-]+/gi,"_").replace(/^_+|_+$/g,"") || "Glaeubiger";
-      doc.save("QR_Bogen_"+safe+".pdf");
+      doc.save("QR_Bogen_"+fmt.key+"x"+fmt.key+"_"+safe+".pdf");
       toast("QR-Bogen erstellt ✅");
     }catch(err){ console.error(err); toast("QR-Bogen konnte nicht erstellt werden: "+(err.message||err)); }
   }
@@ -6461,7 +6480,7 @@ if ('serviceWorker' in navigator) {
       if(tr.querySelector(".debtQrBtn")) return;
       const pair=visible[rowIndex]; if(!pair) return;
       const holder=tr.querySelector(".actionRow") || tr.querySelector("td:last-child"); if(!holder) return;
-      const b=document.createElement("button"); b.type="button"; b.className="debtQrBtn"; b.textContent="QR"; b.title="QR-Bogen für diesen Gläubiger";
+      const b=document.createElement("button"); b.type="button"; b.className="debtQrBtn"; b.textContent="QR"; b.title="QR-Bogen im gewählten Standardformat";
       b.onclick=()=>{
         let c=findCreditorForDebt(pair.d);
         if(!c){
@@ -6481,7 +6500,9 @@ if ('serviceWorker' in navigator) {
     }
   }
   window.openCreditorsV37=open;
+  window.openCreditorsV39=open;
   window.generateCreditorQrSheetV37=generateSheet;
+  window.generateCreditorQrSheetV39=generateSheet;
   document.addEventListener("DOMContentLoaded",()=>{ ensureOverlay(); insertButtons(); patchAddFormSelect(); refreshCreditorSelect(); patchRender(); setTimeout(()=>{ if(typeof window.render==="function") window.render(); else patchDebtQrButtons(); },120); });
   setTimeout(()=>{ ensureOverlay(); insertButtons(); patchAddFormSelect(); refreshCreditorSelect(); patchRender(); patchDebtQrButtons(); },500);
 })();

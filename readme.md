@@ -1,16 +1,15 @@
-# Schulden v37
+# Schulden v39
 
-Basis: Schulden v36.
+Basis: Schulden v38.
 
-Neu in v37:
+Neu in v39:
 
-- Gläubiger-Verwaltung hinzugefügt
-- Gläubiger können aus vorhandenen Schulden übernommen werden
-- Beim Anlegen einer neuen Schuld kann ein Gläubiger ausgewählt werden
-- QR-Bogen pro Gläubiger im Stil der großen PDF
-- QR-Codes enthalten Gläubiger-ID, Name und Dokumenttyp
-- Dokumenttypen: Brief, Bescheid, Mahnung, Vollstreckung
-- QR-Button direkt in der Schulden-Tabelle
+- QR-Etikettenformate auswählbar: 30×30 mm und 35×35 mm
+- 30×30 mm: 6 Spalten × 8 Reihen = 48 Etiketten pro A4-Seite
+- 35×35 mm: 5 Spalten × 7 Reihen = 35 Etiketten pro A4-Seite
+- Beide Bögen sind auf A4 angepasst und im Stil der großen PDF aufgebaut
+- Pro Gläubiger gibt es Buttons für 30×30, 35×35 und QR Standard
+- QR-Erstellung bleibt offline ohne externe QR-Bibliothek
 
 Hinweis:
-Für die QR-Code-Erstellung wird im Browser die QR-Bibliothek von jsDelivr geladen. PDF-Erstellung nutzt wie vorher jsPDF.
+PDF-Erstellung nutzt weiterhin die in der App vorhandene jsPDF-Bibliothek.
