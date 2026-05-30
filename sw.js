@@ -1,4 +1,4 @@
-const VERSION = 'dark-v45-desktop-button-colors-fixed';
+const VERSION = 'dark-v46-sidebar-logo-cleanup';
 const CACHE_STATIC = `schulden-manager-static-${VERSION}`;
 const CACHE_RUNTIME = `schulden-manager-runtime-${VERSION}`;
 const APP_SHELL = [
@@ -7,7 +7,8 @@ const APP_SHELL = [
   '/manifest.webmanifest',
   '/sw.js',
   '/assets/icons/icon-192.png',
-  '/assets/icons/icon-512.png'
+  '/assets/icons/icon-512.png',
+  '/assets/logo-schulden-manager.png'
 ];
 
 self.addEventListener('install', (event) => {

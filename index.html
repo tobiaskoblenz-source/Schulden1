@@ -2785,12 +2785,8 @@ body.force-mobile-view .dashboardShell{
 <div class="appFrame">
 <div class="dashboardShell">
   <aside class="sidebar">
-    <div class="brandCard">
-      <div class="brandLogo">S</div>
-      <div>
-        <div class="brandTitle">Schulden</div>
-        <div class="brandSub">Manager</div>
-      </div>
+    <div class="brandCard brandCardLogoOnly">
+      <img class="brandFullLogo" src="assets/logo-schulden-manager.png" alt="Schulden Manager Logo">
     </div>
 
     <nav class="sidebarNav">
@@ -2801,13 +2797,6 @@ body.force-mobile-view .dashboardShell{
     </nav>
 
     <div class="sidebarBottom">
-      <div class="userMiniCard">
-        <div class="userMiniAvatar">👤</div>
-        <div>
-          <strong>Schulden App</strong>
-          <span>Dark Dashboard</span>
-        </div>
-      </div>
       <div class="modeMiniCard">
         <span>🌙 Dunkelmodus</span>
         <span class="modeSwitchOn"></span>
@@ -6241,7 +6230,7 @@ if ('serviceWorker' in navigator) {
 <script id="v39-creditor-qr-module">
 (function(){
   document.documentElement.setAttribute("data-schulden-version","v39");
-  window.SCHULDEN_APP_VERSION = "v45-desktop-button-colors-fixed";
+  window.SCHULDEN_APP_VERSION = "v46-sidebar-logo-cleanup";
   const LS = "schulden_creditors_v37";
   const FORMAT_LS = "schulden_qr_label_format_v39";
   const TYPES = [
@@ -6590,6 +6579,28 @@ if ('serviceWorker' in navigator) {
 .mobileRow .debtQrBtn,
 .tableActions .debtQrBtn,
 .actionRow .debtQrBtn{background:linear-gradient(180deg,#1e3b61,#132846)!important;color:#eef5ff!important;border-color:rgba(255,255,255,.14)!important;}
+</style>
+<style id="v46-sidebar-logo-cleanup">
+/* v46: altes App-Kärtchen unten entfernt und neues Logo oben eingesetzt */
+.brandCardLogoOnly{
+  padding:14px 8px 24px !important;
+  justify-content:flex-start !important;
+  align-items:center !important;
+}
+.brandFullLogo{
+  width:184px;
+  max-width:100%;
+  height:auto;
+  display:block;
+  object-fit:contain;
+  filter:drop-shadow(0 12px 26px rgba(0,120,255,.18));
+}
+.sidebarBottom{
+  gap:14px !important;
+}
+.sidebarBottom .modeMiniCard{
+  margin-top:auto;
+}
 </style>
 </body>
 </html>
