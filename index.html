@@ -2931,7 +2931,7 @@ body.force-mobile-view .dashboardShell{
         </div>
         <div class="desktopAkteTitleBlock">
           <h3>Daten – Schuld-Akte</h3>
-          <p>Alle wichtigen Infos, Dateien und Verlauf auf einen Blick. <b class="v31Marker">V35</b></p>
+          <p>Alle wichtigen Infos, Dateien und Verlauf auf einen Blick. <b class="v31Marker">V36</b></p>
         </div>
         <div class="desktopPanelBody desktopAkteBodyV30">
           <section class="desktopPanelSection desktopHeroCard">
@@ -5691,12 +5691,14 @@ if ('serviceWorker' in navigator) {
         callback:(resp)=>{
           if(resp && resp.access_token){
             accessToken = resp.access_token;
+            localStorage.setItem("schulden_google_drive_allowed_v36","1");
             driveStatus("Google Drive: verbunden ✓", "ok");
             resolve(accessToken);
           }else reject(new Error(resp && resp.error ? resp.error : "Keine Freigabe erhalten"));
         }
       });
-      tokenClient.requestAccessToken({prompt: interactive ? "consent" : ""});
+      const alreadyAllowed = localStorage.getItem("schulden_google_drive_allowed_v36") === "1";
+      tokenClient.requestAccessToken({prompt: alreadyAllowed ? "" : (interactive ? "consent" : "")});
     });
   }
   async function driveFetch(url, options={}){
@@ -5789,7 +5791,8 @@ if ('serviceWorker' in navigator) {
       fileId = result.id;
     }
     meta.syncFileId = fileId; meta.lastDriveSave = new Date().toISOString(); writeMeta(meta);
-    driveStatus("Google Drive: Daten gespeichert ✓", "ok");
+    const driveTime = new Date().toLocaleTimeString("de-DE", {hour:"2-digit", minute:"2-digit"});
+    driveStatus("Google Drive: gespeichert ✓ · " + driveTime, "ok");
     return result;
   }
   async function loadDriveSyncFile(){
@@ -5886,7 +5889,7 @@ if ('serviceWorker' in navigator) {
     overlay.style.display="flex"; document.body.classList.add('modalOpen');
   };
 
-  $("btnDriveConnect")?.addEventListener("click", ()=>ensureToken(true).then(()=>toast("Google Drive verbunden ✅")).catch(err=>{console.error(err); driveStatus("Google Drive: Verbindung fehlgeschlagen", "error"); toast(err.message); }));
+  $("btnDriveConnect")?.addEventListener("click", ()=>ensureToken(true).then(()=>toast("Google Drive verbunden und gemerkt ✅")).catch(err=>{console.error(err); driveStatus("Google Drive: Verbindung fehlgeschlagen", "error"); toast(err.message); }));
   $("btnDriveSave")?.addEventListener("click", ()=>saveDriveSyncFile().then(()=>toast("In Google Drive gespeichert ✅")).catch(err=>{console.error(err); driveStatus("Google Drive: Speicherfehler", "error"); toast(err.message);}));
   $("btnDriveLoad")?.addEventListener("click", ()=>{
     if(confirm("Daten aus Google Drive laden? Der aktuelle Stand in der App wird ersetzt.")) loadDriveSyncFile().catch(err=>{console.error(err); driveStatus("Google Drive: Ladefehler", "error"); toast(err.message);});
@@ -5899,7 +5902,7 @@ if ('serviceWorker' in navigator) {
     return result;
   };
 
-  loadConfig().then(id=>{ if(id) driveStatus("Google Drive: bereit, noch nicht verbunden", ""); }).catch(()=>{});
+  loadConfig().then(id=>{ if(id) driveStatus("Google Drive: bereit · weniger Nachfragen aktiv", ""); }).catch(()=>{});
 })();
 </script>
 
@@ -5988,264 +5991,16 @@ if ('serviceWorker' in navigator) {
 
 
 
-<style id="v33-polished-data-fields-and-layout">
-/* V35 – rechte Daten-Akte sauber, breite Felder als Karten, kein Zusammenkleben */
-.v31Marker{
-  display:inline-flex;
-  margin-left:8px;
-  padding:4px 9px;
-  border-radius:999px;
-  background:#35f29a;
-  color:#07111f;
-  font-size:11px;
-  font-weight:1000;
-  letter-spacing:.06em;
-  vertical-align:middle;
-}
-
-.dashboardContentGrid{
-  display:grid !important;
-  grid-template-columns:minmax(0, calc(100% - 650px)) 628px !important;
-  gap:22px !important;
-  align-items:start !important;
-  width:100% !important;
-  max-width:100% !important;
-}
-.dashboardContentGrid > *:first-child,
-.dashboardContentGrid > section,
-.dashboardTableWrap,
-#desktopTable{
-  min-width:0 !important;
-  max-width:100% !important;
-  overflow:hidden !important;
-}
-.actionToolbarGrid,
-.driveToolbarGrid{
-  display:grid !important;
-  grid-template-columns:repeat(3,minmax(0,1fr)) !important;
-  gap:10px !important;
-}
-.actionToolbarGrid button,
-.driveToolbarGrid button{
-  min-width:0 !important;
-  width:100% !important;
-  box-sizing:border-box !important;
-}
-.dashboardStats{
-  display:grid !important;
-  grid-template-columns:repeat(4,minmax(0,1fr)) !important;
-  gap:12px !important;
-}
-.stat{min-width:0 !important;}
-
-.desktopDetailPanel,
-.desktopAktePanel{
-  width:628px !important;
-  min-width:628px !important;
-  max-width:628px !important;
-  justify-self:end !important;
-  padding:24px !important;
-  border-radius:30px !important;
-  box-sizing:border-box !important;
-  z-index:1 !important;
-}
-
-/* Kopfbereich */
-.desktopAkteTitleBlock h3{
-  font-size:33px !important;
-  line-height:1.08 !important;
-  margin-bottom:10px !important;
-}
-.desktopAkteTitleBlock p{
-  font-size:15px !important;
-  line-height:1.45 !important;
-}
-
-/* Der obere Block wird jetzt eine saubere Karte */
-.desktopHeroCard{
-  width:100% !important;
-  padding:22px !important;
-  border-radius:24px !important;
-  box-sizing:border-box !important;
-  background:linear-gradient(180deg, rgba(64,59,126,.48), rgba(20,31,55,.62)) !important;
-  border:1px solid rgba(133,124,255,.22) !important;
-  box-shadow:0 18px 34px rgba(0,0,0,.18) !important;
-}
-.desktopHeroHead{
-  display:grid !important;
-  grid-template-columns:58px minmax(0,1fr) !important;
-  gap:14px !important;
-  align-items:center !important;
-  margin-bottom:18px !important;
-}
-.desktopHeroAvatar{
-  width:58px !important;
-  height:58px !important;
-  border-radius:18px !important;
-  display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-  background:linear-gradient(180deg,#7c5cff,#5a40f1) !important;
-  color:#fff !important;
-  font-size:24px !important;
-  font-weight:900 !important;
-  box-shadow:0 16px 30px rgba(90,64,241,.35) !important;
-}
-.desktopHeroName{
-  color:#fff !important;
-  font-size:24px !important;
-  font-weight:900 !important;
-  line-height:1.1 !important;
-  display:block !important;
-}
-.desktopHeroMeta{
-  color:#9fb0cf !important;
-  font-size:13px !important;
-  margin-top:5px !important;
-  display:block !important;
-}
-
-/* Wichtig: Felder nicht mehr zusammenkleben */
-.desktopHeroFacts{
-  display:grid !important;
-  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
-  gap:14px !important;
-  width:100% !important;
-}
-.desktopFactTile{
-  display:grid !important;
-  align-content:center !important;
-  gap:7px !important;
-  min-height:86px !important;
-  padding:16px 18px !important;
-  border-radius:17px !important;
-  box-sizing:border-box !important;
-  background:rgba(255,255,255,.045) !important;
-  border:1px solid rgba(255,255,255,.085) !important;
-  overflow:hidden !important;
-}
-.desktopFactTile span{
-  display:block !important;
-  color:#8fa4c4 !important;
-  font-size:12px !important;
-  line-height:1.2 !important;
-  font-weight:700 !important;
-}
-.desktopFactTile strong{
-  display:block !important;
-  color:#f4f7ff !important;
-  font-size:17px !important;
-  line-height:1.25 !important;
-  font-weight:900 !important;
-  word-break:break-word !important;
-}
-.desktopFactTile .statusBadge{
-  width:max-content !important;
-  min-width:86px !important;
-  justify-content:center !important;
-}
-
-/* Untere Karten */
-.desktopInfoGridV30{
-  display:grid !important;
-  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
-  gap:16px !important;
-}
-.desktopMiniInfoCard{
-  min-height:222px !important;
-  padding:18px !important;
-  box-sizing:border-box !important;
-  border-radius:22px !important;
-}
-.desktopInfoRows{
-  display:grid !important;
-  gap:11px !important;
-}
-.desktopInfoRow{
-  display:grid !important;
-  grid-template-columns:108px minmax(0,1fr) !important;
-  gap:12px !important;
-  align-items:start !important;
-}
-.desktopInfoRow span{
-  color:#8fa4c4 !important;
-  font-size:12px !important;
-  line-height:1.35 !important;
-}
-.desktopInfoRow strong{
-  color:#f2f6ff !important;
-  font-size:13px !important;
-  line-height:1.45 !important;
-  word-break:break-word !important;
-}
-
-/* Neue-Schuld-Form: Aktenzeichen ordentlich über volle Breite, wenn Platz knapp */
-#m_aktenzeichen{
-  width:100%;
-}
-
-/* Responsive Desktop */
-@media (max-width:1600px){
-  .dashboardContentGrid{
-    grid-template-columns:minmax(0, calc(100% - 610px)) 590px !important;
-  }
-  .desktopDetailPanel,
-  .desktopAktePanel{
-    width:590px !important;
-    min-width:590px !important;
-    max-width:590px !important;
-  }
-}
-@media (max-width:1450px){
-  .dashboardContentGrid{
-    grid-template-columns:minmax(0, calc(100% - 560px)) 540px !important;
-  }
-  .desktopDetailPanel,
-  .desktopAktePanel{
-    width:540px !important;
-    min-width:540px !important;
-    max-width:540px !important;
-  }
-  .desktopInfoGridV30{grid-template-columns:1fr !important;}
-}
-@media (max-width:1280px){
-  .dashboardContentGrid{grid-template-columns:1fr !important;}
-  .desktopDetailPanel,
-  .desktopAktePanel{
-    position:relative !important;
-    width:100% !important;
-    min-width:0 !important;
-    max-width:100% !important;
-    justify-self:stretch !important;
-  }
-}
-@media (max-width:1120px){
-  .dashboardContentGrid{grid-template-columns:1fr !important;}
-  .desktopDetailPanel,
-  .desktopAktePanel{
-    display:none !important;
-  }
-}
-</style>
 
 
 <script id="v33-loaded-marker">
 (function(){
-  document.documentElement.setAttribute("data-schulden-version","v35");
-  window.SCHULDEN_APP_VERSION = "v35-save-fix-aktenzeichen-linked";
+  document.documentElement.setAttribute("data-schulden-version","v36");
+  window.SCHULDEN_APP_VERSION = "v36-drive-less-prompts-dataakte-polish";
 })();
 </script>
 
 
-<style id="v34-aktenzeichen-link-style">
-.drawerMutedText{
-  margin-top:-4px;
-  margin-bottom:6px;
-  color:#8fa4c0;
-  font-size:12px;
-  line-height:1.45;
-}
-</style>
 
 
 <script id="v35-save-debt-fallback-fix">
@@ -6312,13 +6067,13 @@ if ('serviceWorker' in navigator) {
       }
       return true;
     }catch(err){
-      console.error("V35 Speicherfehler:", err);
+      console.error("V36 Speicherfehler:", err);
       toast("Speichern fehlgeschlagen: " + (err.message || err));
       return false;
     }
   }
 
-  window.saveDebtSafeV35 = saveDebtSafe;
+  window.saveDebtSafeV36 = saveDebtSafe;
   document.addEventListener("DOMContentLoaded", function(){
     const add = $("m_add");
     const addMore = $("m_add_more");
@@ -6331,6 +6086,140 @@ if ('serviceWorker' in navigator) {
     if(add) add.onclick = function(e){ e.preventDefault(); e.stopPropagation(); return saveDebtSafe(false); };
     if(addMore) addMore.onclick = function(e){ e.preventDefault(); e.stopPropagation(); return saveDebtSafe(true); };
   }, 300);
+})();
+</script>
+
+
+<style id="v36-drive-and-dataakte-polish">
+/* V36 – Google-Status + rechte Daten-Akte optisch sauberer */
+.v31Marker{
+  display:inline-flex;
+  margin-left:8px;
+  padding:4px 9px;
+  border-radius:999px;
+  background:#59f6a7;
+  color:#07111f;
+  font-size:11px;
+  font-weight:1000;
+  letter-spacing:.06em;
+  vertical-align:middle;
+}
+.drivePill{
+  min-height:34px;
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  padding:8px 14px!important;
+  border-radius:999px!important;
+  font-weight:800!important;
+  letter-spacing:.01em;
+}
+.drivePill.drive-ok{background:rgba(89,246,167,.12)!important;border-color:rgba(89,246,167,.28)!important;color:#9fffc8!important;}
+.drivePill.drive-error{background:rgba(255,90,120,.13)!important;border-color:rgba(255,90,120,.28)!important;color:#ffb8c5!important;}
+.dashboardContentGrid{
+  display:grid!important;
+  grid-template-columns:minmax(0, calc(100% - 650px)) 628px!important;
+  gap:22px!important;
+  align-items:start!important;
+  width:100%!important;
+  max-width:100%!important;
+}
+.dashboardContentGrid > *:first-child,.dashboardContentGrid > section,.dashboardTableWrap,#desktopTable{
+  min-width:0!important;max-width:100%!important;overflow:hidden!important;
+}
+.actionToolbarGrid,.driveToolbarGrid{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:10px!important;}
+.actionToolbarGrid button,.driveToolbarGrid button{min-width:0!important;width:100%!important;box-sizing:border-box!important;}
+.dashboardStats{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:12px!important;}
+.stat{min-width:0!important;}
+.desktopDetailPanel,.desktopAktePanel{
+  width:628px!important;min-width:628px!important;max-width:628px!important;justify-self:end!important;
+  padding:24px!important;border-radius:32px!important;box-sizing:border-box!important;
+  background:linear-gradient(180deg, rgba(9,18,32,.992), rgba(5,13,25,.992))!important;
+  border:1px solid rgba(255,255,255,.09)!important;box-shadow:0 28px 60px rgba(0,0,0,.33)!important;z-index:1!important;
+}
+.desktopAkteTopbar{padding-bottom:12px!important;}
+.desktopAkteBadge{
+  border-radius:999px!important;padding:8px 14px!important;
+  background:linear-gradient(180deg, rgba(48,91,164,.42), rgba(24,45,82,.42))!important;
+  border:1px solid rgba(148,177,255,.18)!important;color:#edf4ff!important;
+}
+.desktopTopNoteBtn{border-radius:15px!important;min-height:42px!important;padding:0 16px!important;}
+.desktopAkteTitleBlock{padding:4px 2px 14px!important;}
+.desktopAkteTitleBlock h3{font-size:33px!important;line-height:1.08!important;margin:0 0 10px!important;letter-spacing:-.03em!important;}
+.desktopAkteTitleBlock p{color:#95a9c9!important;font-size:15px!important;line-height:1.45!important;margin:0!important;}
+.desktopAkteBodyV30{display:grid!important;gap:16px!important;padding-top:4px!important;max-height:calc(100vh - 180px)!important;overflow:auto!important;padding-right:4px!important;}
+.desktopHeroCard{
+  width:100%!important;padding:22px!important;border-radius:26px!important;box-sizing:border-box!important;
+  background:radial-gradient(circle at 12% 0%, rgba(124,92,255,.24), transparent 36%),linear-gradient(180deg, rgba(44,54,93,.72), rgba(17,28,51,.68))!important;
+  border:1px solid rgba(133,124,255,.22)!important;box-shadow:0 18px 34px rgba(0,0,0,.20)!important;
+}
+.desktopHeroHead{display:grid!important;grid-template-columns:60px minmax(0,1fr)!important;gap:15px!important;align-items:center!important;margin-bottom:18px!important;}
+.desktopHeroAvatar{
+  width:60px!important;height:60px!important;border-radius:19px!important;display:flex!important;align-items:center!important;justify-content:center!important;
+  background:linear-gradient(180deg,#8b6cff,#5a40f1)!important;color:#fff!important;font-size:25px!important;font-weight:950!important;
+  box-shadow:0 16px 30px rgba(90,64,241,.36)!important;
+}
+.desktopHeroName{color:#fff!important;font-size:25px!important;font-weight:950!important;line-height:1.1!important;display:block!important;}
+.desktopHeroMeta{color:#a7b8d7!important;font-size:13px!important;margin-top:5px!important;display:block!important;}
+.desktopHeroFacts{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:14px!important;width:100%!important;}
+.desktopFactTile{
+  display:grid!important;align-content:center!important;gap:8px!important;min-height:88px!important;padding:17px 18px!important;border-radius:18px!important;
+  box-sizing:border-box!important;background:rgba(255,255,255,.055)!important;border:1px solid rgba(255,255,255,.09)!important;overflow:hidden!important;
+}
+.desktopFactTile span{display:block!important;color:#91a7c8!important;font-size:12px!important;line-height:1.2!important;font-weight:800!important;}
+.desktopFactTile strong{display:block!important;color:#f6f8ff!important;font-size:17px!important;line-height:1.25!important;font-weight:950!important;word-break:break-word!important;}
+.desktopFactTile .statusBadge{width:max-content!important;min-width:90px!important;justify-content:center!important;padding-inline:12px!important;}
+.desktopInfoGridV30{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:16px!important;}
+.desktopMiniInfoCard{
+  min-height:226px!important;padding:18px!important;box-sizing:border-box!important;border-radius:24px!important;
+  background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.025))!important;border:1px solid rgba(255,255,255,.075)!important;
+}
+.drawerSectionHead{margin-bottom:12px!important;}
+.drawerSectionHead span{width:30px!important;height:30px!important;border-radius:11px!important;background:rgba(91,124,255,.16)!important;color:#cbd7ff!important;}
+.drawerMutedText{margin:-4px 0 10px;color:#8fa4c0;font-size:12px;line-height:1.45;}
+.desktopInfoRows{display:grid!important;gap:12px!important;}
+.desktopInfoRow{display:grid!important;grid-template-columns:112px minmax(0,1fr)!important;gap:12px!important;align-items:start!important;}
+.desktopInfoRow span{color:#91a7c8!important;font-size:12px!important;line-height:1.35!important;}
+.desktopInfoRow strong{color:#f2f6ff!important;font-size:13px!important;line-height:1.45!important;word-break:break-word!important;}
+.desktopCardActionBtn{border-radius:15px!important;}
+.desktopCorrItem,.desktopTimelineItemV30{border-radius:16px!important;background:rgba(255,255,255,.04)!important;border:1px solid rgba(255,255,255,.075)!important;}
+.desktopAkteFooterV30{display:grid!important;grid-template-columns:1.15fr 1fr 1fr!important;gap:10px!important;margin-top:16px!important;}
+.desktopAkteFooterV30 button{border-radius:16px!important;min-height:48px!important;}
+#m_aktenzeichen{width:100%;}
+@media (max-width:1600px){
+  .dashboardContentGrid{grid-template-columns:minmax(0, calc(100% - 610px)) 590px!important;}
+  .desktopDetailPanel,.desktopAktePanel{width:590px!important;min-width:590px!important;max-width:590px!important;}
+}
+@media (max-width:1450px){
+  .dashboardContentGrid{grid-template-columns:minmax(0, calc(100% - 560px)) 540px!important;}
+  .desktopDetailPanel,.desktopAktePanel{width:540px!important;min-width:540px!important;max-width:540px!important;}
+  .desktopInfoGridV30{grid-template-columns:1fr!important;}
+}
+@media (max-width:1280px){
+  .dashboardContentGrid{grid-template-columns:1fr!important;}
+  .desktopDetailPanel,.desktopAktePanel{position:relative!important;width:100%!important;min-width:0!important;max-width:100%!important;justify-self:stretch!important;}
+}
+@media (max-width:1120px){
+  .dashboardContentGrid{grid-template-columns:1fr!important;}
+  .desktopDetailPanel,.desktopAktePanel{display:none!important;}
+}
+</style>
+
+
+<script id="v36-drive-status-helper">
+(function(){
+  function $(id){ return document.getElementById(id); }
+  function setStatus(){
+    const el = $("driveStatus");
+    if(!el) return;
+    const allowed = localStorage.getItem("schulden_google_drive_allowed_v36") === "1";
+    if(allowed && !/verbunden|gespeichert|lädt|speichert|Fehler/i.test(el.textContent || "")){
+      el.textContent = "Google Drive: Freigabe gemerkt ✓";
+      el.classList.add("drive-ok");
+    }
+  }
+  document.addEventListener("DOMContentLoaded", setStatus);
+  setTimeout(setStatus, 500);
 })();
 </script>
 
