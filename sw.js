@@ -1,4 +1,4 @@
-const VERSION = 'dark-v34-aktenzeichen-linked';
+const VERSION = 'dark-v35-save-fix-aktenzeichen-linked';
 const CACHE_STATIC = `schulden-manager-static-${VERSION}`;
 const CACHE_RUNTIME = `schulden-manager-runtime-${VERSION}`;
 const APP_SHELL = [

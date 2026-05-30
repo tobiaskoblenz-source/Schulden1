@@ -2931,7 +2931,7 @@ body.force-mobile-view .dashboardShell{
         </div>
         <div class="desktopAkteTitleBlock">
           <h3>Daten – Schuld-Akte</h3>
-          <p>Alle wichtigen Infos, Dateien und Verlauf auf einen Blick. <b class="v31Marker">V34</b></p>
+          <p>Alle wichtigen Infos, Dateien und Verlauf auf einen Blick. <b class="v31Marker">V35</b></p>
         </div>
         <div class="desktopPanelBody desktopAkteBodyV30">
           <section class="desktopPanelSection desktopHeroCard">
@@ -4323,7 +4323,7 @@ if ('serviceWorker' in navigator) {
     setHTML('sideStatusValue', '<span class="statusBadge ' + statusCss(d.status) + '">' + prettyStatus(d.status) + '</span>');
     setText('sideDateValue', d.datum || '–');
     setText('sideCaseValue', d.aktenzeichen || d.caseNumber || '–');
-    setText('sideReferenceValue', d.referenceNumber || d.ref || d.aktenzeichen || '–');
+    setText('sideReferenceValue', d.referenceNumber || d.ref || '–');
     setText('sideCustomerValue', d.customerNumber || d.kundennummer || d.customerId || '–');
     setText('sideCaseNote', (d.caseNote || '').trim() || 'Falls vorhanden, erscheint hier dein Aktenzeichen oder die Referenznummer.');
     setText('sideLastAmountValue', lastPay ? formatEUR(Number(lastPay.amount) || 0) : '–');
@@ -4535,7 +4535,7 @@ if ('serviceWorker' in navigator) {
 
   function clearFormV13(){
     [
-      "m_name","m_grund","m_betrag","m_datum",
+      "m_name","m_grund","m_betrag","m_datum","m_aktenzeichen",
       "m_contactRepresentative","m_contactAddress","m_contactEmail","m_contactPhone",
       "m_firstNote"
     ].forEach(id => {
@@ -4575,6 +4575,7 @@ if ('serviceWorker' in navigator) {
     const grund = $("m_grund")?.value.trim() || "";
     const betrag = parseAmountV13($("m_betrag")?.value);
     const datum = $("m_datum")?.value || "";
+    const aktenzeichen = $("m_aktenzeichen")?.value.trim() || "";
     const status = $("m_status")?.value || "offen";
 
     if(!name){
@@ -5988,7 +5989,7 @@ if ('serviceWorker' in navigator) {
 
 
 <style id="v33-polished-data-fields-and-layout">
-/* V34 – rechte Daten-Akte sauber, breite Felder als Karten, kein Zusammenkleben */
+/* V35 – rechte Daten-Akte sauber, breite Felder als Karten, kein Zusammenkleben */
 .v31Marker{
   display:inline-flex;
   margin-left:8px;
@@ -6230,8 +6231,8 @@ if ('serviceWorker' in navigator) {
 
 <script id="v33-loaded-marker">
 (function(){
-  document.documentElement.setAttribute("data-schulden-version","v34");
-  window.SCHULDEN_APP_VERSION = "v34-aktenzeichen-linked";
+  document.documentElement.setAttribute("data-schulden-version","v35");
+  window.SCHULDEN_APP_VERSION = "v35-save-fix-aktenzeichen-linked";
 })();
 </script>
 
@@ -6245,6 +6246,93 @@ if ('serviceWorker' in navigator) {
   line-height:1.45;
 }
 </style>
+
+
+<script id="v35-save-debt-fallback-fix">
+(function(){
+  function $(id){ return document.getElementById(id); }
+  function toast(msg){ if(typeof showToast === "function") showToast(msg); else alert(msg); }
+  function parseAmount(v){
+    const n = parseFloat(String(v || "").replace(/\./g,"").replace(",","."));
+    return Number.isFinite(n) ? n : NaN;
+  }
+  function resetForm(){
+    ["m_name","m_grund","m_betrag","m_datum","m_aktenzeichen","m_contactRepresentative","m_contactAddress","m_contactEmail","m_contactPhone","m_firstNote"].forEach(id=>{
+      const el=$(id); if(el) el.value="";
+    });
+    if(typeof setNewDebtStatus === "function") setNewDebtStatus("offen");
+    if(typeof setStatusV13 === "function") setStatusV13("offen");
+  }
+  function saveDebtSafe(keepOpen){
+    try{
+      const name = $("m_name")?.value.trim() || "";
+      const grund = $("m_grund")?.value.trim() || "";
+      const betrag = parseAmount($("m_betrag")?.value);
+      const datum = $("m_datum")?.value || "";
+      const aktenzeichen = $("m_aktenzeichen")?.value.trim() || "";
+      const status = $("m_status")?.value || "offen";
+      if(!name){ toast("Bitte Name eintragen."); $("m_name")?.focus(); return false; }
+      if(!grund){ toast("Bitte Grund eintragen."); $("m_grund")?.focus(); return false; }
+      if(!Number.isFinite(betrag) || betrag <= 0){ toast("Bitte Betrag korrekt eintragen."); $("m_betrag")?.focus(); return false; }
+
+      const contact = {
+        representative: $("m_contactRepresentative")?.value.trim() || "",
+        address: $("m_contactAddress")?.value.trim() || "",
+        email: $("m_contactEmail")?.value.trim() || "",
+        phone: $("m_contactPhone")?.value.trim() || ""
+      };
+      const note = $("m_firstNote")?.value.trim() || "";
+      const debt = {
+        name, grund, betrag, datum, aktenzeichen, status,
+        contactDetails: contact,
+        contactPerson: [contact.representative, contact.address, contact.email, contact.phone].filter(Boolean).join(" | "),
+        notes: "",
+        notesHistory: note ? [{ at: new Date().toISOString(), text: note }] : [],
+        history: [],
+        correspondence: []
+      };
+      debt.notes = typeof notesText === "function" ? notesText(debt) : note;
+
+      if(!Array.isArray(window.debts) && typeof debts !== "undefined") window.debts = debts;
+      if(Array.isArray(window.debts)) window.debts.push(debt);
+      else if(typeof debts !== "undefined" && Array.isArray(debts)) debts.push(debt);
+      else throw new Error("Schulden-Liste nicht gefunden");
+
+      if(typeof save === "function") save();
+      else localStorage.setItem("godmode_debts", JSON.stringify(window.debts || debts || []));
+
+      if(typeof render === "function") render();
+      toast("Schuld gespeichert ✅");
+
+      resetForm();
+      if(keepOpen){
+        setTimeout(()=>$("m_name")?.focus(), 60);
+      }else if(typeof window.closeAddModal === "function"){
+        window.closeAddModal();
+      }
+      return true;
+    }catch(err){
+      console.error("V35 Speicherfehler:", err);
+      toast("Speichern fehlgeschlagen: " + (err.message || err));
+      return false;
+    }
+  }
+
+  window.saveDebtSafeV35 = saveDebtSafe;
+  document.addEventListener("DOMContentLoaded", function(){
+    const add = $("m_add");
+    const addMore = $("m_add_more");
+    if(add) add.onclick = function(e){ e.preventDefault(); e.stopPropagation(); return saveDebtSafe(false); };
+    if(addMore) addMore.onclick = function(e){ e.preventDefault(); e.stopPropagation(); return saveDebtSafe(true); };
+  });
+  setTimeout(function(){
+    const add = $("m_add");
+    const addMore = $("m_add_more");
+    if(add) add.onclick = function(e){ e.preventDefault(); e.stopPropagation(); return saveDebtSafe(false); };
+    if(addMore) addMore.onclick = function(e){ e.preventDefault(); e.stopPropagation(); return saveDebtSafe(true); };
+  }, 300);
+})();
+</script>
 
 </body>
 </html>
