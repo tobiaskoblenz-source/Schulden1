@@ -1,4 +1,4 @@
-const VERSION = 'dark-v47-logo-brighter';
+const VERSION = 'dark-v48-greeting-shift-hide-eyebrow';
 const CACHE_STATIC = `schulden-manager-static-${VERSION}`;
 const CACHE_RUNTIME = `schulden-manager-runtime-${VERSION}`;
 const APP_SHELL = [

@@ -6230,7 +6230,7 @@ if ('serviceWorker' in navigator) {
 <script id="v39-creditor-qr-module">
 (function(){
   document.documentElement.setAttribute("data-schulden-version","v39");
-  window.SCHULDEN_APP_VERSION = "v47-logo-brighter";
+  window.SCHULDEN_APP_VERSION = "v48-greeting-shift-hide-eyebrow";
   const LS = "schulden_creditors_v37";
   const FORMAT_LS = "schulden_qr_label_format_v39";
   const TYPES = [
@@ -6600,6 +6600,19 @@ if ('serviceWorker' in navigator) {
 }
 .sidebarBottom .modeMiniCard{
   margin-top:auto;
+}
+</style>
+
+<style id="v48-greeting-shift-hide-eyebrow">
+/* v48: Dark Dashboard Chip entfernen und Begrüßung etwas nach rechts */
+.dashboardGreetingWrap{
+  padding-left:18px !important;
+}
+.dashboardGreetingWrap .eyebrow{
+  display:none !important;
+}
+.dashboardGreetingWrap h1{
+  margin-top:6px !important;
 }
 </style>
 </body>
