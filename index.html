@@ -6010,5 +6010,16 @@ if ('serviceWorker' in navigator) {
 @media (max-width:1380px){.desktopAkteGrid2,.desktopIdentityGrid{grid-template-columns:1fr;}.desktopPanelFooter.desktopAkteFooter{grid-template-columns:1fr;}}
 </style>
 
+
+<style id="v27-right-panel-width-tweak">
+/* v27 – mittleren Bereich etwas schmaler, rechte Schuld-Akte breiter */
+.dashboardContentGrid{grid-template-columns:minmax(0,1.08fr) 500px!important;gap:18px!important;align-items:start;}
+#desktopTable.dashboardTableWrap{min-width:0;}
+.desktopDetailPanel{padding:20px!important;}
+@media (max-width:1500px){.dashboardContentGrid{grid-template-columns:minmax(0,1fr) 470px!important;}}
+@media (max-width:1320px){.dashboardContentGrid{grid-template-columns:minmax(0,1fr) 430px!important;}}
+@media (max-width:1120px){.dashboardContentGrid{grid-template-columns:1fr!important;}}
+</style>
+
 </body>
 </html>

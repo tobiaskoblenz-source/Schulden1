@@ -1,4 +1,4 @@
-const VERSION = 'dark-v26-desktop-akte';
+const VERSION = 'dark-v27-layout-width';
 const CACHE_STATIC = `schulden-manager-static-${VERSION}`;
 const CACHE_RUNTIME = `schulden-manager-runtime-${VERSION}`;
 const APP_SHELL = [
