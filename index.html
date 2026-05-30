@@ -17,6 +17,7 @@
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable"></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 
 <style>
 :root{
@@ -542,6 +543,21 @@ body.softlight .toast,body.dark .toast{background:rgba(10,18,30,.94)}
   #desktopTable{display:block !important}
   #addModal{display:none !important}
 }
+
+/* v22 Google Drive + Korrespondenz */
+.driveToolbarGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:12px}
+.drivePill{display:inline-flex;align-items:center;gap:8px;margin-top:10px;padding:9px 12px;border-radius:999px;background:rgba(79,140,255,.14);border:1px solid rgba(125,165,255,.22);font-size:13px;color:var(--muted);font-weight:700}
+.drivePill.drive-ok{color:#86efac;background:rgba(39,182,110,.13);border-color:rgba(39,182,110,.28)}
+.drivePill.drive-error{color:#fecdd3;background:rgba(255,107,134,.13);border-color:rgba(255,107,134,.28)}
+button.btn-correspondence,.miniBtn.btn-correspondence{background:linear-gradient(135deg,#f0abfc,#93c5fd)!important;color:#07111f!important}
+.v19Actions .btn-correspondence{background:linear-gradient(135deg,#f0abfc,#93c5fd)!important;color:#07111f!important}
+.corrOverlay{position:fixed;inset:0;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(3,8,18,.72);backdrop-filter:blur(14px);z-index:9999}
+.corrModal{width:min(760px,96vw);max-height:90vh;overflow:auto;border-radius:28px;background:linear-gradient(180deg,rgba(15,23,42,.96),rgba(2,6,23,.96));border:1px solid rgba(148,163,184,.22);box-shadow:0 30px 90px rgba(0,0,0,.45);color:#e5edf8;padding:22px}
+.corrHead{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:16px}.corrHead h3{margin:0;font-size:22px}.corrHead p{margin:6px 0 0;color:#9ca3af;font-size:14px}
+.corrClose{width:42px;height:42px;border-radius:16px;border:1px solid rgba(148,163,184,.28);background:rgba(255,255,255,.08);color:#fff;font-size:20px;cursor:pointer}
+.corrForm{display:grid;grid-template-columns:1fr 170px auto;gap:10px;align-items:end;margin:14px 0 18px}.corrForm label{display:grid;gap:6px;font-size:12px;color:#9ca3af;font-weight:800}.corrForm input{width:100%;border-radius:16px;border:1px solid rgba(148,163,184,.25);background:rgba(15,23,42,.78);color:#fff;padding:12px}
+.corrUploadBtn{border:0;border-radius:16px;padding:13px 16px;background:linear-gradient(135deg,#60a5fa,#a78bfa);color:#07111f;font-weight:900;cursor:pointer}.corrList{display:grid;gap:10px}.corrItem{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:12px;border-radius:18px;background:rgba(255,255,255,.07);border:1px solid rgba(148,163,184,.16)}.corrItem strong{display:block}.corrItem span{display:block;margin-top:4px;color:#9ca3af;font-size:12px}.corrActions{display:flex;gap:8px;flex-wrap:wrap}.corrActions a,.corrActions button{border:0;border-radius:12px;padding:9px 11px;text-decoration:none;background:rgba(255,255,255,.10);color:#fff;font-weight:800;cursor:pointer}.corrEmpty{padding:16px;border-radius:18px;background:rgba(255,255,255,.06);color:#9ca3af;text-align:center}.corrHint{margin-top:10px;color:#9ca3af;font-size:12px;line-height:1.45}@media(max-width:760px){.corrForm{grid-template-columns:1fr}.corrItem{grid-template-columns:1fr}.driveToolbarGrid{grid-template-columns:1fr 1fr}.v19Actions{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
 </style>
 
 <style id="apple-dark-overrides">
@@ -2836,6 +2852,12 @@ body.force-mobile-view .dashboardShell{
       </div>
       <div id="backupStatus" class="backupPill">Letztes Backup: –</div>
       <div id="syncStatus" class="syncPill">Sync: wird vorbereitet…</div>
+      <div class="driveToolbarGrid" aria-label="Google Drive Sync">
+        <button id="btnDriveConnect" class="secondary" type="button">🔐 Google Drive verbinden</button>
+        <button id="btnDriveSave" class="secondary" type="button">☁️ In Drive speichern</button>
+        <button id="btnDriveLoad" class="secondary" type="button">⬇️ Aus Drive laden</button>
+      </div>
+      <div id="driveStatus" class="drivePill">Google Drive: nicht verbunden</div>
       <div id="installHint" class="installHint">Installierbar auf iPhone, iPad, Android und Desktop-Browsern.</div>
       <input id="restoreFile" type="file" accept=".godmode,application/octet-stream,application/json,text/plain" style="display:none">
     </section>
@@ -3299,7 +3321,8 @@ function restoreBackup(event){
         history: Array.isArray(d.history) ? d.history.map(h => ({
           date: String(h.date ?? ""),
           amount: Number(h.amount ?? 0)
-        })) : []
+        })) : [],
+        correspondence: Array.isArray(d.correspondence) ? d.correspondence : []
       }));
 
       save();
@@ -3400,7 +3423,8 @@ function createDebtFromModal({keepOpen=false}={}){
     contactPerson: contact.representative || "",
     notes:"",
     notesHistory,
-    history:[]
+    history:[],
+    correspondence:[]
   };
   debt.notes = notesText(debt);
   debts.push(debt);
@@ -4028,6 +4052,7 @@ if ('serviceWorker' in navigator) {
           '<button class="miniBtn primary" type="button">Info</button>' +
           '<button class="miniBtn" type="button">Abbau</button>' +
           '<button class="miniBtn" type="button">Ansprechpartner</button>' +
+          '<button class="miniBtn btn-correspondence" type="button">Korrespondenz</button>' +
           '<button class="miniBtn" type="button">Status</button>' +
           '<button class="miniBtn" type="button">Historie</button>' +
           '<button class="miniBtn" type="button">Löschen</button>' +
@@ -4036,9 +4061,10 @@ if ('serviceWorker' in navigator) {
       btns[0].addEventListener('click', ()=>showInfo(i));
       btns[1].addEventListener('click', ()=>paySingleDebt(i));
       btns[2].addEventListener('click', ()=>showContact(i));
-      btns[3].addEventListener('click', ()=>toggleStatus(i));
-      btns[4].addEventListener('click', ()=>showHistory(i));
-      btns[5].addEventListener('click', ()=>removeDebt(i));
+      btns[3].addEventListener('click', ()=>window.showCorrespondence && window.showCorrespondence(i));
+      btns[4].addEventListener('click', ()=>toggleStatus(i));
+      btns[5].addEventListener('click', ()=>showHistory(i));
+      btns[6].addEventListener('click', ()=>removeDebt(i));
       tbody.appendChild(row);
 
       const card = document.createElement('div');
@@ -4051,6 +4077,7 @@ if ('serviceWorker' in navigator) {
           '<button class="miniBtn" type="button">Info</button>' +
           '<button class="miniBtn" type="button">Abbau</button>' +
           '<button class="miniBtn" type="button">Kontakt</button>' +
+          '<button class="miniBtn btn-correspondence" type="button">Korrespondenz</button>' +
           '<button class="miniBtn" type="button">Status</button>' +
           '<button class="miniBtn" type="button">Historie</button>' +
           '<button class="miniBtn" type="button">Löschen</button>' +
@@ -4059,9 +4086,10 @@ if ('serviceWorker' in navigator) {
       cbtns[0].addEventListener('click', ()=>showInfo(i));
       cbtns[1].addEventListener('click', ()=>paySingleDebt(i));
       cbtns[2].addEventListener('click', ()=>showContact(i));
-      cbtns[3].addEventListener('click', ()=>toggleStatus(i));
-      cbtns[4].addEventListener('click', ()=>showHistory(i));
-      cbtns[5].addEventListener('click', ()=>removeDebt(i));
+      cbtns[3].addEventListener('click', ()=>window.showCorrespondence && window.showCorrespondence(i));
+      cbtns[4].addEventListener('click', ()=>toggleStatus(i));
+      cbtns[5].addEventListener('click', ()=>showHistory(i));
+      cbtns[6].addEventListener('click', ()=>removeDebt(i));
       mobile.appendChild(card);
     });
   };
@@ -5125,7 +5153,7 @@ if ('serviceWorker' in navigator) {
           "<button class='btn-pay' data-action='pay' type='button'>Abbau</button>" +
           "<button class='btn-history' data-action='history' type='button'>Historie</button>" +
           "<button class='btn-info' data-action='info' type='button'>Info</button>" +
-          "<button class='btn-contact' data-action='contact' type='button'>Ansprechpartner</button>" +
+          "<button class='btn-contact' data-action='contact' type='button'>Ansprech<br>partner</button><button class='btn-correspondence' data-action='corr' type='button'>Korrespondenz</button>" +
         "</div>" +
       "</div>";
     }).join("");
@@ -5146,6 +5174,7 @@ if ('serviceWorker' in navigator) {
       row.querySelector("[data-action='history']")?.addEventListener("click", ()=>showHistory(i));
       row.querySelector("[data-action='info']")?.addEventListener("click", ()=>showInfo(i));
       row.querySelector("[data-action='contact']")?.addEventListener("click", ()=>showContact(i));
+      row.querySelector("[data-action='corr']")?.addEventListener("click", ()=>window.showCorrespondence && window.showCorrespondence(i));
     });
   }
 
@@ -5480,6 +5509,297 @@ if ('serviceWorker' in navigator) {
   };
 
   setTimeout(startSync, 500);
+})();
+</script>
+
+
+<script id="v22-google-drive-correspondence">
+(function(){
+  const DRIVE_SCOPE = "https://www.googleapis.com/auth/drive.file";
+  const ROOT_FOLDER = "Schulden-App";
+  const CORR_FOLDER = "Korrespondenz";
+  const SYNC_FILE = "schulden-sync.json";
+  const CLIENT_KEY = "schulden_google_client_id_v22";
+  const META_KEY = "schulden_google_drive_meta_v22";
+  const AUTO_DELAY = 1600;
+
+  let accessToken = "";
+  let tokenClient = null;
+  let configLoaded = false;
+  let driveAutoTimer = null;
+  let suppressDriveAuto = false;
+
+  function $(id){ return document.getElementById(id); }
+  function driveStatus(text, mode){
+    const el = $("driveStatus");
+    if(!el) return;
+    el.textContent = text;
+    el.classList.toggle("drive-ok", mode === "ok");
+    el.classList.toggle("drive-error", mode === "error");
+  }
+  function toast(msg){ if(typeof showToast === "function") showToast(msg); else alert(msg); }
+  function readMeta(){ try{return JSON.parse(localStorage.getItem(META_KEY)||"{}");}catch(e){return {};} }
+  function writeMeta(meta){ localStorage.setItem(META_KEY, JSON.stringify(meta||{})); }
+  function esc(str){ return String(str||"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;"); }
+  function bytes(n){ n=Number(n)||0; if(n>1024*1024) return (n/1024/1024).toFixed(1).replace('.',',')+" MB"; if(n>1024) return (n/1024).toFixed(1).replace('.',',')+" KB"; return n+" B"; }
+  function fileDate(v){ if(!v) return "Ohne Datum"; const d=new Date(v); return Number.isNaN(d.getTime()) ? v : d.toLocaleDateString("de-DE"); }
+  function today(){ return new Date().toISOString().slice(0,10); }
+  function sanitizeName(name){ return String(name||"Schuld").trim().replace(/[\\/:*?"<>|#%{}~&]/g,"-").replace(/\s+/g," ").slice(0,80) || "Schuld"; }
+  function ensureCorrespondence(d){ if(!Array.isArray(d.correspondence)) d.correspondence = []; return d.correspondence; }
+  function currentDebts(){ return Array.isArray(window.debts) ? window.debts : (Array.isArray(debts) ? debts : []); }
+
+  async function loadConfig(){
+    if(configLoaded) return localStorage.getItem(CLIENT_KEY) || "";
+    configLoaded = true;
+    try{
+      const res = await fetch("/api/config", {cache:"no-store"});
+      if(res.ok){
+        const cfg = await res.json();
+        if(cfg.googleClientId) localStorage.setItem(CLIENT_KEY, cfg.googleClientId);
+      }
+    }catch(e){}
+    return localStorage.getItem(CLIENT_KEY) || "";
+  }
+  async function clientId(){
+    let id = await loadConfig();
+    if(!id){
+      id = prompt("Google OAuth Client ID eintragen. Du bekommst sie in der Google Cloud Console bei OAuth-Client für Webanwendung.", "") || "";
+      id = id.trim();
+      if(id) localStorage.setItem(CLIENT_KEY, id);
+    }
+    return id;
+  }
+  function waitForGIS(){
+    return new Promise((resolve,reject)=>{
+      let tries=0;
+      const t=setInterval(()=>{
+        tries++;
+        if(window.google && google.accounts && google.accounts.oauth2){ clearInterval(t); resolve(); }
+        if(tries>80){ clearInterval(t); reject(new Error("Google Identity Services nicht geladen")); }
+      },100);
+    });
+  }
+  async function ensureToken(interactive=true){
+    if(accessToken) return accessToken;
+    const id = await clientId();
+    if(!id) throw new Error("Keine Google Client ID eingetragen");
+    await waitForGIS();
+    return await new Promise((resolve,reject)=>{
+      tokenClient = google.accounts.oauth2.initTokenClient({
+        client_id:id,
+        scope:DRIVE_SCOPE,
+        callback:(resp)=>{
+          if(resp && resp.access_token){
+            accessToken = resp.access_token;
+            driveStatus("Google Drive: verbunden ✓", "ok");
+            resolve(accessToken);
+          }else reject(new Error(resp && resp.error ? resp.error : "Keine Freigabe erhalten"));
+        }
+      });
+      tokenClient.requestAccessToken({prompt: interactive ? "consent" : ""});
+    });
+  }
+  async function driveFetch(url, options={}){
+    const token = await ensureToken(true);
+    const headers = new Headers(options.headers || {});
+    headers.set("Authorization", "Bearer " + token);
+    const res = await fetch(url, {...options, headers});
+    if(res.status === 401){ accessToken=""; throw new Error("Google Anmeldung abgelaufen"); }
+    if(!res.ok){ const text = await res.text().catch(()=>""); throw new Error("Drive Fehler " + res.status + " " + text); }
+    return res;
+  }
+  async function listFiles(q){
+    const url = "https://www.googleapis.com/drive/v3/files?fields=files(id,name,mimeType,modifiedTime,webViewLink,webContentLink)&spaces=drive&q=" + encodeURIComponent(q);
+    const res = await driveFetch(url);
+    const data = await res.json();
+    return data.files || [];
+  }
+  async function findChild(name, parentId, mimeType){
+    let q = "name='" + String(name).replaceAll("'","\\'") + "' and trashed=false";
+    if(parentId) q += " and '" + parentId + "' in parents";
+    if(mimeType) q += " and mimeType='" + mimeType + "'";
+    return (await listFiles(q))[0] || null;
+  }
+  async function createFolder(name, parentId){
+    const found = await findChild(name, parentId, "application/vnd.google-apps.folder");
+    if(found) return found;
+    const meta = {name, mimeType:"application/vnd.google-apps.folder"};
+    if(parentId) meta.parents = [parentId];
+    const res = await driveFetch("https://www.googleapis.com/drive/v3/files?fields=id,name,webViewLink", {
+      method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(meta)
+    });
+    return await res.json();
+  }
+  async function rootFolder(){
+    const meta = readMeta();
+    if(meta.rootFolderId) return {id:meta.rootFolderId};
+    const folder = await createFolder(ROOT_FOLDER);
+    meta.rootFolderId = folder.id; writeMeta(meta); return folder;
+  }
+  async function corrRootFolder(){
+    const meta = readMeta();
+    if(meta.corrFolderId) return {id:meta.corrFolderId};
+    const root = await rootFolder();
+    const folder = await createFolder(CORR_FOLDER, root.id);
+    meta.corrFolderId = folder.id; writeMeta(meta); return folder;
+  }
+  async function debtFolder(index){
+    const root = await corrRootFolder();
+    const d = currentDebts()[index] || {};
+    return await createFolder("S-" + (1001+index) + "_" + sanitizeName(d.name || d.grund || "Schuld"), root.id);
+  }
+  async function uploadMultipart({metadata, blob, mimeType, fields}){
+    const boundary = "schuldenapp_" + Date.now().toString(36) + Math.random().toString(36).slice(2);
+    const body = new Blob([
+      "--"+boundary+"\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n" + JSON.stringify(metadata) + "\r\n",
+      "--"+boundary+"\r\nContent-Type: " + (mimeType || "application/octet-stream") + "\r\n\r\n",
+      blob,
+      "\r\n--"+boundary+"--"
+    ], {type:"multipart/related; boundary="+boundary});
+    const res = await driveFetch("https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=" + encodeURIComponent(fields || "id,name,webViewLink,webContentLink,modifiedTime"), {
+      method:"POST", headers:{"Content-Type":"multipart/related; boundary="+boundary}, body
+    });
+    return await res.json();
+  }
+  async function saveDriveSyncFile(){
+    await ensureToken(true);
+    driveStatus("Google Drive: speichert Daten…", "");
+    const root = await rootFolder();
+    const meta = readMeta();
+    const payload = {
+      version:22,
+      app:"Schulden Manager",
+      savedAt:new Date().toISOString(),
+      debts:currentDebts()
+    };
+    const blob = new Blob([JSON.stringify(payload,null,2)], {type:"application/json"});
+    let fileId = meta.syncFileId;
+    if(!fileId){
+      const existing = await findChild(SYNC_FILE, root.id, "application/json");
+      if(existing) fileId = existing.id;
+    }
+    let result;
+    if(fileId){
+      const res = await driveFetch("https://www.googleapis.com/upload/drive/v3/files/"+fileId+"?uploadType=media&fields=id,name,modifiedTime,webViewLink", {
+        method:"PATCH", headers:{"Content-Type":"application/json"}, body:blob
+      });
+      result = await res.json();
+    }else{
+      result = await uploadMultipart({metadata:{name:SYNC_FILE, mimeType:"application/json", parents:[root.id]}, blob, mimeType:"application/json", fields:"id,name,modifiedTime,webViewLink"});
+      fileId = result.id;
+    }
+    meta.syncFileId = fileId; meta.lastDriveSave = new Date().toISOString(); writeMeta(meta);
+    driveStatus("Google Drive: Daten gespeichert ✓", "ok");
+    return result;
+  }
+  async function loadDriveSyncFile(){
+    await ensureToken(true);
+    driveStatus("Google Drive: lädt Daten…", "");
+    const root = await rootFolder();
+    const meta = readMeta();
+    let fileId = meta.syncFileId;
+    if(!fileId){
+      const existing = await findChild(SYNC_FILE, root.id, "application/json");
+      if(existing) fileId = existing.id;
+    }
+    if(!fileId) throw new Error("Keine schulden-sync.json in Google Drive gefunden");
+    const res = await driveFetch("https://www.googleapis.com/drive/v3/files/"+fileId+"?alt=media", {cache:"no-store"});
+    const data = await res.json();
+    const imported = Array.isArray(data) ? data : data.debts;
+    if(!Array.isArray(imported)) throw new Error("Drive-Datei hat kein gültiges Schulden-Format");
+    suppressDriveAuto = true;
+    window.debts = debts = imported.map(d=>({...d, correspondence:Array.isArray(d.correspondence)?d.correspondence:[]}));
+    localStorage.setItem("godmode_debts", JSON.stringify(debts));
+    if(typeof save === "function") save();
+    if(typeof render === "function") render();
+    suppressDriveAuto = false;
+    meta.syncFileId = fileId; meta.lastDriveLoad = new Date().toISOString(); writeMeta(meta);
+    driveStatus("Google Drive: Daten geladen ✓", "ok");
+    toast("Daten aus Google Drive geladen ✅");
+  }
+  function scheduleDriveSave(){
+    if(suppressDriveAuto || !accessToken) return;
+    clearTimeout(driveAutoTimer);
+    driveAutoTimer = setTimeout(()=>saveDriveSyncFile().catch(err=>{console.error(err); driveStatus("Google Drive: Speicherfehler", "error");}), AUTO_DELAY);
+  }
+
+  async function uploadCorrespondence(index){
+    const d = currentDebts()[index]; if(!d) return;
+    const fileInput = $("corrFile"); const dateInput = $("corrDate");
+    const file = fileInput && fileInput.files && fileInput.files[0];
+    if(!file){ toast("Bitte erst Foto oder PDF auswählen."); return; }
+    if(!/^(application\/pdf|image\/)/.test(file.type || "")){ toast("Erlaubt sind Bilder und PDF-Dateien."); return; }
+    await ensureToken(true);
+    driveStatus("Google Drive: lädt Korrespondenz hoch…", "");
+    const folder = await debtFolder(index);
+    const date = (dateInput && dateInput.value) || today();
+    const driveName = date + "_" + sanitizeName(file.name);
+    const uploaded = await uploadMultipart({metadata:{name:driveName, parents:[folder.id]}, blob:file, mimeType:file.type || "application/octet-stream"});
+    ensureCorrespondence(d).push({
+      id:"corr-"+Date.now().toString(36)+Math.random().toString(36).slice(2,7),
+      date, name:file.name, driveName, mimeType:file.type || "", size:file.size || 0,
+      driveFileId:uploaded.id, webViewLink:uploaded.webViewLink || "", webContentLink:uploaded.webContentLink || "",
+      uploadedAt:new Date().toISOString()
+    });
+    if(typeof save === "function") save();
+    if(typeof render === "function") render();
+    renderCorrList(index);
+    fileInput.value = "";
+    driveStatus("Google Drive: Korrespondenz gespeichert ✓", "ok");
+    toast("Korrespondenz hochgeladen ✅");
+    scheduleDriveSave();
+  }
+  function renderCorrList(index){
+    const d = currentDebts()[index]; const list = $("corrList"); if(!d || !list) return;
+    const items = ensureCorrespondence(d);
+    if(!items.length){ list.innerHTML = '<div class="corrEmpty">Noch keine Korrespondenz hinterlegt.</div>'; return; }
+    list.innerHTML = items.slice().reverse().map(item=>{
+      const link = item.webViewLink || (item.driveFileId ? "https://drive.google.com/file/d/"+encodeURIComponent(item.driveFileId)+"/view" : "");
+      return '<div class="corrItem" data-corr-id="'+esc(item.id)+'"><div><strong>'+esc(item.name || item.driveName || 'Datei')+'</strong><span>'+esc(fileDate(item.date))+' · '+esc(item.mimeType || 'Datei')+' · '+esc(bytes(item.size))+'</span></div><div class="corrActions">'+(link ? '<a href="'+esc(link)+'" target="_blank" rel="noopener">Öffnen</a>' : '')+'<button type="button" data-delete-corr="'+esc(item.id)+'">Löschen</button></div></div>';
+    }).join('');
+    list.querySelectorAll('[data-delete-corr]').forEach(btn=>btn.addEventListener('click',()=>{
+      const id = btn.getAttribute('data-delete-corr');
+      const idx = items.findIndex(x=>x.id===id);
+      if(idx>=0 && confirm('Korrespondenz-Eintrag aus der App-Liste löschen? Die Datei in Google Drive bleibt erhalten.')){
+        items.splice(idx,1); if(typeof save==='function') save(); renderCorrList(index); scheduleDriveSave();
+      }
+    }));
+  }
+  function ensureCorrModal(){
+    let overlay = $("corrOverlay"); if(overlay) return overlay;
+    overlay = document.createElement("div"); overlay.id="corrOverlay"; overlay.className="corrOverlay"; overlay.innerHTML =
+      '<div class="corrModal" role="dialog" aria-modal="true" aria-labelledby="corrTitle"><div class="corrHead"><div><h3 id="corrTitle">Korrespondenz</h3><p id="corrSub">Fotos und PDFs zu dieser Schuld.</p></div><button class="corrClose" id="corrClose" type="button">×</button></div><div class="corrForm"><label>Foto/PDF auswählen<input id="corrFile" type="file" accept="application/pdf,image/*"></label><label>Datum<input id="corrDate" type="date"></label><button id="corrUpload" class="corrUploadBtn" type="button">Hochladen</button></div><div id="corrList" class="corrList"></div><div class="corrHint">Die Dateien werden in Google Drive im Ordner <b>Schulden-App / Korrespondenz</b> gespeichert. In der App wird der Drive-Link mit Datum abgelegt.</div></div>';
+    document.body.appendChild(overlay);
+    overlay.addEventListener('click', e=>{ if(e.target===overlay) closeCorrModal(); });
+    $("corrClose").addEventListener('click', closeCorrModal);
+    return overlay;
+  }
+  function closeCorrModal(){ const overlay=$("corrOverlay"); if(overlay) overlay.style.display="none"; document.body.classList.remove('modalOpen'); }
+  window.showCorrespondence = function(index){
+    const d = currentDebts()[index]; if(!d) return;
+    const overlay = ensureCorrModal();
+    $("corrTitle").textContent = "Korrespondenz";
+    $("corrSub").textContent = (d.name || "Schuld") + " · " + (d.grund || "") ;
+    $("corrDate").value = today();
+    const upload = $("corrUpload"); upload.onclick = ()=>uploadCorrespondence(index).catch(err=>{console.error(err); driveStatus("Google Drive: Upload-Fehler", "error"); toast("Upload fehlgeschlagen: " + err.message);});
+    renderCorrList(index);
+    overlay.style.display="flex"; document.body.classList.add('modalOpen');
+  };
+
+  $("btnDriveConnect")?.addEventListener("click", ()=>ensureToken(true).then(()=>toast("Google Drive verbunden ✅")).catch(err=>{console.error(err); driveStatus("Google Drive: Verbindung fehlgeschlagen", "error"); toast(err.message); }));
+  $("btnDriveSave")?.addEventListener("click", ()=>saveDriveSyncFile().then(()=>toast("In Google Drive gespeichert ✅")).catch(err=>{console.error(err); driveStatus("Google Drive: Speicherfehler", "error"); toast(err.message);}));
+  $("btnDriveLoad")?.addEventListener("click", ()=>{
+    if(confirm("Daten aus Google Drive laden? Der aktuelle Stand in der App wird ersetzt.")) loadDriveSyncFile().catch(err=>{console.error(err); driveStatus("Google Drive: Ladefehler", "error"); toast(err.message);});
+  });
+
+  const previousSave = window.save;
+  window.save = function(){
+    const result = typeof previousSave === "function" ? previousSave.apply(this, arguments) : undefined;
+    scheduleDriveSave();
+    return result;
+  };
+
+  loadConfig().then(id=>{ if(id) driveStatus("Google Drive: bereit, noch nicht verbunden", ""); }).catch(()=>{});
 })();
 </script>
 

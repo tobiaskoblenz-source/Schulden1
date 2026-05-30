@@ -121,6 +121,12 @@ const server = http.createServer(async (req, res)=>{
       return sendJson(res, 200, {ok:true, service:"schulden-manager", version:"v21"});
     }
 
+    if(url.pathname === "/api/config"){
+      return sendJson(res, 200, {
+        googleClientId: process.env.GOOGLE_CLIENT_ID || process.env.GOOGLE_DRIVE_CLIENT_ID || ""
+      });
+    }
+
     if(url.pathname === "/api/sync" && req.method === "GET"){
       return sendJson(res, 200, readSync());
     }
