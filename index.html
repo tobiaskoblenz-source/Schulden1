@@ -544,12 +544,15 @@ body.softlight .toast,body.dark .toast{background:rgba(10,18,30,.94)}
   #addModal{display:none !important}
 }
 
-/* v24 Google Drive + Korrespondenz + Button-Fix */
+/* v25 Google Drive + Daten-Button + Button-Schrift-Fix */
 .driveToolbarGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:12px}
+.driveToolbarGrid .driveBtn{min-height:54px;display:flex;align-items:center;justify-content:center;gap:9px;text-align:center;white-space:normal;line-height:1.12;padding:11px 12px;font-weight:900}
+.driveToolbarGrid .driveIcon{font-size:18px;line-height:1;flex:0 0 auto}
+.driveToolbarGrid .driveText{display:block;line-height:1.12}
 .drivePill{display:inline-flex;align-items:center;gap:8px;margin-top:10px;padding:9px 12px;border-radius:999px;background:rgba(79,140,255,.14);border:1px solid rgba(125,165,255,.22);font-size:13px;color:var(--muted);font-weight:700}
 .drivePill.drive-ok{color:#86efac;background:rgba(39,182,110,.13);border-color:rgba(39,182,110,.28)}
 .drivePill.drive-error{color:#fecdd3;background:rgba(255,107,134,.13);border-color:rgba(255,107,134,.28)}
-button.btn-correspondence,.miniBtn.btn-correspondence{background:linear-gradient(135deg,#f0abfc,#93c5fd)!important;color:#07111f!important}
+button.btn-correspondence,.miniBtn.btn-correspondence{background:linear-gradient(135deg,#f0abfc,#93c5fd)!important;color:#07111f!important;display:inline-flex;align-items:center;justify-content:center;gap:7px;text-align:center;line-height:1.12;white-space:normal;font-weight:900}
 .v19Actions .btn-correspondence{background:linear-gradient(135deg,#f0abfc,#93c5fd)!important;color:#07111f!important}
 .corrOverlay{position:fixed;inset:0;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(3,8,18,.72);backdrop-filter:blur(14px);z-index:9999}
 .corrModal{width:min(760px,96vw);max-height:90vh;overflow:auto;border-radius:28px;background:linear-gradient(180deg,rgba(15,23,42,.96),rgba(2,6,23,.96));border:1px solid rgba(148,163,184,.22);box-shadow:0 30px 90px rgba(0,0,0,.45);color:#e5edf8;padding:22px}
@@ -2853,9 +2856,9 @@ body.force-mobile-view .dashboardShell{
       <div id="backupStatus" class="backupPill">Letztes Backup: –</div>
       <div id="syncStatus" class="syncPill">Sync: wird vorbereitet…</div>
       <div class="driveToolbarGrid" aria-label="Google Drive Sync">
-        <button id="btnDriveConnect" class="secondary" type="button">🔐 Google Drive verbinden</button>
-        <button id="btnDriveSave" class="secondary" type="button">☁️ In Drive speichern</button>
-        <button id="btnDriveLoad" class="secondary" type="button">⬇️ Aus Drive laden</button>
+        <button id="btnDriveConnect" class="secondary driveBtn" type="button"><span class="driveIcon">🔐</span><span class="driveText">Google Drive<br>verbinden</span></button>
+        <button id="btnDriveSave" class="secondary driveBtn" type="button"><span class="driveIcon">☁️</span><span class="driveText">In Drive<br>speichern</span></button>
+        <button id="btnDriveLoad" class="secondary driveBtn" type="button"><span class="driveIcon">⬇️</span><span class="driveText">Aus Drive<br>laden</span></button>
       </div>
       <div id="driveStatus" class="drivePill">Google Drive: nicht verbunden</div>
       <div id="installHint" class="installHint">Installierbar auf iPhone, iPad, Android und Desktop-Browsern.</div>
@@ -4052,7 +4055,7 @@ if ('serviceWorker' in navigator) {
           '<button class="miniBtn primary" type="button">Info</button>' +
           '<button class="miniBtn" type="button">Abbau</button>' +
           '<button class="miniBtn" type="button">Ansprechpartner</button>' +
-          '<button class="miniBtn btn-correspondence" type="button">Korrespondenz</button>' +
+          '<button class="miniBtn btn-correspondence" type="button">📎 Daten</button>' +
           '<button class="miniBtn" type="button">Status</button>' +
           '<button class="miniBtn" type="button">Historie</button>' +
           '<button class="miniBtn" type="button">Löschen</button>' +
@@ -4077,7 +4080,7 @@ if ('serviceWorker' in navigator) {
           '<button class="miniBtn" type="button">Info</button>' +
           '<button class="miniBtn" type="button">Abbau</button>' +
           '<button class="miniBtn" type="button">Kontakt</button>' +
-          '<button class="miniBtn btn-correspondence" type="button">Korrespondenz</button>' +
+          '<button class="miniBtn btn-correspondence" type="button">📎 Daten</button>' +
           '<button class="miniBtn" type="button">Status</button>' +
           '<button class="miniBtn" type="button">Historie</button>' +
           '<button class="miniBtn" type="button">Löschen</button>' +
@@ -5153,7 +5156,7 @@ if ('serviceWorker' in navigator) {
           "<button class='btn-pay' data-action='pay' type='button'>Abbau</button>" +
           "<button class='btn-history' data-action='history' type='button'>Historie</button>" +
           "<button class='btn-info' data-action='info' type='button'>Info</button>" +
-          "<button class='btn-contact' data-action='contact' type='button'>Ansprech<br>partner</button><button class='btn-correspondence' data-action='corr' type='button'>Korrespondenz</button>" +
+          "<button class='btn-contact' data-action='contact' type='button'>Ansprech<br>partner</button><button class='btn-correspondence' data-action='corr' type='button'><span class='ico'>📎</span><span class='lbl'>Daten</span></button>" +
         "</div>" +
       "</div>";
     }).join("");
@@ -5837,7 +5840,7 @@ if ('serviceWorker' in navigator) {
     const btn = document.createElement("button");
     btn.type = "button";
     btn.className = isAction ? "actionBtn btn-correspondence" : "miniBtn btn-correspondence";
-    btn.innerHTML = isAction ? "<span class='ico'>📎</span><span class='lbl'>Korrespondenz</span>" : "Korrespondenz";
+    btn.innerHTML = isAction ? "<span class='ico'>📎</span><span class='lbl'>Daten</span>" : "📎 Daten";
     btn.dataset.action = "corr";
     btn.addEventListener("click", function(e){
       e.preventDefault();
