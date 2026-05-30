@@ -2931,7 +2931,7 @@ body.force-mobile-view .dashboardShell{
         </div>
         <div class="desktopAkteTitleBlock">
           <h3>Daten – Schuld-Akte</h3>
-          <p>Alle wichtigen Infos, Dateien und Verlauf auf einen Blick. <b class="v31Marker">V33</b></p>
+          <p>Alle wichtigen Infos, Dateien und Verlauf auf einen Blick. <b class="v31Marker">V34</b></p>
         </div>
         <div class="desktopPanelBody desktopAkteBodyV30">
           <section class="desktopPanelSection desktopHeroCard">
@@ -2962,7 +2962,7 @@ body.force-mobile-view .dashboardShell{
             </section>
 
             <section class="desktopPanelSection desktopMiniInfoCard">
-              <div class="drawerSectionHead"><span>2</span><strong>Aktenzeichen</strong></div>
+              <div class="drawerSectionHead"><span>2</span><strong>Aktenzeichen</strong></div><div class="drawerMutedText">Dieses Feld ist mit dem Aktenzeichen aus „+ Neue Schuld“ verbunden.</div>
               <div class="desktopInfoRows">
                 <div class="desktopInfoRow"><span>Aktenzeichen</span><strong id="sideCaseValue">–</strong></div>
                 <div class="desktopInfoRow"><span>Referenznummer</span><strong id="sideReferenceValue">–</strong></div>
@@ -3443,6 +3443,7 @@ function createDebtFromModal({keepOpen=false}={}){
   const grund = document.getElementById("m_grund").value.trim();
   const betrag = parseMoneyInput(document.getElementById("m_betrag").value);
   const datum = document.getElementById("m_datum").value;
+  const aktenzeichen = document.getElementById("m_aktenzeichen")?.value.trim() || "";
   const status = document.getElementById("m_status").value || "offen";
   const contact = {
     representative: document.getElementById("m_contactRepresentative").value.trim(),
@@ -3463,6 +3464,7 @@ function createDebtFromModal({keepOpen=false}={}){
     grund,
     betrag,
     datum,
+    aktenzeichen,
     status,
     contactDetails:contact,
     contactPerson: contact.representative || "",
@@ -3848,7 +3850,7 @@ function closeAddModal(){
   document.body.classList.remove("modalOpen");
 }
 function clearModalInputs(){
-  const ids = ["m_name","m_grund","m_betrag","m_datum","m_contactRepresentative","m_contactAddress","m_contactEmail","m_contactPhone","m_firstNote"];
+  const ids = ["m_name","m_grund","m_betrag","m_datum","m_aktenzeichen","m_contactRepresentative","m_contactAddress","m_contactEmail","m_contactPhone","m_firstNote"];
   ids.forEach(id=>{ const el=document.getElementById(id); if(el) el.value=""; });
   setNewDebtStatus("offen");
   const fields = document.getElementById("newDebtContactFields");
@@ -4321,7 +4323,7 @@ if ('serviceWorker' in navigator) {
     setHTML('sideStatusValue', '<span class="statusBadge ' + statusCss(d.status) + '">' + prettyStatus(d.status) + '</span>');
     setText('sideDateValue', d.datum || '–');
     setText('sideCaseValue', d.aktenzeichen || d.caseNumber || '–');
-    setText('sideReferenceValue', d.referenceNumber || d.ref || '–');
+    setText('sideReferenceValue', d.referenceNumber || d.ref || d.aktenzeichen || '–');
     setText('sideCustomerValue', d.customerNumber || d.kundennummer || d.customerId || '–');
     setText('sideCaseNote', (d.caseNote || '').trim() || 'Falls vorhanden, erscheint hier dein Aktenzeichen oder die Referenznummer.');
     setText('sideLastAmountValue', lastPay ? formatEUR(Number(lastPay.amount) || 0) : '–');
@@ -4603,12 +4605,14 @@ if ('serviceWorker' in navigator) {
       grund,
       betrag,
       datum,
+      aktenzeichen,
       status,
       contactDetails: contact,
       contactPerson: [contact.representative, contact.address, contact.email, contact.phone].filter(Boolean).join(" | "),
       notes: "",
       notesHistory: note ? [{ at: new Date().toISOString(), text: note }] : [],
-      history: []
+      history: [],
+      correspondence: []
     };
     if(typeof notesText === "function"){
       debt.notes = notesText(debt);
@@ -5984,7 +5988,7 @@ if ('serviceWorker' in navigator) {
 
 
 <style id="v33-polished-data-fields-and-layout">
-/* V33 – rechte Daten-Akte sauber, breite Felder als Karten, kein Zusammenkleben */
+/* V34 – rechte Daten-Akte sauber, breite Felder als Karten, kein Zusammenkleben */
 .v31Marker{
   display:inline-flex;
   margin-left:8px;
@@ -6226,10 +6230,21 @@ if ('serviceWorker' in navigator) {
 
 <script id="v33-loaded-marker">
 (function(){
-  document.documentElement.setAttribute("data-schulden-version","v33");
-  window.SCHULDEN_APP_VERSION = "v33-polished-data-fields";
+  document.documentElement.setAttribute("data-schulden-version","v34");
+  window.SCHULDEN_APP_VERSION = "v34-aktenzeichen-linked";
 })();
 </script>
+
+
+<style id="v34-aktenzeichen-link-style">
+.drawerMutedText{
+  margin-top:-4px;
+  margin-bottom:6px;
+  color:#8fa4c0;
+  font-size:12px;
+  line-height:1.45;
+}
+</style>
 
 </body>
 </html>

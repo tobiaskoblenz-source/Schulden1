@@ -1,4 +1,4 @@
-const VERSION = 'dark-v33-polished-data-fields';
+const VERSION = 'dark-v34-aktenzeichen-linked';
 const CACHE_STATIC = `schulden-manager-static-${VERSION}`;
 const CACHE_RUNTIME = `schulden-manager-runtime-${VERSION}`;
 const APP_SHELL = [
