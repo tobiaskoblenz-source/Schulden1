@@ -1,4 +1,4 @@
-const VERSION = 'dark-v36-drive-less-prompts-dataakte-polish';
+const VERSION = 'dark-v45-desktop-button-colors-fixed';
 const CACHE_STATIC = `schulden-manager-static-${VERSION}`;
 const CACHE_RUNTIME = `schulden-manager-runtime-${VERSION}`;
 const APP_SHELL = [

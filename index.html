@@ -6241,7 +6241,7 @@ if ('serviceWorker' in navigator) {
 <script id="v39-creditor-qr-module">
 (function(){
   document.documentElement.setAttribute("data-schulden-version","v39");
-  window.SCHULDEN_APP_VERSION = "v44-button-colors-from-preview";
+  window.SCHULDEN_APP_VERSION = "v45-desktop-button-colors-fixed";
   const LS = "schulden_creditors_v37";
   const FORMAT_LS = "schulden_qr_label_format_v39";
   const TYPES = [
@@ -6546,38 +6546,45 @@ if ('serviceWorker' in navigator) {
 })();
 </script>
 
-<style id="v44-button-colors-from-preview">
-/* v44: Farben passend zum letzten Vorschaubild */
+<style id="v45-desktop-button-colors-fixed">
+/* v45: Farben aus deinem Beispiel – jetzt auch sicher für Desktop-Aktionen */
 .v19Actions .btn-status,
 .mobileRow .btn-status,
-.actionRow .btn-status{background:linear-gradient(135deg,#45cdfc,#79befb)!important;color:#051b2f!important;}
+.actionRow .btn-status,
+.tableActions .tableUtilityActions .tinyBtn:nth-child(1){background:linear-gradient(135deg,#45cdfc,#79befb)!important;color:#051b2f!important;border-color:rgba(255,255,255,.12)!important;}
 
 .v19Actions .btn-delete,
 .mobileRow .btn-delete,
-.actionRow .btn-delete{background:linear-gradient(135deg,#ff9c68,#ff7a3c)!important;color:#ffffff!important;}
+.actionRow .btn-delete,
+.tableActions .tableUtilityActions .tinyBtn:nth-child(3){background:linear-gradient(135deg,#ff9c68,#ff7a3c)!important;color:#ffffff!important;border-color:rgba(255,255,255,.10)!important;}
 
 .v19Actions .btn-pay,
 .mobileRow .btn-pay,
-.actionRow .btn-pay{background:linear-gradient(135deg,#48dca4,#89e6b5)!important;color:#08281d!important;}
+.actionRow .btn-pay,
+.tableActions .payBtn,
+.tableActions > .miniBtn:nth-of-type(2){background:linear-gradient(135deg,#48dca4,#89e6b5)!important;color:#08281d!important;border-color:rgba(255,255,255,.10)!important;}
 
 .v19Actions .btn-history,
 .mobileRow .btn-history,
-.actionRow .btn-history{background:linear-gradient(135deg,#ffd246,#f7b60d)!important;color:#3c2b00!important;}
+.actionRow .btn-history,
+.tableActions .tableUtilityActions .tinyBtn:nth-child(2){background:linear-gradient(135deg,#ffd246,#f7b60d)!important;color:#3c2b00!important;border-color:rgba(255,255,255,.10)!important;}
 
 .v19Actions .btn-info,
 .mobileRow .btn-info,
 .tableActions .infoBtn,
-.actionRow .btn-info{background:linear-gradient(135deg,#b7b8ff,#9fc3ff)!important;color:#1b204b!important;}
+.tableActions > .miniBtn:nth-of-type(1),
+.actionRow .btn-info{background:linear-gradient(135deg,#b7b8ff,#9fc3ff)!important;color:#1b204b!important;border-color:rgba(255,255,255,.10)!important;}
 
 .v19Actions .btn-contact,
 .mobileRow .btn-contact,
 .tableActions .contactBtn,
-.actionRow .btn-contact{background:linear-gradient(135deg,#6ebcff,#8cb6ff)!important;color:#0a2340!important;}
+.tableActions > .miniBtn:nth-of-type(3),
+.actionRow .btn-contact{background:linear-gradient(135deg,#6ebcff,#8cb6ff)!important;color:#0a2340!important;border-color:rgba(255,255,255,.10)!important;}
 
 .v19Actions .btn-correspondence,
 .mobileRow .btn-correspondence,
 .tableActions .btn-correspondence,
-.actionRow .btn-correspondence{background:linear-gradient(135deg,#dfb6ff,#c3c9ff)!important;color:#2f2452!important;}
+.actionRow .btn-correspondence{background:linear-gradient(135deg,#dfb6ff,#c3c9ff)!important;color:#2f2452!important;border-color:rgba(255,255,255,.10)!important;}
 
 .v19Actions .debtQrBtn,
 .mobileRow .debtQrBtn,
