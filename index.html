@@ -7066,7 +7066,7 @@ if ('serviceWorker' in navigator) {
   function moveToTrash(i){
     const debts=arr(); if(i==null || i<0 || !debts[i]) return;
     const d=debts[i];
-    if(!confirm('Diese Schuld in den Papierkorb verschieben?')) return;
+    // v57: keine Browser-Bestätigung mehr beim Verschieben in den Papierkorb.
     const trash=readTrash();
     trash.unshift({trashId:'trash_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,7), deletedAt:new Date().toISOString(), originalIndex:i, debt:JSON.parse(JSON.stringify(d))});
     writeTrash(trash);
@@ -7358,6 +7358,60 @@ if ('serviceWorker' in navigator) {
   .editQuickV56{display:grid;gap:10px;}.editQuickV56 .dangerSoftV56{background:linear-gradient(135deg,rgba(255,156,104,.16),rgba(255,122,60,.10))!important;border-color:rgba(255,156,104,.22)!important;color:#ffe5d5!important;}.editHintV56,.editInfoBoxV56{margin-top:12px;padding:12px;border-radius:16px;background:rgba(79,140,255,.08);border:1px solid rgba(79,140,255,.14);color:#b9c8e8;font-size:13px;line-height:1.5;}
 }
 @media (max-width:1120px){#sideEditV56,.editPageV56{display:none!important;}}
+</style>
+
+<script id="v57-delete-without-browser-confirm-js">
+(function(){
+  const TRASH_KEY = 'schulden_trash_v54';
+  function getDebts(){ try{return Array.isArray(window.debts)?window.debts:(Array.isArray(debts)?debts:[]);}catch(e){return [];} }
+  function saveNow(){ try{ if(typeof save==='function') save(); else if(window.save) window.save(); }catch(e){} }
+  function renderNow(){ try{ if(typeof render==='function') render(); else if(window.render) window.render(); }catch(e){} setTimeout(updateTrashCount,80); }
+  function toastMsg(m){ try{ if(typeof toast==='function') toast(m); else console.log(m); }catch(e){ console.log(m); } }
+  function readTrash(){ try{return JSON.parse(localStorage.getItem(TRASH_KEY)||'[]')||[];}catch(e){return [];} }
+  function writeTrash(x){ localStorage.setItem(TRASH_KEY, JSON.stringify(x||[])); updateTrashCount(); }
+  function updateTrashCount(){ const c=document.getElementById('trashCountV54'); if(c) c.textContent=String(readTrash().length); }
+  function moveToTrashNoConfirm(i){
+    const debts=getDebts();
+    i=Number(i);
+    if(!Number.isFinite(i) || i<0 || !debts[i]){ toastMsg('Keine Schuld zum Löschen gefunden.'); return; }
+    const d=debts[i];
+    const trash=readTrash();
+    trash.unshift({trashId:'trash_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,7), deletedAt:new Date().toISOString(), originalIndex:i, debt:JSON.parse(JSON.stringify(d))});
+    writeTrash(trash);
+    debts.splice(i,1);
+    try{ if(typeof selectedDebtIndex !== 'undefined'){ selectedDebtIndex = Math.max(0, Math.min(i, debts.length-1)); } }catch(e){}
+    saveNow();
+    renderNow();
+    toastMsg('Schuld wurde in den Papierkorb verschoben.');
+  }
+  function patchDelete(){
+    try{ window.removeDebt = moveToTrashNoConfirm; removeDebt = moveToTrashNoConfirm; }catch(e){ window.removeDebt = moveToTrashNoConfirm; }
+  }
+  // Endgültig löschen im Papierkorb ebenfalls ohne Browser-Dialog-Problem abfangen.
+  document.addEventListener('click', function(e){
+    const btn=e.target && e.target.closest ? e.target.closest('.trashItemV54 button[data-act="delete"]') : null;
+    if(!btn) return;
+    e.preventDefault();
+    e.stopPropagation();
+    e.stopImmediatePropagation();
+    const item=btn.closest('.trashItemV54');
+    const id=item && item.dataset ? item.dataset.id : '';
+    if(!id) return;
+    const trash=readTrash().filter(x=>x.trashId!==id);
+    writeTrash(trash);
+    if(item) item.remove();
+    const list=document.getElementById('trashListV54');
+    if(list && !trash.length) list.innerHTML='<div class="v54Empty">Papierkorb ist leer.</div>';
+    toastMsg('Endgültig gelöscht.');
+  }, true);
+  document.addEventListener('DOMContentLoaded',()=>setTimeout(patchDelete,80));
+  setTimeout(patchDelete,150);
+  setTimeout(patchDelete,700);
+  setTimeout(patchDelete,1600);
+})();
+</script>
+<style id="v57-delete-without-browser-confirm-style">
+/* v57: Löschen verschiebt ohne Browser-Bestätigung in den Papierkorb, damit ein falsch gesetzter Dialog-Haken nichts blockiert. */
 </style>
 </body>
 </html>
