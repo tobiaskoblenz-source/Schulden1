@@ -1,4 +1,4 @@
-const VERSION = 'dark-v55-bearbeiten-kategorien';
+const VERSION = 'dark-v56-bearbeiten-kategorien-v54-basis';
 const CACHE_STATIC = `schulden-manager-static-${VERSION}`;
 const CACHE_RUNTIME = `schulden-manager-runtime-${VERSION}`;
 const APP_SHELL = [

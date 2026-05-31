@@ -6230,7 +6230,7 @@ if ('serviceWorker' in navigator) {
 <script id="v39-creditor-qr-module">
 (function(){
   document.documentElement.setAttribute("data-schulden-version","v39");
-  window.SCHULDEN_APP_VERSION = "v54-papierkorb-dokumente-glaeubiger";
+  window.SCHULDEN_APP_VERSION = "v56-bearbeiten-kategorien-v54-basis";
   const LS = "schulden_creditors_v37";
   const FORMAT_LS = "schulden_qr_label_format_v39";
   const TYPES = [
@@ -7217,131 +7217,147 @@ if ('serviceWorker' in navigator) {
 }
 @media (max-width:1120px){.akteTabsV54,.docPanelV54,.creditorPanelV54,.trashOverlayV54{display:none!important;}}
 </style>
-<script id="v55-bearbeiten-settings-js">
+
+<script id="v56-bearbeiten-kategorien-js">
 (function(){
-  const CAT_KEY = 'schulden_creditor_categories_v55';
+  const CAT_KEY = 'schulden_creditor_categories_v56';
   const DEFAULT_CATS = ['Krankenkasse','Amt / Behörde','Gericht','Inkasso','Versicherung','Privatperson','Sonstiges'];
   function $(id){ return document.getElementById(id); }
-  function safeParse(v,fallback){ try{return JSON.parse(v)||fallback;}catch(e){return fallback;} }
+  function esc(s){ return String(s??'').replace(/[&<>\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+  function toastMsg(m){ try{ if(typeof toast==='function') toast(m); else alert(m); }catch(e){ alert(m); } }
   function readCats(){
-    const stored = safeParse(localStorage.getItem(CAT_KEY), null);
-    const cats = Array.isArray(stored) && stored.length ? stored : DEFAULT_CATS;
-    return Array.from(new Set(cats.map(x=>String(x||'').trim()).filter(Boolean)));
+    try{
+      const raw = JSON.parse(localStorage.getItem(CAT_KEY)||'null');
+      if(Array.isArray(raw) && raw.length) return raw.map(String).filter(Boolean);
+    }catch(e){}
+    return DEFAULT_CATS.slice();
   }
   function writeCats(cats){
-    const clean = Array.from(new Set(cats.map(x=>String(x||'').trim()).filter(Boolean)));
-    localStorage.setItem(CAT_KEY, JSON.stringify(clean.length ? clean : DEFAULT_CATS));
-    refreshCategorySelects();
-    renderSettingsCats();
+    const clean=[];
+    (cats||[]).forEach(c=>{ c=String(c||'').trim(); if(c && !clean.some(x=>x.toLowerCase()===c.toLowerCase())) clean.push(c); });
+    localStorage.setItem(CAT_KEY, JSON.stringify(clean.length?clean:DEFAULT_CATS));
+    refreshCategoryList(); patchCreditorCategorySelect();
   }
-  function toast(msg){ if(typeof window.toast==='function') window.toast(msg); else alert(msg); }
-  function refreshCategorySelects(){
-    const cats = readCats();
-    document.querySelectorAll('#credCategory, [data-creditor-category-select]').forEach(sel=>{
-      const current = sel.value;
-      sel.innerHTML = cats.map(c=>'<option>'+escapeHtml(c)+'</option>').join('');
-      if(current && cats.includes(current)) sel.value = current;
-      else if(cats.includes('Sonstiges')) sel.value = 'Sonstiges';
-    });
-  }
-  function escapeHtml(s){ return String(s||'').replace(/[&<>'"]/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[m])); }
-  function ensureSettingsPage(){
-    if($('settingsOverlayV55')) return;
-    const div = document.createElement('div');
-    div.id = 'settingsOverlayV55';
-    div.className = 'settingsOverlayV55';
-    div.setAttribute('aria-hidden','true');
-    div.innerHTML = `
-      <div class="settingsPageV55" role="dialog" aria-modal="true" aria-labelledby="settingsTitleV55">
-        <div class="settingsHeadV55">
-          <div>
-            <span class="settingsKickerV55">Bearbeiten</span>
-            <h3 id="settingsTitleV55">Einstellungen & Listen</h3>
-            <p>Hier bearbeitest du feste Listen wie Gläubiger-Kategorien. Die Handy-Seite bleibt unverändert.</p>
-          </div>
-          <button id="settingsCloseV55" class="secondary" type="button">✕</button>
-        </div>
-        <div class="settingsBodyV55">
-          <section class="settingsCardV55">
-            <div class="settingsSectionTitleV55"><span>🏷️</span><div><strong>Gläubiger-Kategorien</strong><small>Neue Kategorien erstellen, um Gläubiger sauberer zu sortieren.</small></div></div>
-            <div class="categoryInputRowV55">
-              <input id="newCategoryV55" placeholder="Neue Kategorie, z. B. Stromanbieter">
-              <button id="addCategoryV55" type="button">Kategorie hinzufügen</button>
-            </div>
-            <div id="categoryListV55" class="categoryListV55"></div>
-          </section>
-          <section class="settingsCardV55">
-            <div class="settingsSectionTitleV55"><span>⚙️</span><div><strong>Schnelle Bearbeitung</strong><small>Direkt zu den wichtigsten Bereichen springen.</small></div></div>
-            <div class="quickEditGridV55">
-              <button id="openCreditorsFromSettingsV55" type="button">🏢 Gläubiger verwalten</button>
-              <button id="openTrashFromSettingsV55" type="button">🗑 Papierkorb öffnen</button>
-              <button id="resetCategoriesV55" class="secondary" type="button">Kategorien zurücksetzen</button>
-            </div>
-            <div class="settingsHintV55">Meine Empfehlung: Kategorien hier pflegen, Gläubiger weiter über „Gläubiger / QR“ anlegen. So bleibt alles übersichtlich und später QR-/Dokumenten-tauglich.</div>
-          </section>
-        </div>
-      </div>`;
-    document.body.appendChild(div);
-    $('settingsCloseV55').onclick = closeSettings;
-    div.addEventListener('click', e=>{ if(e.target.id==='settingsOverlayV55') closeSettings(); });
-    $('addCategoryV55').onclick = addCategory;
-    $('newCategoryV55').addEventListener('keydown', e=>{ if(e.key==='Enter') addCategory(); });
-    $('resetCategoriesV55').onclick = ()=>{ if(confirm('Kategorien auf Standard zurücksetzen?')){ writeCats(DEFAULT_CATS); toast('Kategorien zurückgesetzt.'); } };
-    $('openCreditorsFromSettingsV55').onclick = ()=>{ closeSettings(); if(typeof window.openCreditorsV39==='function') window.openCreditorsV39(); else $('btnCreditors')?.click(); };
-    $('openTrashFromSettingsV55').onclick = ()=>{ if(typeof window.openTrashV54==='function') window.openTrashV54(); else toast('Papierkorb ist noch nicht geladen.'); };
-  }
-  function openSettings(){ ensureSettingsPage(); refreshCategorySelects(); renderSettingsCats(); $('settingsOverlayV55').classList.add('show'); $('settingsOverlayV55').setAttribute('aria-hidden','false'); document.body.classList.add('modalOpen'); setTimeout(()=>$('newCategoryV55')?.focus(),80); }
-  function closeSettings(){ $('settingsOverlayV55')?.classList.remove('show'); $('settingsOverlayV55')?.setAttribute('aria-hidden','true'); document.body.classList.remove('modalOpen'); }
-  function addCategory(){
-    const input=$('newCategoryV55'); const val=String(input?.value||'').trim();
-    if(!val){ toast('Bitte Kategorie eintragen.'); return; }
-    const cats=readCats();
-    if(cats.some(c=>c.toLowerCase()===val.toLowerCase())){ toast('Kategorie gibt es schon.'); return; }
-    cats.push(val); writeCats(cats); if(input) input.value=''; toast('Kategorie hinzugefügt ✅');
-  }
-  function renderSettingsCats(){
-    const box=$('categoryListV55'); if(!box) return;
-    const cats=readCats();
-    box.innerHTML = cats.map((c,i)=>`<div class="categoryItemV55" data-index="${i}"><span>${escapeHtml(c)}</span><div><button data-act="rename" type="button">Umbenennen</button><button data-act="delete" class="danger" type="button">Löschen</button></div></div>`).join('');
-    box.querySelectorAll('button').forEach(btn=>btn.onclick=()=>{
-      const item=btn.closest('.categoryItemV55'); const idx=Number(item.dataset.index); const cats=readCats(); const name=cats[idx];
-      if(btn.dataset.act==='rename'){
-        const val=prompt('Kategorie umbenennen:', name);
-        if(val===null) return;
-        const clean=String(val).trim(); if(!clean){ toast('Name darf nicht leer sein.'); return; }
-        cats[idx]=clean; writeCats(cats); toast('Kategorie umbenannt.');
-      }
-      if(btn.dataset.act==='delete'){
-        if(cats.length<=1){ toast('Mindestens eine Kategorie muss bleiben.'); return; }
-        if(!confirm('Kategorie „'+name+'“ löschen? Gläubiger mit dieser Kategorie bleiben erhalten.')) return;
-        cats.splice(idx,1); writeCats(cats); toast('Kategorie gelöscht.');
-      }
-    });
-  }
-  function insertSideButton(){
-    const side=document.querySelector('.sideNav'); if(!side || $('sideEditSettingsV55')) return;
+  function ensureEditNav(){
+    const nav=document.querySelector('.sidebarNav');
+    if(!nav || $('sideEditV56')) return;
     const b=document.createElement('button');
-    b.id='sideEditSettingsV55'; b.className='sideNavBtn'; b.type='button';
-    b.innerHTML='<span class="navIco">✎</span><span>Bearbeiten</span>';
-    b.addEventListener('click', openSettings);
-    const neu = Array.from(side.querySelectorAll('.sideNavBtn')).find(x=>x.textContent.trim()==='Neu');
-    if(neu && neu.nextSibling) side.insertBefore(b, neu.nextSibling); else side.appendChild(b);
+    b.id='sideEditV56'; b.className='sideNavBtn'; b.type='button';
+    b.innerHTML='<span class="navIco">⚙</span><span>Bearbeiten</span>';
+    b.addEventListener('click', openEditPage);
+    nav.appendChild(b);
   }
-  const oldEnsure = window.openCreditorsV39;
-  document.addEventListener('DOMContentLoaded', ()=>{ ensureSettingsPage(); insertSideButton(); refreshCategorySelects(); setTimeout(refreshCategorySelects, 600); });
-  setTimeout(()=>{ ensureSettingsPage(); insertSideButton(); refreshCategorySelects(); },700);
-  const mo = new MutationObserver(()=>refreshCategorySelects());
-  document.addEventListener('DOMContentLoaded', ()=>mo.observe(document.body,{childList:true,subtree:true}));
-  window.openSettingsV55 = openSettings;
-  window.refreshCreditorCategoriesV55 = refreshCategorySelects;
+  function ensureEditPage(){
+    const content=document.querySelector('.contentArea');
+    if(!content || $('editPageV56')) return;
+    const section=document.createElement('section');
+    section.id='editPageV56'; section.className='card editPageV56';
+    section.innerHTML = `
+      <div class="editHeadV56">
+        <div>
+          <span class="editKickerV56">Einstellungen</span>
+          <h2>Bearbeiten</h2>
+          <p>Hier verwaltest du Listen und Einstellungen, die dauerhaft in der App genutzt werden.</p>
+        </div>
+        <button id="editBackV56" class="secondary" type="button">Zurück zur Übersicht</button>
+      </div>
+      <div class="editGridV56">
+        <section class="editPanelV56">
+          <div class="editPanelHeadV56"><span>🏷</span><div><strong>Gläubiger-Kategorien</strong><small>Diese Kategorien erscheinen im Gläubiger-Formular.</small></div></div>
+          <div class="catAddV56"><input id="catInputV56" placeholder="Neue Kategorie, z. B. Energie, Bank, Inkasso alt"><button id="catAddV56" type="button">Kategorie hinzufügen</button></div>
+          <div id="catListV56" class="catListV56"></div>
+          <div class="editHintV56">Tipp: Bestehende Gläubiger behalten ihre Kategorie. Neue Kategorien sind sofort im Gläubiger-Fenster auswählbar.</div>
+        </section>
+        <section class="editPanelV56">
+          <div class="editPanelHeadV56"><span>⚡</span><div><strong>Schnellzugriff</strong><small>Direkt zu den Bereichen, die du oft bearbeitest.</small></div></div>
+          <div class="editQuickV56">
+            <button id="editOpenCreditorsV56" type="button">🏢 Gläubiger verwalten</button>
+            <button id="editOpenTrashV56" type="button">🗑 Papierkorb öffnen</button>
+            <button id="editResetCatsV56" class="dangerSoftV56" type="button">Kategorien zurücksetzen</button>
+          </div>
+          <div class="editInfoBoxV56"><strong>Bessere Idee:</strong><br>Alles, was Listen betrifft, kommt hier in „Bearbeiten“. Gläubiger und QR bleiben im Gläubiger-Fenster. So bleibt die App übersichtlich.</div>
+        </section>
+      </div>`;
+    content.appendChild(section);
+    $('editBackV56').onclick=closeEditPage;
+    $('catAddV56').onclick=addCategory;
+    $('catInputV56').addEventListener('keydown', e=>{ if(e.key==='Enter') addCategory(); });
+    $('editOpenCreditorsV56').onclick=()=>{ if(typeof window.openCreditorsV39==='function') window.openCreditorsV39(); else if(typeof window.openCreditorsV37==='function') window.openCreditorsV37(); else toastMsg('Gläubiger-Fenster nicht geladen.'); };
+    $('editOpenTrashV56').onclick=()=>{ const t=$('btnTrashV54'); if(t) t.click(); else toastMsg('Papierkorb ist noch nicht geladen.'); };
+    $('editResetCatsV56').onclick=()=>{ if(confirm('Kategorien auf Standard zurücksetzen?')){ localStorage.removeItem(CAT_KEY); refreshCategoryList(); patchCreditorCategorySelect(); toastMsg('Kategorien zurückgesetzt.'); } };
+    refreshCategoryList();
+  }
+  function openEditPage(){
+    ensureEditPage();
+    document.body.classList.add('editModeV56');
+    document.querySelectorAll('.sideNavBtn').forEach(x=>x.classList.remove('active'));
+    $('sideEditV56')?.classList.add('active');
+    $('editPageV56')?.scrollIntoView({behavior:'smooth', block:'start'});
+  }
+  function closeEditPage(){
+    document.body.classList.remove('editModeV56');
+    document.querySelectorAll('.sideNavBtn').forEach(x=>x.classList.remove('active'));
+    document.querySelector('.sideNavBtn[data-scroll-target="dashboardTop"]')?.classList.add('active');
+    $('dashboardTop')?.scrollIntoView({behavior:'smooth', block:'start'});
+  }
+  function addCategory(){
+    const input=$('catInputV56'); const name=String(input?.value||'').trim();
+    if(!name){ toastMsg('Bitte Kategorie eintragen.'); return; }
+    const cats=readCats();
+    if(cats.some(c=>c.toLowerCase()===name.toLowerCase())){ toastMsg('Diese Kategorie gibt es schon.'); return; }
+    cats.push(name); writeCats(cats); if(input) input.value=''; toastMsg('Kategorie hinzugefügt.');
+  }
+  function refreshCategoryList(){
+    const box=$('catListV56'); if(!box) return; const cats=readCats();
+    box.innerHTML=cats.map((c,i)=>`<article class="catItemV56" data-index="${i}"><span>${esc(c)}</span><div><button data-act="rename" type="button">Umbenennen</button><button data-act="delete" type="button">Löschen</button></div></article>`).join('');
+    box.querySelectorAll('button').forEach(btn=>btn.onclick=()=>{
+      const item=btn.closest('.catItemV56'); const i=Number(item?.dataset.index); const cats=readCats(); const old=cats[i]; if(!old) return;
+      if(btn.dataset.act==='rename'){
+        const neu=prompt('Kategorie umbenennen:', old); if(neu==null) return; const n=neu.trim(); if(!n) return;
+        if(cats.some((c,idx)=>idx!==i && c.toLowerCase()===n.toLowerCase())){ toastMsg('Diese Kategorie gibt es schon.'); return; }
+        cats[i]=n; writeCats(cats); toastMsg('Kategorie umbenannt.');
+      }else{
+        if(DEFAULT_CATS.includes(old) && !confirm('Standard-Kategorie wirklich ausblenden/löschen?')) return;
+        if(confirm('Kategorie „'+old+'“ löschen? Bestehende Gläubiger behalten den Text, aber die Auswahl verschwindet.')){ cats.splice(i,1); writeCats(cats); toastMsg('Kategorie gelöscht.'); }
+      }
+    });
+  }
+  function patchCreditorCategorySelect(){
+    const sel=$('credCategory'); if(!sel) return;
+    const current=sel.value || 'Krankenkasse';
+    const cats=readCats();
+    if(current && !cats.some(c=>c.toLowerCase()===current.toLowerCase())) cats.push(current);
+    sel.innerHTML=cats.map(c=>'<option>'+esc(c)+'</option>').join('');
+    sel.value=current;
+  }
+  function patchSidebarScrollButtons(){
+    document.querySelectorAll('.sideNavBtn[data-scroll-target]').forEach(btn=>{
+      if(btn.__v56closeEdit) return; btn.__v56closeEdit=true;
+      btn.addEventListener('click',()=>{ document.body.classList.remove('editModeV56'); }, true);
+    });
+  }
+  function init(){ ensureEditNav(); ensureEditPage(); refreshCategoryList(); patchCreditorCategorySelect(); patchSidebarScrollButtons(); }
+  document.addEventListener('DOMContentLoaded',()=>setTimeout(init,180));
+  setTimeout(init,700); setInterval(()=>{ patchCreditorCategorySelect(); patchSidebarScrollButtons(); }, 1800);
 })();
 </script>
-<style id="v55-bearbeiten-settings-style">
-.settingsOverlayV55{position:fixed;inset:0;z-index:10090;background:rgba(0,0,0,.62);backdrop-filter:blur(14px);display:none;padding:18px;overflow:auto}.settingsOverlayV55.show{display:block}.settingsPageV55{width:min(1050px,100%);margin:28px auto;border-radius:30px;background:linear-gradient(180deg,rgba(9,18,32,.98),rgba(5,13,25,.98));border:1px solid rgba(255,255,255,.10);box-shadow:0 38px 90px rgba(0,0,0,.5);color:#edf4ff;overflow:hidden}.settingsHeadV55{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;padding:24px;border-bottom:1px solid rgba(255,255,255,.08);background:radial-gradient(circle at 12% 0%,rgba(79,140,255,.18),transparent 34%),radial-gradient(circle at 88% 0%,rgba(89,246,167,.12),transparent 32%)}.settingsHeadV55 h3{margin:8px 0 0;font-size:30px;letter-spacing:-.03em}.settingsHeadV55 p{margin:7px 0 0;color:#9eb0cc}.settingsHeadV55 button{min-width:52px;border-radius:18px!important}.settingsKickerV55{display:inline-flex;padding:7px 10px;border-radius:999px;background:rgba(79,140,255,.12);border:1px solid rgba(79,140,255,.18);color:#d5e7ff;font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.08em}.settingsBodyV55{display:grid;grid-template-columns:1.2fr .8fr;gap:18px;padding:20px}.settingsCardV55{border-radius:24px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.08);padding:18px}.settingsSectionTitleV55{display:flex;gap:12px;align-items:flex-start;margin-bottom:14px}.settingsSectionTitleV55>span{width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;border-radius:14px;background:linear-gradient(135deg,rgba(79,140,255,.28),rgba(89,246,167,.12));border:1px solid rgba(255,255,255,.10)}.settingsSectionTitleV55 strong{display:block;font-size:17px}.settingsSectionTitleV55 small{display:block;margin-top:4px;color:#9fb0cc;line-height:1.35}.categoryInputRowV55{display:grid;grid-template-columns:1fr auto;gap:10px;margin-bottom:14px}.categoryInputRowV55 input{min-height:46px!important;border-radius:15px!important;background:#0f1c2f!important;color:#edf4ff!important;border:1px solid rgba(255,255,255,.08)!important}.categoryInputRowV55 button,.quickEditGridV55 button{min-height:46px!important;border-radius:15px!important;font-size:13px!important;font-weight:900!important}.categoryListV55{display:grid;gap:10px;max-height:460px;overflow:auto;padding-right:4px}.categoryItemV55{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:12px;border-radius:16px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.08)}.categoryItemV55 span{font-weight:900}.categoryItemV55 div{display:flex;gap:8px}.categoryItemV55 button{min-height:36px!important;border-radius:12px!important;font-size:12px!important;padding:0 10px!important}.categoryItemV55 .danger{background:linear-gradient(135deg,#ff9c68,#ff7a3c)!important;color:#fff!important}.quickEditGridV55{display:grid;gap:10px}.settingsHintV55{margin-top:14px;padding:12px;border-radius:16px;background:rgba(79,140,255,.08);border:1px solid rgba(79,140,255,.14);color:#b9c8e8;font-size:13px;line-height:1.45}
-#sideEditSettingsV55{background:rgba(255,255,255,.03)!important;border-color:rgba(255,255,255,.06)!important;}
-#sideEditSettingsV55:hover{background:linear-gradient(180deg, rgba(24,51,84,.94), rgba(14,34,59,.92))!important;}
-@media(max-width:1120px){.settingsOverlayV55{display:none!important}}
+<style id="v56-bearbeiten-kategorien-style">
+/* v56: neue Bearbeiten-Seite nur für Desktop/Tablet-Großansicht. Handy bleibt unverändert. */
+@media (min-width:1121px){
+  .editPageV56{display:none;margin-bottom:20px;padding:22px;border-radius:28px;background:linear-gradient(180deg,rgba(11,20,34,.96),rgba(8,16,29,.96))!important;border:1px solid rgba(255,255,255,.08)!important;}
+  body.editModeV56 .contentArea > *:not(#editPageV56){display:none!important;}
+  body.editModeV56 #editPageV56{display:block!important;}
+  .editHeadV56{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid rgba(255,255,255,.08);}
+  .editKickerV56{display:inline-flex;padding:7px 10px;border-radius:999px;background:rgba(79,140,255,.12);border:1px solid rgba(79,140,255,.18);color:#cfe0ff;font-size:12px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;}
+  .editHeadV56 h2{margin:10px 0 6px;color:#fff;font-size:36px;letter-spacing:-.04em;}.editHeadV56 p{margin:0;color:#9fb0cc;line-height:1.45;}.editHeadV56 button{min-height:42px!important;border-radius:14px!important;font-size:13px!important;}
+  .editGridV56{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(320px,.8fr);gap:16px;}
+  .editPanelV56{padding:18px;border-radius:22px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);}
+  .editPanelHeadV56{display:flex;gap:12px;align-items:flex-start;margin-bottom:14px;}.editPanelHeadV56>span{width:38px;height:38px;border-radius:14px;display:inline-flex;align-items:center;justify-content:center;background:linear-gradient(135deg,rgba(79,140,255,.28),rgba(124,113,255,.18));}.editPanelHeadV56 strong{display:block;color:#fff;font-size:17px;}.editPanelHeadV56 small{display:block;color:#9fb0cc;margin-top:3px;}
+  .catAddV56{display:grid;grid-template-columns:1fr auto;gap:10px;margin-bottom:13px;}.catAddV56 input{min-height:42px!important;border-radius:14px!important;background:#0f1c2f!important;color:#edf4ff!important;border:1px solid rgba(255,255,255,.08)!important;}.catAddV56 button,.editQuickV56 button{min-height:42px!important;border-radius:14px!important;font-size:13px!important;font-weight:900!important;background:linear-gradient(135deg,rgba(89,246,167,.16),rgba(79,140,255,.12))!important;border:1px solid rgba(89,246,167,.22)!important;color:#eafff4!important;box-shadow:none!important;}
+  .catListV56{display:grid;gap:8px;}.catItemV56{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:11px 12px;border-radius:16px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);}.catItemV56 span{font-weight:900;color:#edf4ff;}.catItemV56 div{display:flex;gap:7px;}.catItemV56 button{min-height:34px!important;border-radius:12px!important;font-size:12px!important;padding:0 10px!important;background:#0f1c2f!important;color:#dbe9ff!important;border:1px solid rgba(255,255,255,.08)!important;}
+  .editQuickV56{display:grid;gap:10px;}.editQuickV56 .dangerSoftV56{background:linear-gradient(135deg,rgba(255,156,104,.16),rgba(255,122,60,.10))!important;border-color:rgba(255,156,104,.22)!important;color:#ffe5d5!important;}.editHintV56,.editInfoBoxV56{margin-top:12px;padding:12px;border-radius:16px;background:rgba(79,140,255,.08);border:1px solid rgba(79,140,255,.14);color:#b9c8e8;font-size:13px;line-height:1.5;}
+}
+@media (max-width:1120px){#sideEditV56,.editPageV56{display:none!important;}}
 </style>
-
 </body>
 </html>
