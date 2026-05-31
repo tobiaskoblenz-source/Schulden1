@@ -1,4 +1,4 @@
-const VERSION = 'dark-v51-alle-buttons-nebeneinander';
+const VERSION = 'dark-v52-google-buttons-neben-pdf';
 const CACHE_STATIC = `schulden-manager-static-${VERSION}`;
 const CACHE_RUNTIME = `schulden-manager-runtime-${VERSION}`;
 const APP_SHELL = [

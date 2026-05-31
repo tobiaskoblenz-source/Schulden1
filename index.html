@@ -6230,7 +6230,7 @@ if ('serviceWorker' in navigator) {
 <script id="v39-creditor-qr-module">
 (function(){
   document.documentElement.setAttribute("data-schulden-version","v39");
-  window.SCHULDEN_APP_VERSION = "v51-alle-buttons-nebeneinander";
+  window.SCHULDEN_APP_VERSION = "v52-google-buttons-neben-pdf";
   const LS = "schulden_creditors_v37";
   const FORMAT_LS = "schulden_qr_label_format_v39";
   const TYPES = [
@@ -6715,6 +6715,107 @@ if ('serviceWorker' in navigator) {
   .driveToolbarGrid .driveIcon{font-size:15px !important;}
   .driveToolbarGrid .driveText{line-height:1 !important; white-space:nowrap !important;}
   .driveToolbarGrid .driveText br{display:none !important;}
+}
+</style>
+
+<script id="v52-google-buttons-neben-pdf-js">
+(function(){
+  function moveGoogleButtonsIntoQuickActions(){
+    const grid = document.querySelector('.actionToolbarGrid');
+    const driveGrid = document.querySelector('.driveToolbarGrid');
+    const btnPDF = document.getElementById('btnPDF');
+    if(!grid || !driveGrid || !btnPDF) return;
+    const ids = ['btnDriveConnect','btnDriveSave','btnDriveLoad'];
+    const labels = {
+      btnDriveConnect: 'Google<br>Verbinden',
+      btnDriveSave: 'Bei Google<br>Speichern',
+      btnDriveLoad: 'Von Google<br>Laden'
+    };
+    let anchor = btnPDF;
+    ids.forEach((id)=>{
+      const btn = document.getElementById(id);
+      if(!btn) return;
+      btn.classList.add('googleInlineBtn');
+      const txt = btn.querySelector('.driveText');
+      if(txt) txt.innerHTML = labels[id] || txt.innerHTML;
+      if(anchor && anchor.parentNode === grid){
+        grid.insertBefore(btn, anchor.nextSibling);
+      }else{
+        grid.appendChild(btn);
+      }
+      anchor = btn;
+    });
+    driveGrid.style.display = 'none';
+  }
+  document.addEventListener('DOMContentLoaded', ()=>setTimeout(moveGoogleButtonsIntoQuickActions, 120));
+  setTimeout(moveGoogleButtonsIntoQuickActions, 500);
+  setTimeout(moveGoogleButtonsIntoQuickActions, 1200);
+})();
+</script>
+<style id="v52-google-buttons-neben-pdf-style">
+/* v52: Google-Buttons direkt neben PDF Export, zweizeilig und dezent farbig */
+@media (min-width:700px){
+  .actionToolbarGrid{
+    display:flex !important;
+    flex-wrap:nowrap !important;
+    align-items:stretch !important;
+    gap:8px !important;
+    overflow-x:auto !important;
+    overflow-y:hidden !important;
+    white-space:nowrap !important;
+  }
+  .actionToolbarGrid button,
+  .actionToolbarGrid .creditorBtn,
+  .actionToolbarGrid .googleInlineBtn{
+    flex:0 0 auto !important;
+    min-width:132px !important;
+    min-height:42px !important;
+    width:auto !important;
+    padding:0 12px !important;
+    border-radius:14px !important;
+    font-size:12.5px !important;
+    line-height:1.02 !important;
+  }
+  .actionToolbarGrid .googleInlineBtn{
+    display:inline-flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    gap:7px !important;
+    min-width:140px !important;
+    white-space:normal !important;
+  }
+  .actionToolbarGrid .googleInlineBtn .driveIcon{
+    font-size:15px !important;
+    line-height:1 !important;
+    flex:0 0 auto !important;
+  }
+  .actionToolbarGrid .googleInlineBtn .driveText{
+    display:block !important;
+    white-space:normal !important;
+    text-align:center !important;
+    line-height:1.04 !important;
+  }
+  .actionToolbarGrid .googleInlineBtn .driveText br{
+    display:block !important;
+  }
+  #btnDriveConnect.googleInlineBtn{
+    background:linear-gradient(135deg, rgba(55,187,145,.18), rgba(52,120,255,.14)) !important;
+    border-color:rgba(71,214,170,.24) !important;
+    color:#e9fff6 !important;
+  }
+  #btnDriveSave.googleInlineBtn{
+    background:linear-gradient(135deg, rgba(118,138,255,.18), rgba(92,201,255,.12)) !important;
+    border-color:rgba(139,157,255,.24) !important;
+    color:#eef2ff !important;
+  }
+  #btnDriveLoad.googleInlineBtn{
+    background:linear-gradient(135deg, rgba(78,160,255,.18), rgba(76,211,255,.12)) !important;
+    border-color:rgba(113,184,255,.24) !important;
+    color:#eef7ff !important;
+  }
+}
+.driveToolbarGrid[style*="display: none"]{
+  display:none !important;
 }
 </style>
 </body>
