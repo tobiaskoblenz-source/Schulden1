@@ -6230,7 +6230,7 @@ if ('serviceWorker' in navigator) {
 <script id="v39-creditor-qr-module">
 (function(){
   document.documentElement.setAttribute("data-schulden-version","v39");
-  window.SCHULDEN_APP_VERSION = "v50-schnellaktionen-buttons-entfernt";
+  window.SCHULDEN_APP_VERSION = "v51-alle-buttons-nebeneinander";
   const LS = "schulden_creditors_v37";
   const FORMAT_LS = "schulden_qr_label_format_v39";
   const TYPES = [
@@ -6676,6 +6676,45 @@ if ('serviceWorker' in navigator) {
 #btnExcel,
 #btnClear{
   display:none !important;
+}
+</style>
+
+<style id="v51-alle-buttons-nebeneinander">
+/* v51: alle Schnellaktions- und Google-Buttons nebeneinander */
+@media (min-width:700px){
+  .actionToolbarGrid,
+  .driveToolbarGrid{
+    display:flex !important;
+    flex-wrap:nowrap !important;
+    justify-content:flex-start !important;
+    align-items:stretch !important;
+    gap:8px !important;
+    overflow-x:auto !important;
+    overflow-y:hidden !important;
+    white-space:nowrap !important;
+    scrollbar-width:thin;
+    padding-bottom:4px !important;
+  }
+  .actionToolbarGrid button,
+  .driveToolbarGrid button,
+  .actionToolbarGrid .creditorBtn{
+    flex:0 0 auto !important;
+    width:auto !important;
+    min-width:132px !important;
+    max-width:none !important;
+    min-height:40px !important;
+    padding:0 12px !important;
+    border-radius:14px !important;
+    font-size:12.5px !important;
+    line-height:1 !important;
+  }
+  .driveToolbarGrid .driveBtn{
+    min-width:142px !important;
+    gap:6px !important;
+  }
+  .driveToolbarGrid .driveIcon{font-size:15px !important;}
+  .driveToolbarGrid .driveText{line-height:1 !important; white-space:nowrap !important;}
+  .driveToolbarGrid .driveText br{display:none !important;}
 }
 </style>
 </body>
