@@ -1,4 +1,4 @@
-const VERSION = 'dark-v53-desktop-akte-backup-polish';
+const VERSION = 'dark-v55-bearbeiten-kategorien';
 const CACHE_STATIC = `schulden-manager-static-${VERSION}`;
 const CACHE_RUNTIME = `schulden-manager-runtime-${VERSION}`;
 const APP_SHELL = [
