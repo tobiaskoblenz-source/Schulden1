@@ -6230,7 +6230,7 @@ if ('serviceWorker' in navigator) {
 <script id="v39-creditor-qr-module">
 (function(){
   document.documentElement.setAttribute("data-schulden-version","v39");
-  window.SCHULDEN_APP_VERSION = "v52-google-buttons-neben-pdf";
+  window.SCHULDEN_APP_VERSION = "v53-desktop-akte-backup-polish";
   const LS = "schulden_creditors_v37";
   const FORMAT_LS = "schulden_qr_label_format_v39";
   const TYPES = [
@@ -6816,6 +6816,230 @@ if ('serviceWorker' in navigator) {
 }
 .driveToolbarGrid[style*="display: none"]{
   display:none !important;
+}
+</style>
+
+<script id="v53-desktop-akte-backup-polish-js">
+(function(){
+  const AUTO_KEY = 'schulden_auto_backups_v53';
+  let lastBackupHash = '';
+  let lastBackupAt = 0;
+  function getDebts(){
+    try{
+      if(Array.isArray(window.debts)) return window.debts;
+      if(typeof debts !== 'undefined' && Array.isArray(debts)) return debts;
+    }catch(e){}
+    try{return JSON.parse(localStorage.getItem('godmode_debts') || '[]') || [];}catch(e){return [];}
+  }
+  function toast(msg){ if(typeof window.showToast === 'function') window.showToast(msg); }
+  function formatTime(iso){
+    try{return new Date(iso).toLocaleString('de-DE',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});}catch(e){return '–';}
+  }
+  function readBackups(){
+    try{return JSON.parse(localStorage.getItem(AUTO_KEY) || '[]') || [];}catch(e){return [];}
+  }
+  function writeBackups(items){ localStorage.setItem(AUTO_KEY, JSON.stringify(items.slice(0,20))); }
+  function autoBackup(reason){
+    const data = getDebts();
+    const json = JSON.stringify(data || []);
+    if(!json || json === '[]') return;
+    const now = Date.now();
+    if(json === lastBackupHash && (now - lastBackupAt) < 30000) return;
+    lastBackupHash = json;
+    lastBackupAt = now;
+    const items = readBackups();
+    if(items[0] && items[0].hash === json) return;
+    items.unshift({at:new Date().toISOString(), reason:reason || 'auto', count:data.length, hash:json, data});
+    writeBackups(items);
+    updateBackupChip();
+  }
+  function updateBackupChip(){
+    const chip = document.getElementById('autoBackupStatusV53');
+    if(!chip) return;
+    const items = readBackups();
+    chip.innerHTML = items.length ? '🛡️ Auto-Backup aktiv · letzte Sicherung: <b>'+formatTime(items[0].at)+'</b>' : '🛡️ Auto-Backup aktiv · wartet auf Daten';
+  }
+  function installAutoBackup(){
+    if(window.__schuldenAutoBackupV53) return;
+    window.__schuldenAutoBackupV53 = true;
+    const old = window.save;
+    if(typeof old === 'function'){
+      const wrapped = function(){
+        const res = old.apply(this, arguments);
+        try{ autoBackup('save'); }catch(e){ console.warn('Auto-Backup fehlgeschlagen', e); }
+        return res;
+      };
+      window.save = wrapped;
+      try{ save = wrapped; }catch(e){}
+    }
+    setTimeout(()=>autoBackup('start'),800);
+  }
+  function ensureBackupChip(){
+    const card = document.getElementById('newDebtSection');
+    if(!card || document.getElementById('autoBackupStatusV53')) return;
+    const drive = document.getElementById('driveStatus');
+    const chip = document.createElement('div');
+    chip.id = 'autoBackupStatusV53';
+    chip.className = 'autoBackupChipV53';
+    chip.title = 'Automatische lokale Sicherung im Browser. Zusätzlich kannst du bei Google speichern.';
+    if(drive && drive.parentNode) drive.parentNode.insertBefore(chip, drive.nextSibling);
+    else card.appendChild(chip);
+    updateBackupChip();
+  }
+  function currentIndex(){
+    try{
+      if(typeof selectedDebtIndex !== 'undefined' && selectedDebtIndex != null && selectedDebtIndex >= 0) return selectedDebtIndex;
+    }catch(e){}
+    return 0;
+  }
+  function getCurrentDebt(){ const i=currentIndex(); const arr=getDebts(); return {i,d:arr[i]}; }
+  function creditorPayloadFromDebt(d){
+    const name = (d && d.name) ? String(d.name) : 'Gläubiger';
+    const id = 'cred_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,8);
+    return {id, name, extra:'', category:'Sonstiges', aktenzeichen:(d && (d.aktenzeichen||d.caseNumber)) || '', phone:'', email:'', address:'', notes:'Automatisch aus Schuld erstellt', createdAt:new Date().toISOString(), updatedAt:new Date().toISOString()};
+  }
+  function findOrCreateCreditor(d){
+    const key='schulden_creditors_v37';
+    const norm = s => String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
+    let arr=[];
+    try{arr=JSON.parse(localStorage.getItem(key)||'[]')||[];}catch(e){arr=[];}
+    const n=norm(d && d.name);
+    let c=arr.find(x=>norm((x.name||'') + (x.extra?' '+x.extra:''))===n || norm(x.name)===n);
+    if(!c){ c=creditorPayloadFromDebt(d); arr.push(c); localStorage.setItem(key, JSON.stringify(arr)); toast('Gläubiger wurde automatisch angelegt.'); }
+    return c;
+  }
+  function exportSingleDebtPdf(i,d){
+    try{
+      const jsPDF = window.jspdf && window.jspdf.jsPDF;
+      if(!jsPDF){ toast('PDF-Bibliothek nicht geladen.'); return; }
+      const doc = new jsPDF();
+      const euro = (typeof formatEUR === 'function') ? formatEUR : (v=>String(v||0)+' €');
+      doc.setFontSize(18); doc.text('Schuld-Akte',14,18);
+      doc.setFontSize(12);
+      const rows = [
+        ['Name', d.name || '–'],
+        ['Grund', d.grund || '–'],
+        ['Betrag', euro(Number(d.betrag)||0)],
+        ['Status', d.status || '–'],
+        ['Datum / Frist', d.datum || '–'],
+        ['Aktenzeichen', d.aktenzeichen || d.caseNumber || '–'],
+        ['Notizen', (d.notes || '').toString().slice(0,500) || '–']
+      ];
+      let y=32;
+      rows.forEach(r=>{ doc.setFont(undefined,'bold'); doc.text(r[0]+':',14,y); doc.setFont(undefined,'normal'); doc.text(String(r[1]),55,y,{maxWidth:135}); y+=10; });
+      doc.save('Schuld_Akte_'+String(d.name||('S-'+(1001+i))).replace(/[^a-z0-9äöüß_-]+/gi,'_')+'.pdf');
+    }catch(err){ console.error(err); toast('PDF konnte nicht erstellt werden.'); }
+  }
+  function ensureDesktopAkteActions(){
+    const hero = document.querySelector('.desktopHeroCard');
+    if(!hero || document.getElementById('desktopAkteQuickActionsV53')) return;
+    const box = document.createElement('div');
+    box.id='desktopAkteQuickActionsV53';
+    box.className='desktopAkteQuickActionsV53';
+    box.innerHTML = '<button type="button" data-act="daten">📎 Daten</button><button type="button" data-act="qr">▣ QR</button><button type="button" data-act="pdf">🧾 PDF</button><button type="button" data-act="note">＋ Notiz</button><button type="button" data-act="drive">☁️ Speichern</button>';
+    hero.appendChild(box);
+    box.addEventListener('click', (e)=>{
+      const btn=e.target.closest('button'); if(!btn) return;
+      const {i,d}=getCurrentDebt(); if(!d){ toast('Bitte zuerst eine Schuld auswählen.'); return; }
+      const act=btn.dataset.act;
+      if(act==='daten'){ if(typeof window.showCorrespondence==='function') window.showCorrespondence(i); }
+      if(act==='qr'){
+        const c=findOrCreateCreditor(d);
+        if(typeof window.generateCreditorQrSheetV39==='function') window.generateCreditorQrSheetV39(c);
+        else if(typeof window.openCreditorsV39==='function') window.openCreditorsV39();
+      }
+      if(act==='pdf') exportSingleDebtPdf(i,d);
+      if(act==='note') document.getElementById('desktopNewNoteBtn')?.click();
+      if(act==='drive') document.getElementById('btnDriveSave')?.click();
+    });
+  }
+  function improveCreditorBadges(){
+    const style = document.getElementById('v53-desktop-akte-backup-polish-style');
+    if(!style) return;
+  }
+  function init(){
+    ensureBackupChip();
+    installAutoBackup();
+    ensureDesktopAkteActions();
+    improveCreditorBadges();
+    updateBackupChip();
+  }
+  document.addEventListener('DOMContentLoaded',()=>setTimeout(init,120));
+  setTimeout(init,500);
+  setInterval(updateBackupChip,15000);
+})();
+</script>
+<style id="v53-desktop-akte-backup-polish-style">
+/* v53: Desktop verbessern, Handy-Ansicht bleibt unangetastet */
+@media (min-width:1121px){
+  .actionToolbarGrid{
+    gap:9px !important;
+    align-items:stretch !important;
+  }
+  .actionToolbarGrid #btnPDF,
+  .actionToolbarGrid .googleInlineBtn,
+  .actionToolbarGrid #btnCreditors{
+    min-height:44px !important;
+    border-radius:15px !important;
+    font-weight:900 !important;
+  }
+  .actionToolbarGrid #btnPDF{
+    background:linear-gradient(135deg,rgba(180,196,255,.18),rgba(93,189,255,.10)) !important;
+    border-color:rgba(160,190,255,.22) !important;
+    color:#eef4ff !important;
+  }
+  .actionToolbarGrid #btnCreditors{
+    background:linear-gradient(135deg,rgba(89,246,167,.16),rgba(79,140,255,.13)) !important;
+    border-color:rgba(89,246,167,.24) !important;
+    color:#eafff4 !important;
+  }
+  .autoBackupChipV53{
+    display:inline-flex;
+    align-items:center;
+    min-height:34px;
+    margin:8px 8px 0 0;
+    padding:0 12px;
+    border-radius:999px;
+    background:rgba(89,246,167,.08);
+    border:1px solid rgba(89,246,167,.14);
+    color:#bfffd9;
+    font-size:12px;
+    font-weight:800;
+  }
+  .desktopAkteQuickActionsV53{
+    display:grid;
+    grid-template-columns:repeat(5,minmax(0,1fr));
+    gap:8px;
+    margin-top:12px;
+  }
+  .desktopAkteQuickActionsV53 button{
+    min-height:42px !important;
+    padding:0 8px !important;
+    border-radius:14px !important;
+    font-size:12px !important;
+    font-weight:900 !important;
+    background:linear-gradient(180deg,#13243b,#0e1b2e) !important;
+    border:1px solid rgba(255,255,255,.08) !important;
+    color:#e8f2ff !important;
+    box-shadow:none !important;
+  }
+  .desktopAkteQuickActionsV53 button:nth-child(1){background:linear-gradient(135deg,rgba(223,182,255,.28),rgba(195,201,255,.18))!important;color:#f7eeff!important;}
+  .desktopAkteQuickActionsV53 button:nth-child(2){background:linear-gradient(180deg,#1e3b61,#132846)!important;color:#eef5ff!important;}
+  .desktopAkteQuickActionsV53 button:nth-child(3){background:linear-gradient(135deg,rgba(183,184,255,.22),rgba(159,195,255,.16))!important;color:#eef4ff!important;}
+  .desktopAkteQuickActionsV53 button:nth-child(4){background:linear-gradient(135deg,rgba(255,210,70,.22),rgba(247,182,13,.14))!important;color:#ffe6a0!important;}
+  .desktopAkteQuickActionsV53 button:nth-child(5){background:linear-gradient(135deg,rgba(118,138,255,.20),rgba(92,201,255,.12))!important;color:#eef2ff!important;}
+  .desktopPanelFooter.desktopAkteFooterV30{
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:8px;
+  }
+  .desktopPanelFooter.desktopAkteFooterV30 button{
+    min-height:44px !important;
+    border-radius:14px !important;
+    font-size:12.5px !important;
+  }
+}
+@media (max-width:1120px){
+  .desktopAkteQuickActionsV53{display:none !important;}
 }
 </style>
 </body>

@@ -1,4 +1,4 @@
-const VERSION = 'dark-v52-google-buttons-neben-pdf';
+const VERSION = 'dark-v53-desktop-akte-backup-polish';
 const CACHE_STATIC = `schulden-manager-static-${VERSION}`;
 const CACHE_RUNTIME = `schulden-manager-runtime-${VERSION}`;
 const APP_SHELL = [
