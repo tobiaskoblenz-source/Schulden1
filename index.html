@@ -8636,5 +8636,113 @@ Aktenzeichen: AZ-123',onTextareaConfirm:function(text){ applyPasted(text||''); }
 })();
 </script>
 
+
+<style id="v71-paste-fix-style">
+/* v71: Daten-einfügen Button repariert */
+#v71PasteOverlay{position:fixed;inset:0;background:rgba(2,8,16,.66);backdrop-filter:blur(10px);z-index:13000;display:none;align-items:center;justify-content:center;padding:18px;}
+#v71PasteOverlay.show{display:flex;}
+#v71PasteBox{width:min(620px,96vw);border-radius:22px;background:linear-gradient(180deg,rgba(11,20,34,.98),rgba(8,16,29,.98));border:1px solid rgba(255,255,255,.10);box-shadow:0 28px 70px rgba(0,0,0,.42);padding:18px;}
+#v71PasteBox h3{margin:0 0 8px;color:#fff;font-size:22px;}
+#v71PasteBox p{margin:0 0 14px;color:#9fb0cc;line-height:1.45;font-size:13px;}
+#v71PasteText{width:100%;min-height:240px;border-radius:16px;background:#0f1c2f;border:1px solid rgba(255,255,255,.10);color:#eaf2ff;padding:12px;font-size:14px;line-height:1.45;resize:vertical;box-sizing:border-box;}
+.v71PasteActions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;}
+.v71PasteActions button{min-height:44px;border-radius:14px;border:1px solid rgba(255,255,255,.09);font-weight:800;cursor:pointer;}
+#v71PasteCancel{background:#12233a;color:#eaf2ff;}
+#v71PasteApply{background:linear-gradient(135deg,#1d56df,#377eff);color:#fff;}
+@media (max-width:1120px){#v71PasteOverlay{display:none!important;}}
+</style>
+<script id="v71-paste-fix-js">
+(function(){
+  const APP_VERSION='v71';
+  function $(id){return document.getElementById(id);}
+  function toast(msg){try{ if(typeof showToast==='function') showToast(msg); else alert(msg); }catch(e){ alert(msg); }}
+  function setVersion(){
+    try{document.querySelectorAll('.v59MenuVersion,.v67CurrentVersion,#v67CurrentVersion,#v68CurrentVersion,#v69CurrentVersion,#v70OnlyVersion,#v71OnlyVersion').forEach(el=>el.remove());}catch(e){}
+    const bottom=document.querySelector('.sidebarBottom');
+    if(bottom && !document.getElementById('v71OnlyVersion')){
+      const div=document.createElement('div');
+      div.id='v71OnlyVersion';
+      div.className='v70OnlyVersion';
+      div.textContent=APP_VERSION;
+      bottom.appendChild(div);
+    }
+  }
+  function ensureOverlay(){
+    if($('v71PasteOverlay')) return;
+    const o=document.createElement('div');
+    o.id='v71PasteOverlay';
+    o.innerHTML='<div id="v71PasteBox"><h3>Daten einfügen</h3><p>Füge hier Daten aus einem Brief oder einer Rechnung ein. Die App übernimmt erkannte Felder automatisch.</p><textarea id="v71PasteText" placeholder="Name/Gläubiger: Stadtwerke\nGrund: Stromnachzahlung\nBetrag: 125,90\nFällig am: 30.06.2026\nAktenzeichen: AZ-123\nTelefon: 0151 123456\nE-Mail: kontakt@firma.de\nAnschrift: Musterstraße 1, 12345 Ort\nNotiz: Brief erhalten"></textarea><div class="v71PasteActions"><button id="v71PasteCancel" type="button">Abbrechen</button><button id="v71PasteApply" type="button">Daten übernehmen</button></div></div>';
+    document.body.appendChild(o);
+    $('v71PasteCancel').addEventListener('click', closePaste);
+    $('v71PasteApply').addEventListener('click', function(){ applyText($('v71PasteText').value||''); });
+    o.addEventListener('click', function(e){ if(e.target===o) closePaste(); });
+  }
+  function openPaste(){ ensureOverlay(); const o=$('v71PasteOverlay'); const t=$('v71PasteText'); if(o) o.classList.add('show'); if(t){ t.value=''; setTimeout(()=>t.focus(),50); } }
+  function closePaste(){ const o=$('v71PasteOverlay'); if(o) o.classList.remove('show'); }
+  function setVal(id,val){ const el=$(id); if(el && val!=null && String(val).trim()!=='') el.value=val; }
+  function parseAmount(text){
+    const cleaned=String(text||'').replace(/[^\d,.-]/g,'').replace(/\.(?=\d{3}(\D|$))/g,'').replace(',','.');
+    const n=parseFloat(cleaned); return Number.isFinite(n)?n:'';
+  }
+  function parseDate(text){
+    const t=String(text||'').trim();
+    if(!t) return '';
+    if(/^\d{4}-\d{2}-\d{2}$/.test(t)) return t;
+    const m=t.match(/^(\d{1,2})[.\/-](\d{1,2})[.\/-](\d{2,4})$/);
+    if(m){ const y=m[3].length===2?'20'+m[3]:m[3]; return y+'-'+m[2].padStart(2,'0')+'-'+m[1].padStart(2,'0'); }
+    const d=new Date(t); return isNaN(d)?'':d.toISOString().slice(0,10);
+  }
+  function getLineMap(text){
+    const map={};
+    String(text||'').split(/\r?\n/).map(s=>s.trim()).filter(Boolean).forEach(line=>{
+      const m=line.match(/^([^:]+):\s*(.+)$/);
+      if(m) map[m[1].trim().toLowerCase()]=m[2].trim();
+    });
+    return map;
+  }
+  function pick(map){
+    for(let i=1;i<arguments.length;i++){
+      const v=map[String(arguments[i]).toLowerCase()];
+      if(v!=null && String(v).trim()!=='') return v;
+    }
+    return '';
+  }
+  function applyText(text){
+    const map=getLineMap(text);
+    setVal('m_name', pick(map,'name/gläubiger','name / gläubiger','name','gläubiger','glaeubiger'));
+    setVal('m_grund', pick(map,'grund','zweck','betreff'));
+    const amount=parseAmount(pick(map,'betrag','summe','restbetrag','forderung'));
+    if(amount!=='') setVal('m_betrag', amount);
+    const date=parseDate(pick(map,'fällig am','faellig am','fällig','faellig','datum','frist'));
+    if(date) setVal('m_datum', date);
+    setVal('m_aktenzeichen', pick(map,'aktenzeichen','az','aktenzeichen / kundennummer','kundennummer'));
+    setVal('m_contactRepresentative', pick(map,'ansprechpartner','name / vertreter','vertreter','kontakt'));
+    setVal('m_contactPhone', pick(map,'telefon','telefonnummer','phone','tel'));
+    setVal('m_contactEmail', pick(map,'e-mail','email','mail'));
+    setVal('m_contactAddress', pick(map,'anschrift','adresse','address'));
+    setVal('m_firstNote', pick(map,'notiz','notizen','bemerkung'));
+    const fields=$('newDebtContactFields'); if(fields) fields.hidden=false;
+    const toggle=$('toggleContactFields'); if(toggle) toggle.setAttribute('aria-expanded','true');
+    closePaste();
+    toast('Daten eingefügt ✅');
+  }
+  function bindPasteButton(){
+    const btn=$('m_paste');
+    if(!btn) return;
+    if(btn.dataset.v71Bound==='1') return;
+    btn.dataset.v71Bound='1';
+    btn.addEventListener('click', function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+      openPaste();
+    }, true);
+  }
+  function init(){ setVersion(); ensureOverlay(); bindPasteButton(); }
+  document.addEventListener('DOMContentLoaded', function(){ init(); setTimeout(init,300); setTimeout(init,1200); });
+  setInterval(init,1500);
+})();
+</script>
+
 </body>
 </html>
