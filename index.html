@@ -2817,7 +2817,7 @@ body.force-mobile-view .dashboardShell{
             <button id="viewDesktopVisible" class="secondary" type="button">🖥 Desktop</button>
             <button id="viewMobileVisible" class="secondary" type="button">📱 Handy</button>
           </div>
-          <button id="btnOpenAdd" type="button">＋ Neue Schuldenen</button>
+          <button id="btnOpenAdd" type="button">＋ Neue Schulden</button>
           <button id="btnInstall" class="secondary" type="button">📲 App installieren</button>
         </div>
       </div>
@@ -2951,7 +2951,7 @@ body.force-mobile-view .dashboardShell{
             </section>
 
             <section class="desktopPanelSection desktopMiniInfoCard">
-              <div class="drawerSectionHead"><span>2</span><strong>Aktenzeichen</strong></div><div class="drawerMutedText">Dieses Feld ist mit dem Aktenzeichen aus „+ Neue Schuldenen“ verbunden.</div>
+              <div class="drawerSectionHead"><span>2</span><strong>Aktenzeichen</strong></div><div class="drawerMutedText">Dieses Feld ist mit dem Aktenzeichen aus „+ Neue Schulden“ verbunden.</div>
               <div class="desktopInfoRows">
                 <div class="desktopInfoRow"><span>Aktenzeichen</span><strong id="sideCaseValue">–</strong></div>
                 <div class="desktopInfoRow"><span>Referenznummer</span><strong id="sideReferenceValue">–</strong></div>
@@ -3003,7 +3003,7 @@ body.force-mobile-view .dashboardShell{
   <div class="modalBox newDebtModal">
     <div class="modalHeaderRow">
       <div>
-        <h3>Neue Schuldenen anlegen</h3>
+        <h3>Neue Schulden anlegen</h3>
       </div>
       <button id="m_close" class="secondary modalCloseBtn" type="button" aria-label="Schließen">✕</button>
     </div>
@@ -7734,7 +7734,7 @@ if ('serviceWorker' in navigator) {
     nav.classList.add('v59CalmMenu');
     nav.innerHTML = `
       <button class="sideNavBtn active" type="button" data-v59="overview"><span class="navIco">⌂</span><span>Übersicht</span></button>
-      <button class="sideNavBtn" type="button" data-v59="new"><span class="navIco">＋</span><span>Neue Schuldenen</span></button>
+      <button class="sideNavBtn" type="button" data-v59="new"><span class="navIco">＋</span><span>Neue Schulden</span></button>
       <div class="v59EditGroup open" id="v59EditGroup">
         <button class="sideNavBtn v59EditParent" type="button" data-v59="edit"><span class="navIco">✎</span><span>Bearbeiten</span><span class="v59Chevron">⌄</span></button>
         <div class="v59SubMenu">
@@ -8393,13 +8393,9 @@ body.force-mobile-view #fabAdd{display:flex !important;}
 </style>
 <script id="v77-akte-polish-js">
 (function(){
-  const APP_VERSION='v77';
+  const APP_VERSION='v78';
   function $(id){return document.getElementById(id);}
-  function setVersion(){
-    try{document.querySelectorAll('#v76OnlyVersion,.v59MenuVersion,.v67CurrentVersion,.v70OnlyVersion,[id$="CurrentVersion"],[id$="OnlyVersion"]').forEach(el=>{if(el.id!=='v77OnlyVersion') el.remove();});}catch(e){}
-    const bottom=document.querySelector('.sidebarBottom');
-    if(bottom){let box=$('v77OnlyVersion'); if(!box){box=document.createElement('div');box.id='v77OnlyVersion';bottom.appendChild(box);} box.textContent=APP_VERSION;}
-  }
+  function setVersion(){ /* v78: alte Versions-Scripte neutralisiert */ }
   function normalizeText(){
     const title=document.querySelector('.desktopAkteTitleBlock h3'); if(title) title.textContent='Schulden-Akte';
     const subtitle=document.querySelector('.desktopAkteTitleBlock p'); if(subtitle) subtitle.innerHTML='Digitale Akte mit Übersicht, Daten, Notizen und Gläubiger.';
@@ -8408,8 +8404,8 @@ body.force-mobile-view #fabAdd{display:flex !important;}
       if(el.children.length) return;
       const t=el.textContent;
       if(!t) return;
-      if(t.includes('Schuld-Akte') || t.includes('Schuld in den Papierkorb') || t.includes('Neue Schuld')){
-        el.textContent=t.replaceAll('Schuld-Akte','Schulden-Akte').replaceAll('Schuld in den Papierkorb','Schulden in den Papierkorb').replaceAll('Neue Schuld','Neue Schulden');
+      if(t.includes('Schuld-Akte') || t.includes('Schuld in den Papierkorb')){
+        el.textContent=t.replaceAll('Schuld-Akte','Schulden-Akte').replaceAll('Schuld in den Papierkorb','Schulden in den Papierkorb');
       }
     });
     document.querySelectorAll('#akteTabsV54 button').forEach(btn=>{
@@ -8438,6 +8434,50 @@ body.force-mobile-view #fabAdd{display:flex !important;}
   function run(){ setVersion(); normalizeText(); ensureMiniRow(); ensureAkteTab(); }
   document.addEventListener('DOMContentLoaded',function(){run(); setTimeout(run,300); setTimeout(run,1200);});
   setInterval(run,1600);
+})();
+</script>
+
+
+<style id="v78-menu-stability-style">
+/* v78: Menü stabilisieren, Versionsanzeigen vereinheitlichen */
+@media (min-width:1121px){
+  .v59MenuVersion,.v67CurrentVersion,.v70OnlyVersion,[id$="OnlyVersion"],[id$="CurrentVersion"]{display:none!important;visibility:hidden!important;height:0!important;min-height:0!important;margin:0!important;padding:0!important;overflow:hidden!important;}
+  #stableVersionV78{display:block!important;visibility:visible!important;height:auto!important;margin:10px 8px 0!important;padding:6px 0 0!important;text-align:center!important;color:#eaf2ff!important;font-size:12px!important;font-weight:900!important;letter-spacing:.05em;}
+  .sidebarNav.v59CalmMenu{gap:8px!important;}
+  .sideNavBtn{min-height:54px!important;max-height:54px!important;padding:0 15px!important;border-radius:17px!important;font-size:15px!important;line-height:1!important;}
+  .sideNavBtn span:not(.navIco):not(.v59Chevron){white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;}
+  .sideNavBtn .navIco{width:24px!important;height:24px!important;flex:0 0 24px!important;font-size:12px!important;}
+  .v59EditGroup{padding:4px!important;border-radius:19px!important;}
+  .sideNavBtn.v59EditParent{min-height:50px!important;max-height:50px!important;}
+  .v59SubMenu{gap:5px!important;margin:2px 0 2px 12px!important;padding-left:12px!important;}
+  .v59SubBtn{min-height:36px!important;max-height:36px!important;padding:0 10px!important;font-size:13px!important;}
+  .v59MenuSep{margin:12px 10px!important;}
+}
+@media (max-width:1120px){#stableVersionV78{display:none!important;}}
+</style>
+<script id="v78-menu-stability-js">
+(function(){
+  const VERSION='v78';
+  function setText(el,txt){ if(el && el.textContent!==txt) el.textContent=txt; }
+  function cleanup(){
+    document.querySelectorAll('.v59MenuVersion,.v67CurrentVersion,.v70OnlyVersion,[id$="OnlyVersion"],[id$="CurrentVersion"]').forEach(el=>{ if(el.id!=='stableVersionV78') el.style.display='none'; });
+    const bottom=document.querySelector('.sidebarBottom');
+    if(bottom){
+      let box=document.getElementById('stableVersionV78');
+      if(!box){ box=document.createElement('div'); box.id='stableVersionV78'; bottom.appendChild(box); }
+      box.textContent=VERSION;
+    }
+    document.querySelectorAll('[data-v59="new"] span:not(.navIco)').forEach(el=>setText(el,'Neue Schulden'));
+    const topBtn=document.getElementById('btnOpenAdd'); if(topBtn) setText(topBtn,'＋ Neue Schulden');
+    const title=document.querySelector('#addModal h3'); if(title && /Neue Schulden/.test(title.textContent)) setText(title,'Neue Schulden anlegen');
+    document.querySelectorAll('*').forEach(el=>{
+      if(el.children.length) return;
+      const t=el.textContent||'';
+      if(t.includes('Schuldenen')) el.textContent=t.replaceAll('Schuldenen','Schulden');
+    });
+  }
+  document.addEventListener('DOMContentLoaded',()=>{cleanup(); setTimeout(cleanup,200); setTimeout(cleanup,1000);});
+  setInterval(cleanup,900);
 })();
 </script>
 
