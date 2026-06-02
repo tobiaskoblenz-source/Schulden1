@@ -3004,16 +3004,17 @@ body.force-mobile-view .dashboardShell{
     <div class="modalHeaderRow">
       <div>
         <span class="modalKicker">Neuer Eintrag</span>
-        <h3>Neue Schulden</h3>
+        <h3>Neue Schulden anlegen</h3>
+        <p class="v64AddLead">Erfasse alle wichtigen Informationen in einer ruhigen, kompakten Maske.</p>
       </div>
       <button id="m_close" class="secondary modalCloseBtn" type="button" aria-label="Schließen">✕</button>
     </div>
 
     <div class="newDebtSteps">
       <section class="newDebtStep">
-        <div class="stepHead"><span>1</span><strong>Schuldner</strong></div>
-        <label class="fieldLabel" for="m_name">Name / Person *</label>
-        <input id="m_name" placeholder="z. B. Thomas Hauptmann" autocomplete="name">
+        <div class="stepHead"><span>1</span><strong>Schuldner / Gläubiger</strong></div>
+        <label class="fieldLabel" for="m_name">Name / Gläubiger *</label>
+        <input id="m_name" placeholder="z. B. Stadtwerke Müller" autocomplete="name">
       </section>
 
       <section class="newDebtStep">
@@ -3083,7 +3084,7 @@ body.force-mobile-view .dashboardShell{
 
     <div class="modalActions newDebtFooter" style="margin-top:16px;">
       <button id="m_cancel" class="secondary" type="button">Abbrechen</button>
-      <button id="m_add_more" class="secondary" type="button">Speichern & weitere</button>
+      <button id="m_paste" class="secondary" type="button">📋 Daten einfügen</button>
       <button id="m_add" type="button">Schulden speichern</button>
     </div>
   </div>
@@ -7952,6 +7953,126 @@ if ('serviceWorker' in navigator) {
   setInterval(patchAll,1200);
   const obs=new MutationObserver(()=>patchAll());
   window.addEventListener('load',()=>{ const tbody=document.getElementById('tbody'); if(tbody) obs.observe(tbody,{childList:true,subtree:true}); });
+})();
+</script>
+
+
+<style id="v64-new-debt-modal-style">
+/* v64: schönere, kompakte Neue-Schulden-Maske */
+.newDebtModal{width:min(720px,92vw) !important; border-radius:26px !important; overflow:hidden;}
+.newDebtModal .modalHeaderRow{align-items:flex-start; padding-bottom:14px; border-bottom:1px solid rgba(255,255,255,.06);}
+.newDebtModal .modalHeaderRow h3{margin:0; color:#fff; font-size:22px; line-height:1.15;}
+.newDebtModal .v64AddLead{margin:8px 0 0; color:#97abca; font-size:13px; line-height:1.45;}
+.newDebtModal .newDebtSteps{display:grid; gap:12px; margin-top:14px;}
+.newDebtModal .newDebtStep{padding:14px 16px !important; border-radius:18px !important; background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.025)) !important; border:1px solid rgba(255,255,255,.08) !important;}
+.newDebtModal .stepHead, .newDebtModal .stepToggle{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px; color:#fff;}
+.newDebtModal .stepHead span, .newDebtModal .stepToggle b{width:24px; height:24px; border-radius:9px; display:inline-flex; align-items:center; justify-content:center; background:linear-gradient(135deg,#2a67ff,#5a8dff); color:#fff; font-size:12px; font-weight:900; margin-right:8px;}
+.newDebtModal .stepHead strong, .newDebtModal .stepToggle span{font-size:14px !important; font-weight:800 !important; letter-spacing:0 !important; color:#fff;}
+.newDebtModal .stepHead em, .newDebtModal .stepToggle em{font-style:normal; color:#9fb0cc; font-size:12px;}
+.newDebtModal .fieldLabel{font-size:12px !important; letter-spacing:0 !important; margin-bottom:6px !important; color:#dbe7ff !important; text-transform:none !important;}
+.newDebtModal input, .newDebtModal textarea, .newDebtModal select{min-height:42px !important; border-radius:14px !important; font-size:14px !important;}
+.newDebtModal textarea.noteBox, .newDebtModal textarea.contactAddressBox{min-height:54px !important;}
+.newDebtModal .newDebtGrid{gap:12px !important;}
+.newDebtModal .statusPills{grid-template-columns:repeat(4,minmax(0,1fr)) !important; gap:10px !important;}
+.newDebtModal .statusPill{min-height:40px !important; border-radius:13px !important; font-size:13px !important;}
+.newDebtModal .stepToggle{padding:0 !important; background:transparent !important; border:0 !important; width:100%; text-align:left; cursor:default;}
+.newDebtModal .stepToggle[aria-expanded="true"] .v64Chevron{transform:rotate(180deg);}
+.newDebtModal .optionalFields[hidden]{display:block !important;}
+.newDebtModal .modalActions.newDebtFooter{display:grid !important; grid-template-columns:1fr 1fr 1.2fr !important; gap:10px !important; position:static !important; background:none !important; padding-top:8px !important; margin-top:12px !important;}
+.newDebtModal #m_cancel,.newDebtModal #m_paste{background:#12233a !important; border:1px solid rgba(255,255,255,.08) !important; color:#eaf2ff !important; box-shadow:none !important;}
+.newDebtModal #m_add{background:linear-gradient(135deg,#1d56df,#377eff)!important;}
+.newDebtModal #m_add_more{display:none !important;}
+.newDebtModal .v64HintText{margin-top:8px; color:#8fa4c2; font-size:12px;}
+.newDebtModal #m_creditor_wrap{display:none !important;}
+@media (max-width:768px){
+  .newDebtModal{width:min(96vw,96vw)!important;}
+  .newDebtModal .statusPills{grid-template-columns:1fr 1fr !important;}
+  .newDebtModal .modalActions.newDebtFooter{grid-template-columns:1fr !important;}
+}
+</style>
+<script id="v64-new-debt-modal-js">
+(function(){
+  function $(id){ return document.getElementById(id); }
+  function openPasteModal(){
+    if(typeof window.openActionModal !== 'function') return;
+    window.openActionModal({
+      title:'Daten einfügen',
+      body:'Füge hier Daten ein. Du kannst zum Beispiel diese Felder verwenden:
+
+Name/Gläubiger: ...
+Grund: ...
+Betrag: ...
+Fällig am: ...
+Aktenzeichen: ...
+Telefon: ...
+E-Mail: ...
+Anschrift: ...
+Notiz: ...',
+      textareaLabel:'Daten',
+      textareaPlaceholder:'Name/Gläubiger: Stadtwerke
+Grund: Stromnachzahlung
+Betrag: 125,90
+Fällig am: 30.06.2026
+Aktenzeichen: AZ-123',
+      onTextareaConfirm: function(text){ applyPastedData(text||''); }
+    });
+  }
+  function parseAmount(text){
+    const cleaned=String(text||'').replace(/[^\d,.-]/g,'').replace(/\.(?=\d{3}(\D|$))/g,'').replace(',','.');
+    const n=parseFloat(cleaned); return Number.isFinite(n)?n:'';
+  }
+  function parseDate(text){
+    const t=String(text||'').trim();
+    if(!t) return '';
+    if(/^\d{4}-\d{2}-\d{2}$/.test(t)) return t;
+    const m=t.match(/^(\d{1,2})[.\/-](\d{1,2})[.\/-](\d{2,4})$/);
+    if(m){ const y=m[3].length===2 ? '20'+m[3] : m[3]; return y+'-'+m[2].padStart(2,'0')+'-'+m[1].padStart(2,'0'); }
+    const d=new Date(t); if(!isNaN(d)){ return d.toISOString().slice(0,10); }
+    return '';
+  }
+  function setVal(id,val){ const el=$(id); if(el && val!=null && val!=='') el.value=val; }
+  function ensureContactOpen(){
+    const fields=$('newDebtContactFields'); const toggle=$('toggleContactFields');
+    if(fields){ fields.hidden=false; }
+    if(toggle){ toggle.setAttribute('aria-expanded','true'); }
+  }
+  function applyPastedData(text){
+    const map={};
+    const lines=String(text||'').split(/?
+/).map(x=>x.trim()).filter(Boolean);
+    lines.forEach(line=>{
+      const parts=line.split(/:(.+)/); if(parts.length<3) return;
+      const key=parts[0].trim().toLowerCase(); const value=parts[1].trim(); map[key]=value;
+    });
+    const get=(...keys)=>{ for(const k of keys){ if(map[k.toLowerCase()]!=null) return map[k.toLowerCase()]; } return ''; };
+    setVal('m_name', get('name/gläubiger','name / gläubiger','name','gläubiger'));
+    setVal('m_grund', get('grund','zweck'));
+    const amount=parseAmount(get('betrag','summe','restbetrag')); if(amount!=='') setVal('m_betrag', amount);
+    const date=parseDate(get('fällig am','faellig am','fällig','datum')); if(date) setVal('m_datum', date);
+    setVal('m_aktenzeichen', get('aktenzeichen','az'));
+    setVal('m_contactRepresentative', get('ansprechpartner','name / vertreter','vertreter'));
+    setVal('m_contactPhone', get('telefon','telefonnummer','phone'));
+    setVal('m_contactEmail', get('e-mail','email','mail'));
+    setVal('m_contactAddress', get('anschrift','adresse'));
+    setVal('m_firstNote', get('notiz','notizen'));
+    ensureContactOpen();
+    try{ if(typeof showToast==='function') showToast('Daten eingefügt ✅'); }catch(e){}
+    if(typeof window.closeActionModal==='function') window.closeActionModal();
+  }
+  function patchModal(){
+    const t=$('toggleContactFields');
+    if(t && !t.querySelector('.v64Chevron')){ const em=t.querySelector('em'); const c=document.createElement('span'); c.className='v64Chevron'; c.textContent='⌄'; c.style.marginLeft='auto'; c.style.opacity='.7'; t.appendChild(c); }
+    ensureContactOpen();
+    const wrap=$('m_creditor_wrap'); if(wrap) wrap.style.display='none';
+    if($('m_paste') && !$('m_paste').dataset.v64Bound){ $('m_paste').dataset.v64Bound='1'; $('m_paste').addEventListener('click', openPasteModal); }
+    if(t && !t.dataset.v64Bound){ t.dataset.v64Bound='1'; t.addEventListener('click', function(e){ e.preventDefault(); ensureContactOpen(); }); }
+  }
+  const oldOpen=window.openAddModal;
+  window.openAddModal=function(){ if(typeof oldOpen==='function') oldOpen(); setTimeout(patchModal,60); };
+  const oldClose=window.closeAddModal;
+  window.closeAddModal=function(){ if(typeof oldClose==='function') oldClose(); };
+  document.addEventListener('DOMContentLoaded', function(){ patchModal(); setTimeout(patchModal,300); setTimeout(patchModal,1200); });
+  setInterval(function(){ const m=$('addModal'); if(m && m.style.display==='flex') patchModal(); }, 1500);
 })();
 </script>
 
