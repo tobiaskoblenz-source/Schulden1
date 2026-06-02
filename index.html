@@ -8552,5 +8552,89 @@ Aktenzeichen: AZ-123',onTextareaConfirm:function(text){ applyPasted(text||''); }
 })();
 </script>
 
+
+<style id="v70-left-menu-cleanup-style">
+/* v70: nur eine Versionsnummer, linkes Menü wieder etwas kleiner/ruhiger. Handy bleibt unverändert. */
+@media (min-width:1121px){
+  :root{ --sidebar-w: clamp(208px, 15vw, 234px) !important; }
+  .sidebar{padding:24px 14px 18px !important;}
+  .sidebarNav.v59CalmMenu{gap:9px !important;}
+  .sideNavBtn{
+    min-height:56px !important;
+    padding:0 16px !important;
+    border-radius:18px !important;
+    gap:12px !important;
+    font-size:15px !important;
+    font-weight:800 !important;
+  }
+  .sideNavBtn .navIco{
+    width:24px !important; height:24px !important;
+    flex:0 0 24px !important;
+    border-radius:9px !important;
+    font-size:12px !important;
+  }
+  .sideNavBtn.v59EditParent{min-height:52px !important;}
+  .v59EditGroup{
+    padding:4px !important;
+    border-radius:20px !important;
+  }
+  .v59SubMenu{
+    margin:2px 0 2px 12px !important;
+    padding:2px 0 2px 12px !important;
+    gap:6px !important;
+  }
+  .v59SubBtn{
+    min-height:38px !important;
+    padding:0 10px !important;
+    border-radius:13px !important;
+    font-size:13px !important;
+    font-weight:750 !important;
+    gap:8px !important;
+  }
+  .v59SubBtn span:first-child{font-size:12px !important;}
+  .v59MenuSep{margin:14px 10px !important;}
+  .v59ModeLine{
+    margin:10px 8px 0 !important;
+    padding:12px 12px !important;
+    border-radius:16px !important;
+    font-size:13px !important;
+  }
+  .v59MenuVersion,
+  .v67CurrentVersion,
+  #v67CurrentVersion,
+  #v68CurrentVersion,
+  #v69CurrentVersion{display:none !important;}
+  .v70OnlyVersion{
+    display:block !important;
+    margin:10px 8px 0 !important;
+    padding:6px 0 0 !important;
+    text-align:center !important;
+    color:#eaf2ff !important;
+    font-size:12px !important;
+    font-weight:900 !important;
+    letter-spacing:.05em;
+  }
+}
+@media (max-width:1120px){.v70OnlyVersion{display:none !important;}}
+</style>
+<script id="v70-left-menu-cleanup-js">
+(function(){
+  const APP_VERSION='v70';
+  function cleanVersions(){
+    try{ document.querySelectorAll('.v59MenuVersion').forEach(el=>el.remove()); }catch(e){}
+    try{ document.querySelectorAll('.v67CurrentVersion').forEach(el=>el.remove()); }catch(e){}
+    ['v67CurrentVersion','v68CurrentVersion','v69CurrentVersion'].forEach(id=>{ const el=document.getElementById(id); if(el) el.remove(); });
+    const bottom=document.querySelector('.sidebarBottom');
+    if(bottom){
+      let box=document.getElementById('v70OnlyVersion');
+      if(!box){ box=document.createElement('div'); box.id='v70OnlyVersion'; box.className='v70OnlyVersion'; bottom.appendChild(box); }
+      box.textContent=APP_VERSION;
+    }
+  }
+  document.addEventListener('DOMContentLoaded', function(){ cleanVersions(); setTimeout(cleanVersions,300); setTimeout(cleanVersions,1200); });
+  setInterval(cleanVersions,1500);
+})();
+</script>
+
 </body>
 </html>
