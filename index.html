@@ -8186,7 +8186,8 @@ Grund: Stromnachzahlung
 Betrag: 125,90
 Fällig am: 30.06.2026
 Aktenzeichen: AZ-123',onTextareaConfirm:function(text){ applyPasted(text||''); }}); }
-  function applyPasted(text){ const map={}; String(text||'').split(/?
+  function applyPasted(text){ const map={}; String(text||'').split(/
+?
 /).map(x=>x.trim()).filter(Boolean).forEach(line=>{ const m=line.match(/^([^:]+):\s*(.+)$/); if(m) map[m[1].trim().toLowerCase()]=m[2].trim(); }); const get=(...ks)=>{ for(const k of ks){ const v=map[k.toLowerCase()]; if(v!=null) return v; } return ''; }; setVal('m_name', get('name/gläubiger','name / gläubiger','name','gläubiger')); setVal('m_grund', get('grund')); const a=parseAmount(get('betrag','summe','restbetrag')); if(Number.isFinite(a)) setVal('m_betrag', a); const d=parseDate(get('fällig am','faellig am','fällig','datum')); if(d) setVal('m_datum', d); setVal('m_aktenzeichen', get('aktenzeichen','az')); setVal('m_contactRepresentative', get('ansprechpartner','name / vertreter','vertreter')); setVal('m_contactPhone', get('telefon','telefonnummer','phone')); setVal('m_contactEmail', get('e-mail','email','mail')); setVal('m_contactAddress', get('anschrift','adresse')); setVal('m_firstNote', get('notiz','notizen')); try{ if(typeof window.closeActionModal==='function') window.closeActionModal(); }catch(e){} toast('Daten eingefügt ✅'); }
   function bindButtons(){
     const add=$('m_add'), cancel=$('m_cancel'), paste=$('m_paste');
@@ -8198,6 +8199,136 @@ Aktenzeichen: AZ-123',onTextareaConfirm:function(text){ applyPasted(text||''); }
   function init(){ fillCats(); bindButtons(); const wrap=$('m_creditor_wrap'); if(wrap) wrap.style.display='none'; const fields=$('newDebtContactFields'); if(fields) fields.hidden=false; const toggle=$('toggleContactFields'); if(toggle) toggle.setAttribute('aria-expanded','true'); }
   document.addEventListener('DOMContentLoaded', function(){ setTimeout(init,200); setTimeout(init,900); });
   setInterval(init,1500);
+})();
+</script>
+
+
+<style id="v66-sidebar-relax-style">
+/* v66: linkes Menü luftiger und schöner, Handy bleibt unverändert */
+@media (min-width:1121px){
+  :root{ --sidebar-w: clamp(220px, 16vw, 252px) !important; }
+  .sidebar{
+    padding:26px 16px 22px !important;
+    background:
+      radial-gradient(circle at 18% 12%, rgba(52,125,255,.14), transparent 24%),
+      linear-gradient(180deg,#06101b 0%, #081320 46%, #050d17 100%) !important;
+  }
+  .brandCard.brandCardLogoOnly{padding:8px 10px 22px !important;}
+  .sidebarNav.v59CalmMenu{gap:11px !important;}
+  .sideNavBtn{
+    min-height:64px !important;
+    padding:0 18px !important;
+    border-radius:20px !important;
+    gap:14px !important;
+    font-size:17px !important;
+    font-weight:800 !important;
+    letter-spacing:-.01em;
+  }
+  .sideNavBtn .navIco{
+    width:28px; height:28px;
+    border-radius:10px;
+    display:inline-flex; align-items:center; justify-content:center;
+    background:rgba(255,255,255,.05);
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.04);
+    flex:0 0 28px;
+    font-size:14px;
+  }
+  .sideNavBtn > span:last-child{line-height:1.18 !important; white-space:normal;}
+  .sideNavBtn.active,.sideNavBtn:hover{
+    background:linear-gradient(180deg, rgba(28,63,108,.98), rgba(16,40,74,.96)) !important;
+    border-color:rgba(92,145,255,.24) !important;
+    box-shadow:0 10px 24px rgba(0,0,0,.20), inset 0 1px 0 rgba(255,255,255,.05) !important;
+  }
+  .sideNavBtn.v59EditParent{min-height:56px !important;}
+  .v59Chevron{font-size:14px !important; opacity:.76 !important;}
+  .v59EditGroup{
+    padding:4px !important;
+    border-radius:22px !important;
+    background:linear-gradient(180deg, rgba(16,34,60,.22), rgba(10,22,39,.06)) !important;
+    border:1px solid rgba(255,255,255,.05);
+  }
+  .v59EditGroup > .sideNavBtn{margin-bottom:8px !important;}
+  .v59SubMenu{
+    margin:2px 0 4px 14px !important;
+    padding:2px 0 2px 14px !important;
+    gap:8px !important;
+    border-left:1px solid rgba(255,255,255,.08) !important;
+  }
+  .v59SubBtn{
+    min-height:42px !important;
+    padding:0 12px !important;
+    border-radius:14px !important;
+    background:linear-gradient(180deg, rgba(8,18,31,.82), rgba(10,20,36,.55)) !important;
+    border:1px solid rgba(255,255,255,.04) !important;
+    color:rgba(230,239,255,.82) !important;
+    font-size:14px !important;
+    font-weight:750 !important;
+    gap:10px !important;
+  }
+  .v59SubBtn:hover{background:linear-gradient(180deg, rgba(18,36,62,.94), rgba(12,25,44,.86)) !important; color:#fff !important;}
+  .v59SubBtn span:first-child{font-size:13px !important; opacity:.9 !important;}
+  .v59MenuSep{margin:18px 12px !important; background:rgba(255,255,255,.07) !important;}
+  .v59MenuVersion{margin-top:16px !important; font-size:12px !important; opacity:.62;}
+  .sidebarBottom{padding-top:8px !important;}
+  .v59ModeLine{
+    margin:14px 8px 0 !important;
+    padding:14px 14px !important;
+    border-radius:18px !important;
+    background:rgba(255,255,255,.03);
+    border:1px solid rgba(255,255,255,.05);
+    font-size:14px !important;
+  }
+}
+</style>
+<script id="v66-sidebar-relax-js">
+(function(){
+  function apply(){
+    try{ document.querySelectorAll('.v59MenuVersion').forEach(el=>el.textContent='v66'); }catch(e){}
+  }
+  document.addEventListener('DOMContentLoaded', function(){ apply(); setTimeout(apply,250); setTimeout(apply,1200); });
+  setInterval(apply,1800);
+})();
+</script>
+
+
+<style id="v67-current-version-footer-style">
+/* v67: aktuelle Versionsnummer immer unten anzeigen */
+@media (min-width:1121px){
+  .v67CurrentVersion{
+    margin:14px 8px 0;
+    padding:10px 12px;
+    border-radius:16px;
+    background:rgba(79,140,255,.08);
+    border:1px solid rgba(79,140,255,.14);
+    color:#b9cced;
+    font-size:12px;
+    font-weight:850;
+    text-align:center;
+    letter-spacing:.02em;
+  }
+  .v67CurrentVersion b{color:#eaf2ff;}
+}
+@media (max-width:1120px){.v67CurrentVersion{display:none!important;}}
+</style>
+<script id="v67-current-version-footer-js">
+(function(){
+  const APP_VERSION='v67';
+  window.SCHULDEN_CURRENT_VERSION=APP_VERSION;
+  function applyVersion(){
+    try{ document.querySelectorAll('.v59MenuVersion').forEach(el=>el.textContent=APP_VERSION); }catch(e){}
+    const bottom=document.querySelector('.sidebarBottom');
+    if(bottom && !document.getElementById('v67CurrentVersion')){
+      const box=document.createElement('div');
+      box.id='v67CurrentVersion';
+      box.className='v67CurrentVersion';
+      box.innerHTML='Aktuelle Version: <b>'+APP_VERSION+'</b>';
+      bottom.appendChild(box);
+    }
+    const box=document.getElementById('v67CurrentVersion');
+    if(box) box.innerHTML='Aktuelle Version: <b>'+APP_VERSION+'</b>';
+  }
+  document.addEventListener('DOMContentLoaded', function(){ applyVersion(); setTimeout(applyVersion,300); setTimeout(applyVersion,1200); });
+  setInterval(applyVersion,2000);
 })();
 </script>
 
