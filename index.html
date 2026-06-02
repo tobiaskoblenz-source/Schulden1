@@ -8437,5 +8437,120 @@ Aktenzeichen: AZ-123',onTextareaConfirm:function(text){ applyPasted(text||''); }
 })();
 </script>
 
+
+<style id="v69-footer-and-akte-tab-style">
+/* v69: unten nur Versionsnummer, rechts nur schmaler Akte-Tab ohne Pfeil */
+@media (min-width:1121px){
+  .v67CurrentVersion,#v68CurrentVersion,#v69CurrentVersion{
+    margin:10px 8px 0 !important;
+    padding:8px 0 0 !important;
+    border-top:0 !important;
+    color:rgba(234,242,255,.72) !important;
+    font-size:12px !important;
+    font-weight:800 !important;
+    letter-spacing:.04em;
+    text-align:center !important;
+    background:none !important;
+  }
+  .v67CurrentVersion b,#v68CurrentVersion b,#v69CurrentVersion b{color:#eaf2ff !important; font-weight:900 !important;}
+
+  #v68AkteToggle{display:none !important;}
+  #desktopDetailPanel{overflow:visible !important;}
+  #v68AkteCollapsedTab{
+    display:flex !important;
+    position:absolute;
+    top:50%;
+    right:-18px;
+    transform:translateY(-50%);
+    width:36px;
+    height:170px;
+    min-height:170px;
+    z-index:12;
+  }
+  #v68AkteCollapsedTab .v68AktePill{
+    width:36px !important;
+    height:170px !important;
+    border-radius:16px !important;
+    background:linear-gradient(180deg, rgba(15,31,54,.98), rgba(8,18,31,.98)) !important;
+    border:1px solid rgba(255,255,255,.08) !important;
+    box-shadow:0 14px 30px rgba(0,0,0,.22);
+    gap:8px !important;
+  }
+  #v68AkteCollapsedTab .v68AkteArrow{display:none !important;}
+  #v68AkteCollapsedTab .v68AkteLabel{
+    writing-mode:vertical-rl !important;
+    transform:rotate(180deg) !important;
+    letter-spacing:.10em !important;
+    font-size:12px !important;
+    font-weight:900 !important;
+    text-transform:uppercase !important;
+    color:#dbe8ff !important;
+  }
+
+  body.v68AkteCollapsed .dashboardContentGrid{grid-template-columns:minmax(0,1fr) 36px !important;}
+  body.v68AkteCollapsed #desktopDetailPanel{
+    width:36px !important; min-width:36px !important; max-width:36px !important;
+    padding:0 !important; border-radius:16px !important; overflow:visible !important;
+  }
+  body.v68AkteCollapsed #desktopDetailPanel > *{display:none !important;}
+  body.v68AkteCollapsed #desktopDetailPanel #v68AkteCollapsedTab{
+    display:flex !important;
+    position:static !important;
+    transform:none !important;
+    width:36px !important;
+    height:100% !important;
+    min-height:460px !important;
+  }
+  body.v68AkteCollapsed #desktopDetailPanel #v68AkteCollapsedTab .v68AktePill{
+    width:36px !important;
+    height:100% !important;
+    min-height:460px !important;
+    border-radius:16px !important;
+  }
+}
+@media (max-width:1120px){
+  #v68AkteCollapsedTab{display:none !important;}
+}
+</style>
+<script id="v69-footer-and-akte-tab-js">
+(function(){
+  const APP_VERSION='v69';
+  const STATE_KEY='schulden_akte_collapsed_v68';
+  function $(id){ return document.getElementById(id); }
+  function setVersion(){
+    try{ document.querySelectorAll('.v59MenuVersion').forEach(el=>el.textContent=APP_VERSION); }catch(e){}
+    let box=$('v69CurrentVersion') || $('v68CurrentVersion') || $('v67CurrentVersion');
+    const bottom=document.querySelector('.sidebarBottom');
+    if(!box && bottom){
+      box=document.createElement('div');
+      box.className='v67CurrentVersion';
+      bottom.appendChild(box);
+    }
+    if(box){
+      box.id='v69CurrentVersion';
+      box.className='v67CurrentVersion';
+      box.innerHTML='<b>'+APP_VERSION+'</b>';
+    }
+  }
+  function setCollapsed(collapsed){
+    document.body.classList.toggle('v68AkteCollapsed', !!collapsed);
+    try{ localStorage.setItem(STATE_KEY, collapsed ? '1':'0'); }catch(e){}
+  }
+  function toggleCollapsed(){ setCollapsed(!document.body.classList.contains('v68AkteCollapsed')); }
+  function bindTab(){
+    const tab=$('v68AkteCollapsedTab');
+    if(!tab || tab.dataset.v69Bound==='1') return;
+    tab.dataset.v69Bound='1';
+    tab.addEventListener('click', function(e){
+      e.preventDefault(); e.stopPropagation();
+      toggleCollapsed();
+    }, true);
+  }
+  function init(){ setVersion(); bindTab(); }
+  document.addEventListener('DOMContentLoaded', function(){ init(); setTimeout(init,300); setTimeout(init,1200); });
+  setInterval(init,1800);
+})();
+</script>
+
 </body>
 </html>
