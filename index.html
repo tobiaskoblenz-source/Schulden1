@@ -7820,5 +7820,140 @@ if ('serviceWorker' in navigator) {
 })();
 </script>
 
+
+<style id="v63-preview-match-style">
+/* v63: Desktop stärker an die Vorschau angelehnt. Handy bleibt unverändert. */
+@media (min-width:1121px){
+  .actionToolbarCard, .v58KpiBoard, #installHint, #backupStatus, #syncStatus, .driveToolbarGrid, #driveStatus {display:none !important;}
+  .heroDashboard{padding:14px 18px 4px !important; min-height:auto !important; background:transparent !important; border:0 !important; box-shadow:none !important;}
+  .dashboardGreetingWrap .eyebrow{display:none !important;}
+  #greetingTitle{font-size:22px !important; margin:0 !important;}
+  #greetingText{font-size:13px !important; color:#9fb0cc !important; margin-top:6px !important;}
+  .heroTopActions{display:flex !important; align-items:center !important; justify-content:flex-end !important; min-width:220px !important;}
+  .heroTopActions > *{display:none !important;}
+  .heroTopActions .v63DateBadge{display:inline-flex !important; align-items:center; gap:8px; color:#d8e6ff; font-size:14px; font-weight:800; opacity:.92;}
+  .dashboardStats{margin-top:4px !important;}
+  .sectionTitle.boardHeader span{display:none !important;}
+  .boardHeader{margin-bottom:12px !important;}
+  .boardHeader h2{font-size:18px !important;}
+  .boardToolbar{display:grid !important; grid-template-columns:minmax(0,1fr) auto !important; gap:12px !important; align-items:center !important; margin-bottom:14px !important;}
+  #search{min-height:46px !important; border-radius:16px !important;}
+  #statusFilter{display:none !important;}
+  #v63FilterToggle{min-height:46px; padding:0 16px; border-radius:16px; border:1px solid rgba(255,255,255,.10); background:linear-gradient(180deg,rgba(22,38,61,.95),rgba(15,28,47,.95)); color:#e9f2ff; font-weight:800; cursor:pointer;}
+  .v58FilterPanel{display:none !important; margin-top:0 !important;}
+  .v58FilterPanel.v63Open{display:grid !important;}
+  #desktopTable table{width:100% !important; border-collapse:separate !important; border-spacing:0 !important; overflow:hidden;}
+  #desktopTable thead th{font-size:13px !important; text-transform:none !important; letter-spacing:0 !important; color:#99accb !important; padding:14px 16px !important; background:transparent !important;}
+  #desktopTable tbody tr.v58DesktopRow{outline:0 !important; border-top:1px solid rgba(255,255,255,.06) !important; box-shadow:none !important; background:rgba(255,255,255,.02) !important;}
+  #desktopTable tbody tr.v58DesktopRow:hover{transform:none !important; background:rgba(255,255,255,.035) !important;}
+  #desktopTable tbody tr.selectedRow{outline:0 !important; box-shadow:inset 3px 0 0 #4d8bff !important; background:rgba(255,255,255,.045) !important;}
+  #desktopTable tbody td{padding:14px 16px !important; vertical-align:middle !important; border-radius:0 !important;}
+  #desktopTable tbody td:first-child{width:20%;}
+  #desktopTable tbody td:last-child{text-align:right; width:56px;}
+  .v63NameStrong{color:#fff; font-weight:800; display:block;}
+  .v63CredSub{color:#9aacc7; font-size:12px; margin-top:4px; display:block;}
+  .v63Tag{display:inline-flex; align-items:center; padding:6px 10px; border-radius:10px; font-size:12px; font-weight:800; background:rgba(79,140,255,.14); color:#cfe0ff;}
+  .v63Amount{color:#fff; font-weight:800;}
+  .v63Status{display:inline-flex; align-items:center; padding:6px 10px; border-radius:999px; font-size:12px; font-weight:900;}
+  .v63Status.open{background:rgba(255,193,77,.14); color:#ffe2a3;}
+  .v63Status.paid{background:rgba(89,246,167,.14); color:#b8ffd8;}
+  .v63Status.overdue{background:rgba(255,112,112,.16); color:#ffc7c7;}
+  .v63Due{font-weight:800; color:#dbe7ff;}
+  .v63Due.overdue{color:#ff8b8b;}
+  .v63Dots{width:34px; height:34px; border-radius:12px; border:1px solid rgba(255,255,255,.08); background:rgba(255,255,255,.04); color:#e7f0ff; cursor:pointer; font-size:18px; line-height:1;}
+  .desktopAkteTopbar{padding-bottom:10px !important;}
+  .desktopAkteBadge{font-size:13px !important; border-radius:999px !important; padding:8px 14px !important;}
+  .desktopAkteTitleBlock{padding-bottom:10px !important;}
+  .desktopAkteTitleBlock h3{font-size:26px !important; margin:0 !important;}
+  .desktopAkteTitleBlock p{display:none !important;}
+  .desktopHeroName{font-size:20px !important;}
+  .desktopPanelSection{border-radius:20px !important;}
+  .desktopPanelBody .desktopPanelSection:nth-last-child(-n+3){display:none !important;}
+  .v58AktePlus{display:block !important;}
+}
+</style>
+<script id="v63-preview-match-js">
+(function(){
+  function formatDateLong(date){
+    try{return new Intl.DateTimeFormat('de-DE',{day:'2-digit',month:'long',year:'numeric'}).format(date);}catch(e){return '';}
+  }
+  function formatDateShort(value){
+    if(!value) return '–'; const d=new Date(value); if(isNaN(d)) return '–';
+    const dd=String(d.getDate()).padStart(2,'0'); const mm=String(d.getMonth()+1).padStart(2,'0'); const yy=d.getFullYear();
+    return dd+'.'+mm+'.'+yy;
+  }
+  function formatMoney(value){
+    try{return new Intl.NumberFormat('de-DE',{style:'currency',currency:'EUR'}).format(Number(value)||0);}catch(e){return (Number(value)||0).toFixed(2)+' €';}
+  }
+  function statusLabel(status){
+    const s=String(status||'').toLowerCase();
+    if(s==='bezahlt') return 'Bezahlt';
+    if(s==='teilzahlung') return 'Teilzahlung';
+    if(s==='klaerung') return 'In Klärung';
+    return 'Offen';
+  }
+  function isOpen(status){ return !['bezahlt'].includes(String(status||'').toLowerCase()); }
+  function readCreditors(){ try{ const x=JSON.parse(localStorage.getItem('schulden_creditors_v37')||'[]'); return Array.isArray(x)?x:[]; }catch(e){ return []; } }
+  function findCreditor(d){
+    const arr=readCreditors();
+    return arr.find(c=> c && ((d.creditorId && c.id===d.creditorId) || (c.name && d.name && c.name===d.name) || (c.aktenzeichen && d.aktenzeichen && c.aktenzeichen===d.aktenzeichen))) || null;
+  }
+  function patchHero(){
+    const actions=document.querySelector('.heroTopActions');
+    if(actions && !actions.querySelector('.v63DateBadge')){
+      const el=document.createElement('div'); el.className='v63DateBadge'; el.innerHTML='📅 '+formatDateLong(new Date()); actions.appendChild(el);
+    }
+    const title=document.getElementById('greetingTitle'); if(title) title.textContent='Guten Abend!';
+    const txt=document.getElementById('greetingText'); if(txt) txt.textContent='Hier ist deine aktuelle Übersicht.';
+    document.querySelectorAll('.v59MenuVersion').forEach(el=>el.textContent='v63');
+    const h=document.querySelector('.desktopAkteTitleBlock h3'); if(h) h.textContent='Schuld-Akte';
+  }
+  function patchToolbar(){
+    const bar=document.querySelector('.boardToolbar'); if(!bar) return;
+    if(!document.getElementById('v63FilterToggle')){
+      const btn=document.createElement('button'); btn.id='v63FilterToggle'; btn.type='button'; btn.textContent='⎚ Filter anzeigen';
+      btn.onclick=function(){ const panel=document.querySelector('.v58FilterPanel'); if(panel) panel.classList.toggle('v63Open'); };
+      bar.appendChild(btn);
+    }
+  }
+  function patchHeaders(){
+    const tr=document.querySelector('#desktopTable thead tr'); if(!tr) return;
+    tr.innerHTML='<th>Name</th><th>Gläubiger</th><th>Kategorie</th><th>Betrag</th><th>Status</th><th>Fällig</th><th></th>';
+  }
+  function patchRows(){
+    const rows=document.querySelectorAll('#tbody tr.v58DesktopRow');
+    rows.forEach(tr=>{
+      const idx=Number(tr.dataset.index); const debts=window.debts||[]; const d=debts[idx]; if(!d) return;
+      const c=findCreditor(d); const today=new Date(); today.setHours(0,0,0,0);
+      const dueDate=d.datum ? new Date(d.datum) : null; if(dueDate) dueDate.setHours(0,0,0,0);
+      const overdue = !!(dueDate && dueDate < today && isOpen(d.status));
+      const statusText=statusLabel(d.status);
+      const statusClass = overdue ? 'overdue' : (String(d.status||'').toLowerCase()==='bezahlt' ? 'paid' : 'open');
+      const first = d.grund || d.name || '–';
+      const second = (c && c.name) ? c.name : (d.name || '–');
+      const cat = d.kategorie || d.category || (c && c.category) || '–';
+      tr.innerHTML=''
+        + '<td><span class="v63NameStrong">'+escapeHtml(first)+'</span></td>'
+        + '<td><span class="v63NameStrong">'+escapeHtml(second)+'</span>'+(c&&c.extra?'<span class="v63CredSub">'+escapeHtml(c.extra)+'</span>':'')+'</td>'
+        + '<td><span class="v63Tag">'+escapeHtml(cat)+'</span></td>'
+        + '<td><span class="v63Amount">'+escapeHtml(formatMoney(d.betrag))+'</span></td>'
+        + '<td><span class="v63Status '+statusClass+'">'+escapeHtml(statusText)+'</span></td>'
+        + '<td><span class="v63Due '+(overdue?'overdue':'')+'">'+escapeHtml(formatDateShort(d.datum))+'</span></td>'
+        + '<td><button class="v63Dots" type="button" aria-label="Mehr">⋮</button></td>';
+      const dots=tr.querySelector('.v63Dots');
+      if(dots) dots.addEventListener('click', function(e){ e.stopPropagation(); try{ if(typeof window.showInfo==='function') window.showInfo(idx); }catch(err){} });
+    });
+  }
+  function escapeHtml(value){
+    return String(value==null?'':value).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#039;');
+  }
+  function patchAll(){ patchHero(); patchToolbar(); patchHeaders(); patchRows(); }
+  document.addEventListener('DOMContentLoaded', function(){ patchAll(); setTimeout(patchAll,250); setTimeout(patchAll,900); });
+  setInterval(patchAll,1200);
+  const obs=new MutationObserver(()=>patchAll());
+  window.addEventListener('load',()=>{ const tbody=document.getElementById('tbody'); if(tbody) obs.observe(tbody,{childList:true,subtree:true}); });
+})();
+</script>
+
 </body>
 </html>
