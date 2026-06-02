@@ -9027,5 +9027,117 @@ Aktenzeichen: AZ-123',onTextareaConfirm:function(text){ applyPasted(text||''); }
 })();
 </script>
 
+
+<style id="v75-handy-add-form-fix-style">
+/* v75: Eingabemaske auf der Handy-Seite wieder erreichbar. Handy-Layout bleibt unverändert. */
+@media (min-width:769px){
+  body.force-mobile-view .mobileBottomNav{
+    display:flex !important;
+    position:fixed !important;
+    left:50% !important;
+    bottom:18px !important;
+    transform:translateX(-50%) !important;
+    z-index:9999 !important;
+  }
+  body.force-mobile-view #fabAdd{
+    display:flex !important;
+  }
+  body.force-mobile-view #addModal[aria-hidden="false"]{
+    display:flex !important;
+    align-items:flex-start !important;
+    justify-content:center !important;
+    padding:10px !important;
+    z-index:12000 !important;
+  }
+  body.force-mobile-view #addModal .newDebtModal{
+    width:min(96vw,720px) !important;
+    max-height:calc(100dvh - 20px) !important;
+    overflow:auto !important;
+  }
+}
+@media (max-width:1120px){
+  #addModal[aria-hidden="false"]{
+    display:flex !important;
+    align-items:flex-start !important;
+    justify-content:center !important;
+    padding:10px !important;
+    z-index:12000 !important;
+  }
+  #addModal .newDebtModal{
+    width:min(96vw,720px) !important;
+    max-height:calc(100dvh - 20px) !important;
+    overflow:auto !important;
+  }
+}
+@media (max-width:768px){
+  .mobileBottomNav{display:flex !important;}
+}
+@media (min-width:1121px){
+  .v59MenuVersion,.v67CurrentVersion,#v67CurrentVersion,#v68CurrentVersion,#v69CurrentVersion,#v70OnlyVersion,#v71OnlyVersion,#v72OnlyVersion,#v73OnlyVersion,.v74OnlyVersion,#v74OnlyVersion{display:none!important;}
+  #v75OnlyVersion{display:block!important;margin:10px 8px 0!important;text-align:center!important;color:#eaf2ff!important;font-size:12px!important;font-weight:900!important;letter-spacing:.05em;}
+}
+@media (max-width:1120px){#v75OnlyVersion{display:none!important;}}
+</style>
+<script id="v75-handy-add-form-fix-js">
+(function(){
+  const APP_VERSION='v75';
+  function $(id){return document.getElementById(id);}
+  function openForm(){
+    try{
+      if(typeof window.openAddModal === 'function'){
+        window.openAddModal();
+      }else{
+        const modal=$('addModal');
+        if(modal){ modal.style.display='flex'; modal.setAttribute('aria-hidden','false'); document.body.classList.add('modalOpen'); }
+      }
+      setTimeout(()=>{$('m_name')?.focus();},80);
+    }catch(e){
+      const modal=$('addModal');
+      if(modal){ modal.style.display='flex'; modal.setAttribute('aria-hidden','false'); document.body.classList.add('modalOpen'); }
+    }
+  }
+  function bindMobileAdd(){
+    ['navAdd','fabAdd','btnOpenAdd'].forEach(id=>{
+      const btn=$(id);
+      if(btn && btn.dataset.v75add!=='1'){
+        btn.dataset.v75add='1';
+        btn.addEventListener('click', function(e){
+          if(id==='navAdd' || document.body.classList.contains('force-mobile-view') || window.innerWidth<=1120){
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            openForm();
+          }
+        }, true);
+        btn.addEventListener('touchend', function(e){
+          if(id==='navAdd' || document.body.classList.contains('force-mobile-view') || window.innerWidth<=1120){
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            openForm();
+          }
+        }, true);
+      }
+    });
+  }
+  function fixVersion(){
+    try{ document.querySelectorAll('.v59MenuVersion,.v67CurrentVersion,#v67CurrentVersion,#v68CurrentVersion,#v69CurrentVersion,#v70OnlyVersion,#v71OnlyVersion,#v72OnlyVersion,#v73OnlyVersion,.v74OnlyVersion,#v74OnlyVersion').forEach(el=>el.remove()); }catch(e){}
+    const bottom=document.querySelector('.sidebarBottom');
+    if(bottom){
+      let box=$('v75OnlyVersion');
+      if(!box){ box=document.createElement('div'); box.id='v75OnlyVersion'; bottom.appendChild(box); }
+      box.textContent=APP_VERSION;
+    }
+  }
+  function ensureMobileNavVisible(){
+    const nav=document.querySelector('.mobileBottomNav');
+    if(nav && (document.body.classList.contains('force-mobile-view') || window.innerWidth<=768)){
+      nav.style.display='flex';
+    }
+  }
+  function init(){ bindMobileAdd(); fixVersion(); ensureMobileNavVisible(); }
+  document.addEventListener('DOMContentLoaded', function(){ init(); setTimeout(init,200); setTimeout(init,800); setTimeout(init,1600); });
+  setInterval(init,1200);
+})();
+</script>
+
 </body>
 </html>
