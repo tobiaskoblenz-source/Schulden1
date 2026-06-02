@@ -8744,5 +8744,113 @@ Aktenzeichen: AZ-123',onTextareaConfirm:function(text){ applyPasted(text||''); }
 })();
 </script>
 
+
+<style id="v72-file-attach-new-debt-style">
+/* v72: Button in der Neue-Schulden-Maske hängt PDF/Bilder/Briefe direkt an die neue Akte */
+#v72NewDebtFiles{display:grid;gap:8px;margin-top:10px;}
+.v72FileItem{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 10px;border-radius:12px;background:rgba(79,140,255,.08);border:1px solid rgba(79,140,255,.14);color:#dce8ff;font-size:12px;}
+.v72FileItem span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.v72FileItem button{min-height:28px!important;border-radius:9px!important;padding:0 8px!important;background:rgba(255,112,112,.12)!important;color:#ffc7c7!important;border:1px solid rgba(255,112,112,.20)!important;box-shadow:none!important;font-size:12px!important;}
+.newDebtModal #m_paste{border-color:rgba(79,140,255,.34)!important;color:#cfe0ff!important;}
+.newDebtModal #m_paste::first-letter{text-transform:uppercase;}
+@media (max-width:1120px){#v72NewDebtFiles{display:none!important;}}
+</style>
+<script id="v72-file-attach-new-debt-js">
+(function(){
+  const APP_VERSION='v72';
+  let pendingFiles=[];
+  function $(id){return document.getElementById(id);}
+  function toast(msg){try{ if(typeof showToast==='function') showToast(msg); else if(typeof toast==='function') toast(msg); else alert(msg);}catch(e){alert(msg);}}
+  function escapeHtml(v){return String(v??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#039;');}
+  function version(){
+    try{document.querySelectorAll('.v59MenuVersion,.v67CurrentVersion,#v67CurrentVersion,#v68CurrentVersion,#v69CurrentVersion,#v70OnlyVersion,#v71OnlyVersion,#v72OnlyVersion').forEach(el=>el.remove());}catch(e){}
+    const bottom=document.querySelector('.sidebarBottom');
+    if(bottom && !$('v72OnlyVersion')){const div=document.createElement('div');div.id='v72OnlyVersion';div.className='v70OnlyVersion';div.textContent=APP_VERSION;bottom.appendChild(div);}
+  }
+  function ensureFileInput(){
+    if(!$('v72FileInput')){
+      const input=document.createElement('input');
+      input.id='v72FileInput';
+      input.type='file';
+      input.accept='application/pdf,image/*';
+      input.multiple=true;
+      input.style.display='none';
+      document.body.appendChild(input);
+      input.addEventListener('change', handleFiles);
+    }
+    const btn=$('m_paste');
+    if(btn) btn.innerHTML='📎 Dateien einfügen';
+    const footer=document.querySelector('.newDebtFooter');
+    if(footer && !$('v72NewDebtFiles')){
+      const list=document.createElement('div');
+      list.id='v72NewDebtFiles';
+      footer.insertAdjacentElement('beforebegin', list);
+    }
+    renderFileList();
+  }
+  function openFilePicker(){ensureFileInput(); const input=$('v72FileInput'); if(input){input.value=''; input.click();}}
+  function fileToDataUrl(file){return new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(String(r.result||''));r.onerror=reject;r.readAsDataURL(file);});}
+  async function handleFiles(e){
+    const files=[...(e.target.files||[])];
+    if(!files.length) return;
+    for(const file of files){
+      if(!/^(application\/pdf|image\/)/.test(file.type||'')){toast('Erlaubt sind nur PDF-Dateien und Bilder.'); continue;}
+      if(file.size > 8*1024*1024){toast('Datei zu groß: '+file.name+' (max. 8 MB)'); continue;}
+      try{
+        const dataUrl=await fileToDataUrl(file);
+        pendingFiles.push({id:'file_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,8),name:file.name,mimeType:file.type||'Datei',size:file.size,date:new Date().toISOString().slice(0,10),uploadedAt:new Date().toISOString(),url:dataUrl,dataUrl});
+      }catch(err){console.error(err);toast('Datei konnte nicht gelesen werden: '+file.name);}
+    }
+    renderFileList();
+    toast(pendingFiles.length+' Datei(en) vorgemerkt.');
+  }
+  function renderFileList(){
+    const list=$('v72NewDebtFiles'); if(!list) return;
+    if(!pendingFiles.length){list.innerHTML=''; return;}
+    list.innerHTML=pendingFiles.map(f=>'<div class="v72FileItem" data-id="'+escapeHtml(f.id)+'"><span>📎 '+escapeHtml(f.name)+' · '+bytes(f.size)+'</span><button type="button" data-remove="'+escapeHtml(f.id)+'">Entfernen</button></div>').join('');
+    list.querySelectorAll('[data-remove]').forEach(btn=>btn.onclick=()=>{pendingFiles=pendingFiles.filter(f=>f.id!==btn.dataset.remove);renderFileList();});
+  }
+  function bytes(n){n=Number(n)||0;if(n<1024)return n+' B';if(n<1024*1024)return Math.round(n/1024)+' KB';return (n/1024/1024).toFixed(1).replace('.',',')+' MB';}
+  function parseAmount(v){const n=parseFloat(String(v||'').replace(/[^\d,.-]/g,'').replace(/\.(?=\d{3}(\D|$))/g,'').replace(',','.'));return Number.isFinite(n)?n:NaN;}
+  function readArr(){try{if(typeof debts!=='undefined' && Array.isArray(debts)) return debts;}catch(e){} if(Array.isArray(window.debts)) return window.debts; return null;}
+  function closeModal(){if(typeof window.closeAddModal==='function') window.closeAddModal(); else {const m=$('addModal'); if(m){m.style.display='none';m.setAttribute('aria-hidden','true');document.body.classList.remove('modalOpen');}}}
+  function clearForm(){['m_name','m_grund','m_betrag','m_datum','m_aktenzeichen','m_contactRepresentative','m_contactAddress','m_contactEmail','m_contactPhone','m_firstNote'].forEach(id=>{const el=$(id);if(el)el.value='';}); if($('m_category')) $('m_category').value='Sonstiges'; try{if(typeof setNewDebtStatus==='function') setNewDebtStatus('offen'); if(typeof setStatusV13==='function') setStatusV13('offen');}catch(e){} pendingFiles=[]; renderFileList();}
+  function saveDebt(){
+    const name=$('m_name')?.value.trim()||'';
+    const grund=$('m_grund')?.value.trim()||'';
+    const betrag=parseAmount($('m_betrag')?.value);
+    const datum=$('m_datum')?.value||'';
+    const aktenzeichen=$('m_aktenzeichen')?.value.trim()||'';
+    const status=$('m_status')?.value||'offen';
+    const category=$('m_category')?.value||'Sonstiges';
+    if(!name){toast('Bitte Name / Gläubiger eintragen.');$('m_name')?.focus();return false;}
+    if(!grund){toast('Bitte Grund eintragen.');$('m_grund')?.focus();return false;}
+    if(!Number.isFinite(betrag)||betrag<=0){toast('Bitte Betrag korrekt eintragen.');$('m_betrag')?.focus();return false;}
+    const contact={representative:$('m_contactRepresentative')?.value.trim()||'',address:$('m_contactAddress')?.value.trim()||'',email:$('m_contactEmail')?.value.trim()||'',phone:$('m_contactPhone')?.value.trim()||''};
+    const note=$('m_firstNote')?.value.trim()||'';
+    const files=pendingFiles.map(f=>({...f}));
+    const debt={name,grund,betrag,datum,aktenzeichen,status,category,contactDetails:contact,contactPerson:[contact.representative,contact.address,contact.email,contact.phone].filter(Boolean).join(' | '),notes:'',notesHistory:note?[{at:new Date().toISOString(),text:note}]:[],history:files.length?[{at:new Date().toISOString(),text:files.length+' Datei(en) beim Anlegen hinzugefügt'}]:[],documents:[],correspondence:files};
+    try{debt.notes=typeof notesText==='function'?notesText(debt):note;}catch(e){debt.notes=note;}
+    const arr=readArr(); if(!arr){toast('Schulden-Liste nicht gefunden.');return false;}
+    arr.push(debt);
+    try{if(typeof save==='function') save(); else localStorage.setItem('godmode_debts',JSON.stringify(arr));}catch(e){console.error(e);}
+    try{if(typeof render==='function') render();}catch(e){console.error(e);}
+    toast('Schulden mit '+files.length+' Datei(en) gespeichert ✅');
+    clearForm(); closeModal();
+    return true;
+  }
+  document.addEventListener('click', function(e){
+    const paste=e.target.closest && e.target.closest('#m_paste');
+    if(paste){e.preventDefault();e.stopImmediatePropagation();openFilePicker();return;}
+    const add=e.target.closest && e.target.closest('#m_add');
+    if(add){e.preventDefault();e.stopImmediatePropagation();saveDebt();return;}
+  }, true);
+  const oldOpen=window.openAddModal;
+  window.openAddModal=function(){ if(typeof oldOpen==='function') oldOpen(); setTimeout(()=>{ensureFileInput();},80); };
+  document.addEventListener('DOMContentLoaded',()=>{version();ensureFileInput();setTimeout(version,300);setTimeout(ensureFileInput,500);});
+  setInterval(()=>{version();ensureFileInput();},1800);
+})();
+</script>
+
 </body>
 </html>
