@@ -12,7 +12,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="assets/icons/icon-192.png">
 <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
-<title>Schulden Manager – Dashboard Dark v23</title>
+<title>Schulden Manager – v59</title>
 
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
@@ -1208,7 +1208,7 @@ body.dark .statusPill{background:#0f1c2f!important;border-color:rgba(255,255,255
 
 
 <style id="v13-responsive-form-fix">
-/* v13 – responsive Größenanpassung + stabiles Neue-Schuld-Formular */
+/* v13 – responsive Größenanpassung + stabiles Neue-Schulden-Formular */
 :root{
   --content-pad: clamp(12px, 2vw, 30px);
   --sidebar-w: clamp(188px, 14vw, 228px);
@@ -2808,7 +2808,7 @@ body.force-mobile-view .dashboardShell{
     <section class="hero heroDashboard">
       <div class="heroMain dashboardHeader">
         <div class="dashboardGreetingWrap">
-          <div class="eyebrow">Dark Dashboard · v21</div>
+          <div class="eyebrow">Ruhiges Dashboard · v59</div>
           <h1 id="greetingTitle">Guten Abend!</h1>
           <p id="greetingText">Hier ist die Übersicht deiner Schulden.</p>
         </div>
@@ -2817,7 +2817,7 @@ body.force-mobile-view .dashboardShell{
             <button id="viewDesktopVisible" class="secondary" type="button">🖥 Desktop</button>
             <button id="viewMobileVisible" class="secondary" type="button">📱 Handy</button>
           </div>
-          <button id="btnOpenAdd" type="button">＋ Neue Schuld</button>
+          <button id="btnOpenAdd" type="button">＋ Neue Schulden</button>
           <button id="btnInstall" class="secondary" type="button">📲 App installieren</button>
         </div>
       </div>
@@ -2919,7 +2919,7 @@ body.force-mobile-view .dashboardShell{
           <button id="desktopNewNoteBtn" class="secondary smallSideBtn desktopTopNoteBtn" type="button">＋ Notiz</button>
         </div>
         <div class="desktopAkteTitleBlock">
-          <h3>Daten – Schuld-Akte</h3>
+          <h3>Daten – Schulden-Akte</h3>
           <p>Alle wichtigen Infos, Dateien und Verlauf auf einen Blick. <b class="v31Marker">V36</b></p>
         </div>
         <div class="desktopPanelBody desktopAkteBodyV30">
@@ -2928,7 +2928,7 @@ body.force-mobile-view .dashboardShell{
               <div class="desktopHeroAvatar" id="sideIdentityAvatar">S</div>
               <div>
                 <div id="sideNameValue" class="desktopHeroName">–</div>
-                <div id="sideIdentityMeta" class="desktopHeroMeta">Schuld-ID: –</div>
+                <div id="sideIdentityMeta" class="desktopHeroMeta">Schulden-ID: –</div>
               </div>
             </div>
             <div class="desktopHeroFacts">
@@ -2951,7 +2951,7 @@ body.force-mobile-view .dashboardShell{
             </section>
 
             <section class="desktopPanelSection desktopMiniInfoCard">
-              <div class="drawerSectionHead"><span>2</span><strong>Aktenzeichen</strong></div><div class="drawerMutedText">Dieses Feld ist mit dem Aktenzeichen aus „+ Neue Schuld“ verbunden.</div>
+              <div class="drawerSectionHead"><span>2</span><strong>Aktenzeichen</strong></div><div class="drawerMutedText">Dieses Feld ist mit dem Aktenzeichen aus „+ Neue Schulden“ verbunden.</div>
               <div class="desktopInfoRows">
                 <div class="desktopInfoRow"><span>Aktenzeichen</span><strong id="sideCaseValue">–</strong></div>
                 <div class="desktopInfoRow"><span>Referenznummer</span><strong id="sideReferenceValue">–</strong></div>
@@ -3004,7 +3004,7 @@ body.force-mobile-view .dashboardShell{
     <div class="modalHeaderRow">
       <div>
         <span class="modalKicker">Neuer Eintrag</span>
-        <h3>Neue Schuld</h3>
+        <h3>Neue Schulden</h3>
       </div>
       <button id="m_close" class="secondary modalCloseBtn" type="button" aria-label="Schließen">✕</button>
     </div>
@@ -3017,7 +3017,7 @@ body.force-mobile-view .dashboardShell{
       </section>
 
       <section class="newDebtStep">
-        <div class="stepHead"><span>2</span><strong>Schuld-Daten</strong></div>
+        <div class="stepHead"><span>2</span><strong>Schulden-Daten</strong></div>
         <div class="newDebtGrid">
           <div>
             <label class="fieldLabel" for="m_grund">Grund *</label>
@@ -3084,7 +3084,7 @@ body.force-mobile-view .dashboardShell{
     <div class="modalActions newDebtFooter" style="margin-top:16px;">
       <button id="m_cancel" class="secondary" type="button">Abbrechen</button>
       <button id="m_add_more" class="secondary" type="button">Speichern & weitere</button>
-      <button id="m_add" type="button">Schuld speichern</button>
+      <button id="m_add" type="button">Schulden speichern</button>
     </div>
   </div>
 </div>
@@ -3466,7 +3466,7 @@ function createDebtFromModal({keepOpen=false}={}){
   debts.push(debt);
   save();
   render();
-  showToast("Schuld gespeichert ✅");
+  showToast("Schulden gespeichert ✅");
 
   if(keepOpen){
     clearModalInputs();
@@ -3574,7 +3574,7 @@ function closeActionModal(){
 function paySingleDebt(i){
   let d=debts[i];
   if(d.status==="bezahlt"){
-    openActionModal({title:"Abbau", body:"Diese Schuld ist bereits bezahlt."});
+    openActionModal({title:"Abbau", body:"Diese Schulden ist bereits bezahlt."});
     return;
   }
 
@@ -3605,8 +3605,8 @@ function paySingleDebt(i){
   };
 
   openActionModal({
-    title:"Schuld abbauen",
-    body:"Wie viel möchtest du von dieser Schuld bezahlen?\n\nAktuelle Restschuld: " + (Number(d.betrag)||0).toFixed(2) + " €",
+    title:"Schulden abbauen",
+    body:"Wie viel möchtest du von dieser Schulden bezahlen?\n\nAktuelle Restschuld: " + (Number(d.betrag)||0).toFixed(2) + " €",
     confirmText:"Abbau speichern",
     inputValue:"",
     inputPlaceholder:"Betrag eingeben",
@@ -3628,7 +3628,7 @@ function showContact(i){
   const current = normalizeContactData(d);
   openActionModal({
     title:"Ansprechpartner",
-    body:"Hier kannst du die Kontaktdaten zu dieser Schuld speichern.",
+    body:"Hier kannst du die Kontaktdaten zu dieser Schulden speichern.",
     confirmText:"Ansprechpartner speichern",
     contactValue: current,
     onContactConfirm:(contact)=>{
@@ -4050,7 +4050,7 @@ if ('serviceWorker' in navigator) {
   window.showInfo = function(i){ openInfoDrawer(i); };
 
   const oldRemoveDebt = window.removeDebt;
-  window.removeDebt = function(i){ if(confirm('Diese Schuld wirklich löschen?')){ debts.splice(i,1); save(); render(); closeInfoDrawer(); } };
+  window.removeDebt = function(i){ if(confirm('Diese Schulden wirklich löschen?')){ debts.splice(i,1); save(); render(); closeInfoDrawer(); } };
 
   window.render = function(){
     const filtered = getFilteredDebts();
@@ -4079,7 +4079,7 @@ if ('serviceWorker' in navigator) {
       const badgeClass = isOpenLikeStatus(d.status) ? 'status-open' : 'status-bezahlt';
       const amountClass = isOpenLikeStatus(d.status) ? 'amountOpen' : 'amountPaid';
       row.innerHTML =
-        '<td><div class="nameCell"><div class="avatarCircle">' + escapeHTML(initials(d.name)) + '</div><div class="nameStack"><strong>' + escapeHTML(d.name) + '</strong><small>Schuld-ID: S-' + String(1001 + i) + '</small></div></div></td>' +
+        '<td><div class="nameCell"><div class="avatarCircle">' + escapeHTML(initials(d.name)) + '</div><div class="nameStack"><strong>' + escapeHTML(d.name) + '</strong><small>Schulden-ID: S-' + String(1001 + i) + '</small></div></div></td>' +
         '<td><div class="reasonStack"><strong>' + escapeHTML(d.grund || '–') + '</strong><small>' + escapeHTML(contactInline(normalizeContactData(d)) || 'Kein Ansprechpartner') + '</small></div></td>' +
         '<td><div class="dateText">' + escapeHTML(d.datum || '–') + '</div></td>' +
         '<td><div class="amountText ' + amountClass + '">' + escapeHTML(formatEUR(Number(d.betrag) || 0)) + '</div></td>' +
@@ -4280,7 +4280,7 @@ if ('serviceWorker' in navigator) {
 
     if(i == null || i < 0 || !debts[i]){
       nameEl.textContent = 'Keine Daten';
-      setText('sideIdentityMeta', 'Schuld-ID: –');
+      setText('sideIdentityMeta', 'Schulden-ID: –');
       ['sideContactRepresentative','sideContactAddress','sideContactEmail','sideContactPhone','sideReasonValue','sideAmountValue','sideDateValue','sideCaseValue','sideReferenceValue','sideCustomerValue','sideLastAmountValue','sideLastDateOnlyValue','sidePaymentTypeValue'].forEach(id=>setText(id,'–'));
       const status = document.getElementById('sideStatusValue'); if(status) status.textContent = '–';
       setText('sideCaseNote', 'Falls vorhanden, erscheint hier dein Aktenzeichen oder die Referenznummer.');
@@ -4302,7 +4302,7 @@ if ('serviceWorker' in navigator) {
 
     nameEl.textContent = d.name || '–';
     if(avatar) avatar.textContent = initials2(d.name || 'S');
-    setText('sideIdentityMeta', 'Schuld-ID: S-' + String(1001 + i));
+    setText('sideIdentityMeta', 'Schulden-ID: S-' + String(1001 + i));
     setText('sideContactRepresentative', contact.representative || '–');
     setHTML('sideContactAddress', nl2br2(contact.address || '–'));
     setText('sideContactEmail', contact.email || '–');
@@ -4384,7 +4384,7 @@ if ('serviceWorker' in navigator) {
       const tr = document.createElement('tr');
       tr.className = selectedClass.trim();
       tr.innerHTML =
-        '<td><div class="nameCell"><div class="avatarCircle">' + escapeHTML2(initials2(d.name)) + '</div><div class="nameStack"><strong>' + escapeHTML2(d.name) + '</strong><small>Schuld-ID: S-' + String(1001 + i) + '</small></div></div></td>' +
+        '<td><div class="nameCell"><div class="avatarCircle">' + escapeHTML2(initials2(d.name)) + '</div><div class="nameStack"><strong>' + escapeHTML2(d.name) + '</strong><small>Schulden-ID: S-' + String(1001 + i) + '</small></div></div></td>' +
         '<td><div class="reasonStack"><strong>' + escapeHTML2(d.grund || '–') + '</strong><small>' + escapeHTML2(normalizeContactData(d).representative || 'Kein Ansprechpartner') + '</small></div></td>' +
         '<td><div class="dateText">' + escapeHTML2(d.datum || '–') + '</div></td>' +
         '<td><div class="amountText ' + amountClass + '">' + escapeHTML2(formatEUR(Number(d.betrag) || 0)) + '</div></td>' +
@@ -4440,7 +4440,7 @@ if ('serviceWorker' in navigator) {
 
   const oldRemoveDebt = window.removeDebt;
   window.removeDebt = function(i){
-    if(confirm('Diese Schuld wirklich löschen?')){
+    if(confirm('Diese Schulden wirklich löschen?')){
       debts.splice(i,1);
       if(selectedDebtIndex >= debts.length) selectedDebtIndex = debts.length - 1;
       save();
@@ -4617,7 +4617,7 @@ if ('serviceWorker' in navigator) {
     if(typeof save === "function") save();
     if(typeof render === "function") render();
 
-    safeToast("Schuld gespeichert ✅");
+    safeToast("Schulden gespeichert ✅");
 
     if(keepOpen){
       clearFormV13();
@@ -5633,7 +5633,7 @@ if ('serviceWorker' in navigator) {
   function bytes(n){ n=Number(n)||0; if(n>1024*1024) return (n/1024/1024).toFixed(1).replace('.',',')+" MB"; if(n>1024) return (n/1024).toFixed(1).replace('.',',')+" KB"; return n+" B"; }
   function fileDate(v){ if(!v) return "Ohne Datum"; const d=new Date(v); return Number.isNaN(d.getTime()) ? v : d.toLocaleDateString("de-DE"); }
   function today(){ return new Date().toISOString().slice(0,10); }
-  function sanitizeName(name){ return String(name||"Schuld").trim().replace(/[\\/:*?"<>|#%{}~&]/g,"-").replace(/\s+/g," ").slice(0,80) || "Schuld"; }
+  function sanitizeName(name){ return String(name||"Schulden").trim().replace(/[\\/:*?"<>|#%{}~&]/g,"-").replace(/\s+/g," ").slice(0,80) || "Schulden"; }
   function ensureCorrespondence(d){ if(!Array.isArray(d.correspondence)) d.correspondence = []; return d.correspondence; }
   function currentDebts(){ return Array.isArray(window.debts) ? window.debts : (Array.isArray(debts) ? debts : []); }
 
@@ -5737,7 +5737,7 @@ if ('serviceWorker' in navigator) {
   async function debtFolder(index){
     const root = await corrRootFolder();
     const d = currentDebts()[index] || {};
-    return await createFolder("S-" + (1001+index) + "_" + sanitizeName(d.name || d.grund || "Schuld"), root.id);
+    return await createFolder("S-" + (1001+index) + "_" + sanitizeName(d.name || d.grund || "Schulden"), root.id);
   }
   async function uploadMultipart({metadata, blob, mimeType, fields}){
     const boundary = "schuldenapp_" + Date.now().toString(36) + Math.random().toString(36).slice(2);
@@ -5860,7 +5860,7 @@ if ('serviceWorker' in navigator) {
   function ensureCorrModal(){
     let overlay = $("corrOverlay"); if(overlay) return overlay;
     overlay = document.createElement("div"); overlay.id="corrOverlay"; overlay.className="corrOverlay"; overlay.innerHTML =
-      '<div class="corrModal" role="dialog" aria-modal="true" aria-labelledby="corrTitle"><div class="corrHead"><div><h3 id="corrTitle">Korrespondenz</h3><p id="corrSub">Fotos und PDFs zu dieser Schuld.</p></div><button class="corrClose" id="corrClose" type="button">×</button></div><div class="corrForm"><label>Foto/PDF auswählen<input id="corrFile" type="file" accept="application/pdf,image/*"></label><label>Datum<input id="corrDate" type="date"></label><button id="corrUpload" class="corrUploadBtn" type="button">Hochladen</button></div><div id="corrList" class="corrList"></div><div class="corrHint">Die Dateien werden in Google Drive im Ordner <b>Schulden-App / Korrespondenz</b> gespeichert. In der App wird der Drive-Link mit Datum abgelegt.</div></div>';
+      '<div class="corrModal" role="dialog" aria-modal="true" aria-labelledby="corrTitle"><div class="corrHead"><div><h3 id="corrTitle">Korrespondenz</h3><p id="corrSub">Fotos und PDFs zu dieser Schulden.</p></div><button class="corrClose" id="corrClose" type="button">×</button></div><div class="corrForm"><label>Foto/PDF auswählen<input id="corrFile" type="file" accept="application/pdf,image/*"></label><label>Datum<input id="corrDate" type="date"></label><button id="corrUpload" class="corrUploadBtn" type="button">Hochladen</button></div><div id="corrList" class="corrList"></div><div class="corrHint">Die Dateien werden in Google Drive im Ordner <b>Schulden-App / Korrespondenz</b> gespeichert. In der App wird der Drive-Link mit Datum abgelegt.</div></div>';
     document.body.appendChild(overlay);
     overlay.addEventListener('click', e=>{ if(e.target===overlay) closeCorrModal(); });
     $("corrClose").addEventListener('click', closeCorrModal);
@@ -5871,7 +5871,7 @@ if ('serviceWorker' in navigator) {
     const d = currentDebts()[index]; if(!d) return;
     const overlay = ensureCorrModal();
     $("corrTitle").textContent = "Korrespondenz";
-    $("corrSub").textContent = (d.name || "Schuld") + " · " + (d.grund || "") ;
+    $("corrSub").textContent = (d.name || "Schulden") + " · " + (d.grund || "") ;
     $("corrDate").value = today();
     const upload = $("corrUpload"); upload.onclick = ()=>uploadCorrespondence(index).catch(err=>{console.error(err); driveStatus("Google Drive: Upload-Fehler", "error"); toast("Upload fehlgeschlagen: " + err.message);});
     renderCorrList(index);
@@ -6046,7 +6046,7 @@ if ('serviceWorker' in navigator) {
       else localStorage.setItem("godmode_debts", JSON.stringify(window.debts || debts || []));
 
       if(typeof render === "function") render();
-      toast("Schuld gespeichert ✅");
+      toast("Schulden gespeichert ✅");
 
       resetForm();
       if(keepOpen){
@@ -6330,7 +6330,7 @@ if ('serviceWorker' in navigator) {
   }
   function importFromDebts(){
     const arr=read(); const seen=new Set(arr.map(c=>normalize(label(c)))); let added=0;
-    getDebtsSafe().forEach(d=>{ const name=String(d.name||"").trim(); if(!name) return; const key=normalize(name); if(seen.has(key)) return; arr.push({id:uid(),name,extra:"",category:"Sonstiges",aktenzeichen:d.aktenzeichen||"",phone:"",email:"",address:"",notes:"Aus vorhandener Schuld übernommen",createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()}); seen.add(key); added++; });
+    getDebtsSafe().forEach(d=>{ const name=String(d.name||"").trim(); if(!name) return; const key=normalize(name); if(seen.has(key)) return; arr.push({id:uid(),name,extra:"",category:"Sonstiges",aktenzeichen:d.aktenzeichen||"",phone:"",email:"",address:"",notes:"Aus vorhandener Schulden übernommen",createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()}); seen.add(key); added++; });
     write(arr); renderList(); patchAddFormSelect(); toast(added?added+" Gläubiger übernommen ✅":"Keine neuen Gläubiger gefunden.");
   }
   function qrDataUrl(text){
@@ -6499,7 +6499,7 @@ if ('serviceWorker' in navigator) {
       let c=findCreditorForDebt(pair.d);
       if(!c){
         const arr=read();
-        c={id:uid(),name:pair.d.name||"Gläubiger",extra:"",category:"Sonstiges",aktenzeichen:pair.d.aktenzeichen||"",phone:"",email:"",address:"",notes:"Automatisch aus Schuld erstellt",createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()};
+        c={id:uid(),name:pair.d.name||"Gläubiger",extra:"",category:"Sonstiges",aktenzeichen:pair.d.aktenzeichen||"",phone:"",email:"",address:"",notes:"Automatisch aus Schulden erstellt",createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()};
         arr.push(c); write(arr); patchAddFormSelect(); toast("Gläubiger wurde automatisch angelegt.");
       }
       generateSheet(c);
@@ -6896,7 +6896,7 @@ if ('serviceWorker' in navigator) {
   function creditorPayloadFromDebt(d){
     const name = (d && d.name) ? String(d.name) : 'Gläubiger';
     const id = 'cred_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,8);
-    return {id, name, extra:'', category:'Sonstiges', aktenzeichen:(d && (d.aktenzeichen||d.caseNumber)) || '', phone:'', email:'', address:'', notes:'Automatisch aus Schuld erstellt', createdAt:new Date().toISOString(), updatedAt:new Date().toISOString()};
+    return {id, name, extra:'', category:'Sonstiges', aktenzeichen:(d && (d.aktenzeichen||d.caseNumber)) || '', phone:'', email:'', address:'', notes:'Automatisch aus Schulden erstellt', createdAt:new Date().toISOString(), updatedAt:new Date().toISOString()};
   }
   function findOrCreateCreditor(d){
     const key='schulden_creditors_v37';
@@ -6914,7 +6914,7 @@ if ('serviceWorker' in navigator) {
       if(!jsPDF){ toast('PDF-Bibliothek nicht geladen.'); return; }
       const doc = new jsPDF();
       const euro = (typeof formatEUR === 'function') ? formatEUR : (v=>String(v||0)+' €');
-      doc.setFontSize(18); doc.text('Schuld-Akte',14,18);
+      doc.setFontSize(18); doc.text('Schulden-Akte',14,18);
       doc.setFontSize(12);
       const rows = [
         ['Name', d.name || '–'],
@@ -6940,7 +6940,7 @@ if ('serviceWorker' in navigator) {
     hero.appendChild(box);
     box.addEventListener('click', (e)=>{
       const btn=e.target.closest('button'); if(!btn) return;
-      const {i,d}=getCurrentDebt(); if(!d){ toast('Bitte zuerst eine Schuld auswählen.'); return; }
+      const {i,d}=getCurrentDebt(); if(!d){ toast('Bitte zuerst eine Schulden auswählen.'); return; }
       const act=btn.dataset.act;
       if(act==='daten'){ if(typeof window.showCorrespondence==='function') window.showCorrespondence(i); }
       if(act==='qr'){
@@ -7072,7 +7072,7 @@ if ('serviceWorker' in navigator) {
     writeTrash(trash);
     debts.splice(i,1);
     try{ if(typeof selectedDebtIndex !== 'undefined'){ selectedDebtIndex = Math.max(0, Math.min(i, debts.length-1)); } }catch(e){}
-    saveNow(); renderNow(); toastMsg('Schuld in den Papierkorb verschoben.');
+    saveNow(); renderNow(); toastMsg('Schulden in den Papierkorb verschoben.');
   }
   function patchDelete(){
     try{ window.removeDebt = moveToTrash; removeDebt = moveToTrash; }catch(e){ window.removeDebt = moveToTrash; }
@@ -7101,7 +7101,7 @@ if ('serviceWorker' in navigator) {
       const id=btn.closest('.trashItemV54')?.dataset.id; const trash=readTrash(); const item=trash.find(x=>x.trashId===id); if(!item) return;
       if(btn.dataset.act==='restore'){
         arr().splice(Math.min(item.originalIndex||0, arr().length),0,item.debt);
-        writeTrash(trash.filter(x=>x.trashId!==id)); saveNow(); renderNow(); renderTrash(); toastMsg('Schuld wiederhergestellt.');
+        writeTrash(trash.filter(x=>x.trashId!==id)); saveNow(); renderNow(); renderTrash(); toastMsg('Schulden wiederhergestellt.');
       }else{
         if(confirm('Endgültig löschen? Das kann nicht rückgängig gemacht werden.')){ writeTrash(trash.filter(x=>x.trashId!==id)); renderTrash(); toastMsg('Endgültig gelöscht.'); }
       }
@@ -7135,7 +7135,7 @@ if ('serviceWorker' in navigator) {
     const doc=document.createElement('section'); doc.id='docPanelV54'; doc.className='desktopPanelSection docPanelV54';
     doc.innerHTML='<div class="drawerSectionHead"><span>📄</span><strong>Dokumente</strong></div><div class="docFormV54"><select id="docTypeV54"><option>Brief</option><option>Bescheid</option><option>Mahnung</option><option>Vollstreckung</option><option>Zahlungsplan</option><option>Sonstiges</option></select><input id="docDateV54" type="date"><input id="docNameV54" placeholder="Name / kurze Beschreibung"><input id="docLinkV54" placeholder="Datei-Link optional"><button id="docSaveV54" type="button">Dokument speichern</button></div><div id="docListV54" class="docListV54"></div>';
     const cred=document.createElement('section'); cred.id='creditorPanelV54'; cred.className='desktopPanelSection creditorPanelV54';
-    cred.innerHTML='<div class="drawerSectionHead"><span>🏢</span><strong>Gläubiger-Verknüpfung</strong></div><div class="creditorLinkBoxV54"><div><span>Aktuell verknüpft</span><strong id="linkedCreditorV54">–</strong></div><select id="creditorSelectV54"><option value="">Kein Gläubiger</option></select><button id="linkCreditorV54" type="button">Mit Schuld verbinden</button><button id="qrCreditorV54" type="button">▣ QR-Bogen</button></div><div class="v54Hint">Tipp: Wenn kein passender Gläubiger vorhanden ist, lege ihn über „Gläubiger / QR“ an oder nutze den QR-Button. Die App kann bei Bedarf automatisch einen Gläubiger aus der Schuld erstellen.</div>';
+    cred.innerHTML='<div class="drawerSectionHead"><span>🏢</span><strong>Gläubiger-Verknüpfung</strong></div><div class="creditorLinkBoxV54"><div><span>Aktuell verknüpft</span><strong id="linkedCreditorV54">–</strong></div><select id="creditorSelectV54"><option value="">Kein Gläubiger</option></select><button id="linkCreditorV54" type="button">Mit Schulden verbinden</button><button id="qrCreditorV54" type="button">▣ QR-Bogen</button></div><div class="v54Hint">Tipp: Wenn kein passender Gläubiger vorhanden ist, lege ihn über „Gläubiger / QR“ an oder nutze den QR-Button. Die App kann bei Bedarf automatisch einen Gläubiger aus der Schulden erstellen.</div>';
     const corr=[...body.querySelectorAll('.desktopPanelSection')].find(s=>s.textContent.includes('Korrespondenz'));
     if(corr) body.insertBefore(doc,corr); else body.appendChild(doc);
     body.appendChild(cred);
@@ -7144,7 +7144,7 @@ if ('serviceWorker' in navigator) {
     $('qrCreditorV54').onclick=makeCreditorQr;
   }
   function saveDocument(){
-    const {i,d}=currentDebt(); if(!d){ toastMsg('Bitte zuerst eine Schuld auswählen.'); return; }
+    const {i,d}=currentDebt(); if(!d){ toastMsg('Bitte zuerst eine Schulden auswählen.'); return; }
     const item={id:'doc_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,7), type:$('docTypeV54')?.value||'Brief', date:$('docDateV54')?.value||new Date().toISOString().slice(0,10), name:$('docNameV54')?.value||'Dokument', link:$('docLinkV54')?.value||'', createdAt:new Date().toISOString()};
     if(!Array.isArray(d.documents)) d.documents=[]; d.documents.push(item);
     saveNow(); refreshV54(); toastMsg('Dokument gespeichert.');
@@ -7166,10 +7166,10 @@ if ('serviceWorker' in navigator) {
     let creds=readCreds(); let c=creds.find(x=>x.id===d.creditorId);
     if(c) return c;
     const n=norm(d.name); c=creds.find(x=>norm(labelCred(x))===n || norm(x.name)===n);
-    if(!c){ c={id:'cred_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,7), name:d.name||'Gläubiger', extra:'', category:'Sonstiges', aktenzeichen:d.aktenzeichen||d.caseNumber||'', phone:'', email:'', address:'', notes:'Automatisch aus Schuld erstellt', createdAt:new Date().toISOString(), updatedAt:new Date().toISOString()}; creds.push(c); localStorage.setItem(CRED_KEY,JSON.stringify(creds)); }
+    if(!c){ c={id:'cred_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,7), name:d.name||'Gläubiger', extra:'', category:'Sonstiges', aktenzeichen:d.aktenzeichen||d.caseNumber||'', phone:'', email:'', address:'', notes:'Automatisch aus Schulden erstellt', createdAt:new Date().toISOString(), updatedAt:new Date().toISOString()}; creds.push(c); localStorage.setItem(CRED_KEY,JSON.stringify(creds)); }
     d.creditorId=c.id; saveNow(); return c;
   }
-  function makeCreditorQr(){ const {d}=currentDebt(); if(!d){ toastMsg('Bitte zuerst eine Schuld auswählen.'); return; } const c=findOrCreateCreditorLocal(d); refreshCreditorSelect(); if(typeof window.generateCreditorQrSheetV39==='function') window.generateCreditorQrSheetV39(c); else toastMsg('QR-Modul nicht geladen.'); }
+  function makeCreditorQr(){ const {d}=currentDebt(); if(!d){ toastMsg('Bitte zuerst eine Schulden auswählen.'); return; } const c=findOrCreateCreditorLocal(d); refreshCreditorSelect(); if(typeof window.generateCreditorQrSheetV39==='function') window.generateCreditorQrSheetV39(c); else toastMsg('QR-Modul nicht geladen.'); }
 
   function refreshV54(){ ensureIds(); ensureAkteTabs(); ensureDocAndCreditorPanels(); ensureTrashButton(); renderDocuments(); refreshCreditorSelect(); updateTrashCount(); }
   function patchRender(){
@@ -7373,7 +7373,7 @@ if ('serviceWorker' in navigator) {
   function moveToTrashNoConfirm(i){
     const debts=getDebts();
     i=Number(i);
-    if(!Number.isFinite(i) || i<0 || !debts[i]){ toastMsg('Keine Schuld zum Löschen gefunden.'); return; }
+    if(!Number.isFinite(i) || i<0 || !debts[i]){ toastMsg('Keine Schulden zum Löschen gefunden.'); return; }
     const d=debts[i];
     const trash=readTrash();
     trash.unshift({trashId:'trash_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,7), deletedAt:new Date().toISOString(), originalIndex:i, debt:JSON.parse(JSON.stringify(d))});
@@ -7382,7 +7382,7 @@ if ('serviceWorker' in navigator) {
     try{ if(typeof selectedDebtIndex !== 'undefined'){ selectedDebtIndex = Math.max(0, Math.min(i, debts.length-1)); } }catch(e){}
     saveNow();
     renderNow();
-    toastMsg('Schuld wurde in den Papierkorb verschoben.');
+    toastMsg('Schulden wurde in den Papierkorb verschoben.');
   }
   function patchDelete(){
     try{ window.removeDebt = moveToTrashNoConfirm; removeDebt = moveToTrashNoConfirm; }catch(e){ window.removeDebt = moveToTrashNoConfirm; }
@@ -7447,7 +7447,7 @@ if ('serviceWorker' in navigator) {
     sec.id='v58KpiBoard'; sec.className='v58KpiBoard';
     sec.innerHTML = `
       <article class="v58Kpi"><span>🏢 Gläubiger</span><strong id="v58CreditorCount">0</strong><em>angelegte Kontakte</em></article>
-      <article class="v58Kpi"><span>⬆ Höchste Schuld</span><strong id="v58HighestDebt">0,00 €</strong><em id="v58HighestName">–</em></article>
+      <article class="v58Kpi"><span>⬆ Höchste Schulden</span><strong id="v58HighestDebt">0,00 €</strong><em id="v58HighestName">–</em></article>
       <article class="v58Kpi warn"><span>⏰ Überfällig</span><strong id="v58OverdueCount">0</strong><em>offene Fristen</em></article>
       <article class="v58Kpi"><span>📅 Nächste Frist</span><strong id="v58NextDue">–</strong><em id="v58NextDueName">–</em></article>
       <article class="v58Kpi"><span>✎ Zuletzt geändert</span><strong id="v58LastChanged">–</strong><em>heute / zuletzt</em></article>`;
@@ -7540,7 +7540,7 @@ if ('serviceWorker' in navigator) {
       const dueClass=du!==null && du<0 && isOpenV58(d.status) ? 'overdue' : (du!==null && du<=14 && du>=0 && isOpenV58(d.status) ? 'soon' : '');
       const tr=document.createElement('tr'); tr.className='v58DesktopRow'+(index===selectedIndexV58?' selectedRow':''); tr.dataset.index=index;
       tr.innerHTML=`
-        <td><div class="v58NameCell"><b>${esc(initial(d.name))}</b><div><strong>${esc(d.name||'–')}</strong><small>${esc(c?.name && c.name!==d.name ? c.name : (c?.category||'Schuld-Akte'))}</small></div></div></td>
+        <td><div class="v58NameCell"><b>${esc(initial(d.name))}</b><div><strong>${esc(d.name||'–')}</strong><small>${esc(c?.name && c.name!==d.name ? c.name : (c?.category||'Schulden-Akte'))}</small></div></div></td>
         <td><div class="v58Reason"><strong>${esc(d.grund||'–')}</strong><small>${noteCount(d)} Notizen · ${docCount(d)} Dokumente · ${esc(normContact(d).representative || c?.extra || 'kein Ansprechpartner')}</small></div></td>
         <td><span class="v58Due ${dueClass}">${esc(dateText(d.datum))}</span></td>
         <td><strong class="v58Amount">${esc(money(d.betrag))}</strong></td>
@@ -7599,19 +7599,19 @@ if ('serviceWorker' in navigator) {
   }
 
   function exportAktePdfV58(){
-    const d=debtsArr()[selectedIndexV58]; if(!d){ toastMsg('Keine Schuld ausgewählt.'); return; }
+    const d=debtsArr()[selectedIndexV58]; if(!d){ toastMsg('Keine Schulden ausgewählt.'); return; }
     try{
       const jspdf = window.jspdf || window.jsPDF || {}; const jsPDF = jspdf.jsPDF || window.jsPDF;
       if(!jsPDF) throw new Error('jsPDF fehlt');
       const doc=new jsPDF(); let y=16;
-      doc.setFontSize(18); doc.text('Schuld-Akte',14,y); y+=10;
+      doc.setFontSize(18); doc.text('Schulden-Akte',14,y); y+=10;
       doc.setFontSize(11);
       const lines=[['Name',d.name],['Grund',d.grund],['Restbetrag',money(d.betrag)],['Status',statusLabelV58(d.status)],['Fällig am',dateText(d.datum)],['Aktenzeichen',d.aktenzeichen||d.caseNumber||'–'],['Notizen',String(noteCount(d))],['Dokumente',String(docCount(d))]];
       lines.forEach(([a,b])=>{ doc.text(a+': '+String(b||'–'),14,y); y+=8; });
       const notes=Array.isArray(d.notesHistory)?d.notesHistory:[];
       if(notes.length){ y+=4; doc.setFontSize(13); doc.text('Notizen',14,y); y+=8; doc.setFontSize(10); notes.slice(-8).forEach(n=>{ doc.text(doc.splitTextToSize((dateText(n.at)+' - '+(n.text||'')),180),14,y); y+=12; }); }
-      doc.save('Schuld-Akte_'+String(d.name||'Schuld').replace(/[^a-z0-9-_]+/gi,'_')+'.pdf');
-      toastMsg('Schuld-Akte als PDF erstellt.');
+      doc.save('Schulden-Akte_'+String(d.name||'Schulden').replace(/[^a-z0-9-_]+/gi,'_')+'.pdf');
+      toastMsg('Schulden-Akte als PDF erstellt.');
     }catch(e){ toastMsg('PDF konnte nicht erstellt werden.'); }
   }
 
@@ -7634,7 +7634,7 @@ if ('serviceWorker' in navigator) {
   }
   function showUndoV58(){
     let bar=$('v58UndoBar'); if(!bar){ bar=document.createElement('div'); bar.id='v58UndoBar'; bar.className='v58UndoBar'; document.body.appendChild(bar); }
-    bar.innerHTML='<span>Schuld in den Papierkorb verschoben.</span><button type="button">Rückgängig</button>';
+    bar.innerHTML='<span>Schulden in den Papierkorb verschoben.</span><button type="button">Rückgängig</button>';
     bar.classList.add('show');
     bar.querySelector('button').onclick=()=>{
       if(!lastDeletedV58) return;
@@ -7683,6 +7683,88 @@ if ('serviceWorker' in navigator) {
 @media (max-width:1120px){#v58KpiBoard,#v58FilterPanel,#v58AdminBox,#v58AktePlus,.v58UndoBar{display:none!important;}}
 @media (min-width:1121px) and (max-width:1380px){.v58KpiBoard{grid-template-columns:repeat(3,1fr)}.v58FilterPanel{grid-template-columns:repeat(2,1fr)}.v58AkteActions{grid-template-columns:1fr}.v58AkteFacts{grid-template-columns:1fr}}
 </style>
+
+
+
+<style id="v59-calm-left-menu-style">
+/* v59: Ruhiges linkes Menü – Desktop. Mobile/Handy bleibt unverändert. */
+@media (min-width: 1121px){
+  .sidebarNav.v59CalmMenu{gap:7px;}
+  .v59MenuSep{height:1px;background:rgba(255,255,255,.08);margin:12px 10px;}
+  .sideNavBtn.v59EditParent{justify-content:space-between;}
+  .v59Chevron{margin-left:auto;opacity:.72;font-size:13px;transition:transform .18s ease;}
+  .v59EditGroup.open .v59Chevron{transform:rotate(180deg);}
+  .v59SubMenu{display:none;margin:4px 0 2px 18px;padding-left:10px;border-left:1px solid rgba(255,255,255,.08);gap:5px;}
+  .v59EditGroup.open .v59SubMenu{display:grid;}
+  .v59SubBtn{width:100%;min-height:38px;border:0;background:transparent;color:rgba(226,237,255,.78);display:flex;align-items:center;gap:10px;padding:0 10px;border-radius:13px;font-weight:800;text-align:left;cursor:pointer;}
+  .v59SubBtn:hover{background:rgba(255,255,255,.06);color:#fff;}
+  .v59MenuVersion{margin-top:12px;text-align:center;color:rgba(226,237,255,.48);font-size:12px;font-weight:800;}
+  .v59ModeLine{display:flex;align-items:center;gap:10px;margin:12px 10px 0;color:rgba(226,237,255,.78);font-weight:800;font-size:13px;}
+  .v59ModeDot{width:8px;height:8px;border-radius:999px;background:#58e69a;box-shadow:0 0 0 4px rgba(88,230,154,.12);margin-left:auto;}
+  #sideCreditors,#sideEditV56{display:none!important;}
+}
+</style>
+<script id="v59-calm-left-menu-js">
+(function(){
+  function $(id){ return document.getElementById(id); }
+  function scrollToId(id){ const el=$(id); if(el) el.scrollIntoView({behavior:'smooth', block:'start'}); }
+  function openEdit(){
+    try{
+      if(typeof window.openEditPageV56==='function') return window.openEditPageV56();
+      const b=$('sideEditV56'); if(b) return b.click();
+    }catch(e){}
+    scrollToId('editPageV56');
+  }
+  function openCreditors(){
+    try{
+      if(typeof window.openCreditorsV39==='function') return window.openCreditorsV39();
+      if(typeof window.openCreditorsV37==='function') return window.openCreditorsV37();
+    }catch(e){}
+    openEdit();
+  }
+  function openTrash(){ const b=$('btnTrashV54'); if(b) b.click(); else scrollToId('trashListV54'); }
+  function buildMenu(){
+    const nav=document.querySelector('.sidebarNav');
+    if(!nav || nav.dataset.v59Menu==='1') return;
+    nav.dataset.v59Menu='1';
+    nav.classList.add('v59CalmMenu');
+    nav.innerHTML = `
+      <button class="sideNavBtn active" type="button" data-v59="overview"><span class="navIco">⌂</span><span>Übersicht</span></button>
+      <button class="sideNavBtn" type="button" data-v59="new"><span class="navIco">＋</span><span>Neue Schulden</span></button>
+      <div class="v59EditGroup open" id="v59EditGroup">
+        <button class="sideNavBtn v59EditParent" type="button" data-v59="edit"><span class="navIco">✎</span><span>Bearbeiten</span><span class="v59Chevron">⌄</span></button>
+        <div class="v59SubMenu">
+          <button class="v59SubBtn" type="button" data-v59="creditors"><span>👥</span><span>Gläubiger</span></button>
+          <button class="v59SubBtn" type="button" data-v59="categories"><span>🏷</span><span>Kategorien</span></button>
+        </div>
+      </div>
+      <button class="sideNavBtn" type="button" data-v59="trash"><span class="navIco">🗑</span><span>Papierkorb</span></button>
+      <div class="v59MenuSep"></div>
+      <button class="sideNavBtn" type="button" data-v59="settings"><span class="navIco">⚙</span><span>Einstellungen</span></button>
+      <div class="v59MenuVersion">v59</div>`;
+    nav.addEventListener('click', function(e){
+      const btn=e.target.closest('[data-v59]'); if(!btn) return;
+      const act=btn.getAttribute('data-v59');
+      if(btn.classList.contains('sideNavBtn')){ nav.querySelectorAll('.sideNavBtn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); }
+      if(act==='overview') scrollToId('dashboardTop');
+      if(act==='new') scrollToId('newDebtSection');
+      if(act==='edit') $('v59EditGroup')?.classList.toggle('open');
+      if(act==='creditors') openCreditors();
+      if(act==='categories') openEdit();
+      if(act==='trash') openTrash();
+      if(act==='settings') openEdit();
+    });
+    const bottom=document.querySelector('.sidebarBottom');
+    if(bottom){ bottom.innerHTML='<div class="v59ModeLine"><span>🌙 Dunkelmodus</span><span class="v59ModeDot"></span></div>'; }
+  }
+  document.addEventListener('DOMContentLoaded', function(){
+    buildMenu();
+    setTimeout(buildMenu,200);
+    setTimeout(buildMenu,800);
+    setTimeout(function(){ const sc=$('sideCreditors'); if(sc) sc.style.display='none'; const se=$('sideEditV56'); if(se) se.style.display='none'; },1200);
+  });
+})();
+</script>
 
 </body>
 </html>
