@@ -8943,5 +8943,89 @@ Aktenzeichen: AZ-123',onTextareaConfirm:function(text){ applyPasted(text||''); }
 })();
 </script>
 
+
+<style id="v74-handy-view-restore-style">
+/* v74: Handy-Seite wieder auswählbar, nur eine Versionsnummer. Handy-Layout selbst bleibt unverändert. */
+@media (min-width:1121px){
+  .heroTopActions{display:flex !important; align-items:center !important; gap:10px !important;}
+  .heroTopActions > .visibleViewSwitch{display:inline-flex !important; align-items:center !important; gap:8px !important;}
+  .heroTopActions > .v63DateBadge{display:inline-flex !important;}
+  .visibleViewSwitch button{
+    display:inline-flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    min-height:38px !important;
+    padding:0 12px !important;
+    border-radius:13px !important;
+    font-size:13px !important;
+    font-weight:850 !important;
+    background:#13233a !important;
+    border:1px solid rgba(255,255,255,.08) !important;
+    color:#eaf2ff !important;
+    box-shadow:none !important;
+  }
+  .visibleViewSwitch button.activeView{background:linear-gradient(135deg,#1d56df,#377eff)!important;color:#fff!important;}
+  body.force-mobile-view .dashboardContentGrid{grid-template-columns:minmax(0,760px) !important;justify-content:center !important;}
+  body.force-mobile-view #desktopTable, body.force-mobile-view .desktopDetailPanel, body.force-mobile-view .desktopAktePanel{display:none !important;}
+  body.force-mobile-view #mobileList{display:grid !important;}
+  body.force-mobile-view .sidebar{display:none !important;}
+  body.force-mobile-view .dashboardShell{grid-template-columns:1fr !important;}
+  body.force-mobile-view .contentArea{max-width:820px;margin:0 auto;}
+  .v59MenuVersion,.v67CurrentVersion,#v67CurrentVersion,#v68CurrentVersion,#v69CurrentVersion,#v70OnlyVersion,#v71OnlyVersion,#v72OnlyVersion,#v73OnlyVersion{display:none !important;}
+  .v74OnlyVersion{display:block!important;margin:10px 8px 0!important;text-align:center!important;color:#eaf2ff!important;font-size:12px!important;font-weight:900!important;letter-spacing:.05em;}
+}
+@media (max-width:1120px){.v74OnlyVersion{display:none!important;}}
+</style>
+<script id="v74-handy-view-restore-js">
+(function(){
+  const APP_VERSION='v74';
+  function $(id){return document.getElementById(id);}
+  function cleanVersions(){
+    try{ document.querySelectorAll('.v59MenuVersion,.v67CurrentVersion,#v67CurrentVersion,#v68CurrentVersion,#v69CurrentVersion,#v70OnlyVersion,#v71OnlyVersion,#v72OnlyVersion,#v73OnlyVersion').forEach(el=>el.remove()); }catch(e){}
+    const bottom=document.querySelector('.sidebarBottom');
+    if(bottom){
+      let box=$('v74OnlyVersion');
+      if(!box){ box=document.createElement('div'); box.id='v74OnlyVersion'; box.className='v74OnlyVersion'; bottom.appendChild(box); }
+      box.textContent=APP_VERSION;
+    }
+  }
+  function ensureViewSwitch(){
+    const actions=document.querySelector('.heroTopActions');
+    if(!actions) return;
+    let wrap=document.querySelector('.visibleViewSwitch');
+    if(!wrap){
+      wrap=document.createElement('div');
+      wrap.className='visibleViewSwitch';
+      wrap.innerHTML='<button id="viewDesktopVisible" class="secondary" type="button">🖥 Desktop</button><button id="viewMobileVisible" class="secondary" type="button">📱 Handy</button>';
+      actions.insertBefore(wrap, actions.firstChild);
+    }
+    bindButtons();
+  }
+  function applyView(view){
+    const mobile = view === 'mobile';
+    try{ localStorage.setItem('view', mobile ? 'mobile':'desktop'); }catch(e){}
+    document.body.classList.toggle('force-mobile-view', mobile);
+    const desktopTable=$('desktopTable'), mobileList=$('mobileList'), panel=$('desktopDetailPanel');
+    if(desktopTable) desktopTable.style.display = mobile ? 'none' : 'block';
+    if(mobileList) mobileList.style.display = mobile ? 'grid' : 'none';
+    if(panel) panel.style.display = mobile ? 'none' : '';
+    $('viewDesktopVisible')?.classList.toggle('activeView', !mobile);
+    $('viewMobileVisible')?.classList.toggle('activeView', mobile);
+    try{ if(typeof window.render === 'function') window.render(); }catch(e){}
+  }
+  function bindButtons(){
+    const d=$('viewDesktopVisible'), m=$('viewMobileVisible');
+    if(d && d.dataset.v74!=='1'){ d.dataset.v74='1'; d.addEventListener('click', function(e){e.preventDefault(); applyView('desktop');}, true); }
+    if(m && m.dataset.v74!=='1'){ m.dataset.v74='1'; m.addEventListener('click', function(e){e.preventDefault(); applyView('mobile');}, true); }
+    const isMobile=document.body.classList.contains('force-mobile-view');
+    d?.classList.toggle('activeView', !isMobile);
+    m?.classList.toggle('activeView', isMobile);
+  }
+  function init(){ cleanVersions(); ensureViewSwitch(); bindButtons(); }
+  document.addEventListener('DOMContentLoaded', function(){ init(); setTimeout(init,300); setTimeout(init,1200); });
+  setInterval(init,1500);
+})();
+</script>
+
 </body>
 </html>
