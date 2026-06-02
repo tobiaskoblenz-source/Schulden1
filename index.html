@@ -3003,9 +3003,7 @@ body.force-mobile-view .dashboardShell{
   <div class="modalBox newDebtModal">
     <div class="modalHeaderRow">
       <div>
-        <span class="modalKicker">Neuer Eintrag</span>
         <h3>Neue Schulden anlegen</h3>
-        <p class="v64AddLead">Erfasse alle wichtigen Informationen in einer ruhigen, kompakten Maske.</p>
       </div>
       <button id="m_close" class="secondary modalCloseBtn" type="button" aria-label="Schließen">✕</button>
     </div>
@@ -3034,7 +3032,11 @@ body.force-mobile-view .dashboardShell{
           </div>
           <div>
             <label class="fieldLabel" for="m_aktenzeichen">Aktenzeichen</label>
-            <input id="m_aktenzeichen" placeholder="z. B. AZ-2026-05874">
+            <input id="m_aktenzeichen" placeholder="z. B. AZ-2025-00123">
+          </div>
+          <div>
+            <label class="fieldLabel" for="m_category">Kategorie</label>
+            <select id="m_category"></select>
           </div>
           <div>
             <label class="fieldLabel">Status</label>
@@ -3050,11 +3052,12 @@ body.force-mobile-view .dashboardShell{
       </section>
 
       <section class="newDebtStep collapsibleStep">
-        <button id="toggleContactFields" class="stepToggle" type="button" aria-expanded="false">
-          <span><b>3</b> Ansprechpartner hinzufügen</span>
-          <em>Optional</em>
-        </button>
-        <div id="newDebtContactFields" class="optionalFields" hidden>
+        <div id="toggleContactFields" class="stepToggle" aria-expanded="true">
+          <span><b>4</b> Ansprechpartner</span>
+          <em>(optional)</em>
+          <span class="v65SectionArrow">⌄</span>
+        </div>
+        <div id="newDebtContactFields" class="optionalFields">
           <div class="newDebtGrid">
             <div>
               <label class="fieldLabel" for="m_contactRepresentative">Name / Vertreter</label>
@@ -3062,7 +3065,7 @@ body.force-mobile-view .dashboardShell{
             </div>
             <div>
               <label class="fieldLabel" for="m_contactPhone">Telefonnummer</label>
-              <input id="m_contactPhone" type="tel" placeholder="+49 ...">
+              <input id="m_contactPhone" type="tel" placeholder="z. B. 0151 123456">
             </div>
             <div class="wideField">
               <label class="fieldLabel" for="m_contactAddress">Anschrift</label>
@@ -3070,15 +3073,15 @@ body.force-mobile-view .dashboardShell{
             </div>
             <div class="wideField">
               <label class="fieldLabel" for="m_contactEmail">E-Mail</label>
-              <input id="m_contactEmail" type="email" placeholder="name@beispiel.de">
+              <input id="m_contactEmail" type="email" placeholder="z. B. kontakt@firma.de">
             </div>
           </div>
         </div>
       </section>
 
       <section class="newDebtStep">
-        <div class="stepHead"><span>4</span><strong>Erste Notiz</strong><em>Optional</em></div>
-        <textarea id="m_firstNote" class="noteBox" placeholder="z. B. Erstkontakt geführt, Rückzahlung zugesagt..."></textarea>
+        <div class="stepHead"><span>5</span><strong>Erste Notiz</strong></div>
+        <textarea id="m_firstNote" class="noteBox" placeholder="Trage hier eine Notiz zur Schuld ein..."></textarea>
       </section>
     </div>
 
@@ -8038,7 +8041,8 @@ Aktenzeichen: AZ-123',
   }
   function applyPastedData(text){
     const map={};
-    const lines=String(text||'').split(/?
+    const lines=String(text||'').split(/
+?
 /).map(x=>x.trim()).filter(Boolean);
     lines.forEach(line=>{
       const parts=line.split(/:(.+)/); if(parts.length<3) return;
@@ -8073,6 +8077,127 @@ Aktenzeichen: AZ-123',
   window.closeAddModal=function(){ if(typeof oldClose==='function') oldClose(); };
   document.addEventListener('DOMContentLoaded', function(){ patchModal(); setTimeout(patchModal,300); setTimeout(patchModal,1200); });
   setInterval(function(){ const m=$('addModal'); if(m && m.style.display==='flex') patchModal(); }, 1500);
+})();
+</script>
+
+
+<style id="v65-modal-1to1-style">
+/* v65: Neue-Schulden-Maske näher 1:1 an der Vorlage */
+.newDebtModal{width:min(670px,92vw)!important;border-radius:22px!important;overflow:hidden!important;padding:18px 18px 16px!important;}
+.newDebtModal .modalHeaderRow{position:relative;padding:4px 0 14px 54px!important;border-bottom:0!important;align-items:center!important;min-height:40px;}
+.newDebtModal .modalHeaderRow::before{content:"📄";position:absolute;left:0;top:0;width:40px;height:40px;border-radius:13px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#2058de,#377eff);font-size:20px;box-shadow:0 10px 24px rgba(55,126,255,.25);}
+.newDebtModal .modalKicker,.newDebtModal .v64AddLead{display:none!important;}
+.newDebtModal .modalHeaderRow h3{margin:0!important;color:#fff!important;font-size:20px!important;font-weight:800!important;line-height:1.15!important;}
+.newDebtModal .modalCloseBtn{min-width:38px!important;min-height:38px!important;border-radius:12px!important;position:absolute;right:0;top:2px;}
+.newDebtModal .newDebtSteps{display:grid!important;gap:10px!important;margin-top:6px!important;}
+.newDebtModal .newDebtStep{padding:12px 14px!important;border-radius:18px!important;background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.025))!important;border:1px solid rgba(255,255,255,.08)!important;}
+.newDebtModal .stepHead,.newDebtModal .stepToggle{display:flex;align-items:center;gap:8px;margin-bottom:10px!important;color:#fff!important;background:transparent!important;border:0!important;padding:0!important;width:100%!important;}
+.newDebtModal .stepHead span,.newDebtModal .stepToggle b{width:22px;height:22px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;color:#4f8cff;background:rgba(79,140,255,.10);font-size:12px;font-weight:900;margin-right:2px;}
+.newDebtModal .stepHead strong,.newDebtModal .stepToggle span{font-size:13px!important;font-weight:800!important;color:#fff!important;letter-spacing:0!important;text-transform:none!important;}
+.newDebtModal .stepToggle em{font-style:normal;color:#9fb0cc;font-size:11px;margin-left:2px;}
+.newDebtModal .v65SectionArrow{margin-left:auto;color:#90a6c7;font-size:14px;opacity:.8;}
+.newDebtModal .fieldLabel{display:block;font-size:11px!important;color:#dfeaff!important;letter-spacing:0!important;text-transform:none!important;margin-bottom:6px!important;}
+.newDebtModal .newDebtGrid{gap:10px!important;grid-template-columns:repeat(12,minmax(0,1fr))!important;}
+.newDebtModal .newDebtGrid > div{grid-column:span 6;}
+.newDebtModal .newDebtGrid > div:nth-child(2), .newDebtModal .newDebtGrid > div:nth-child(3){grid-column:span 3;}
+.newDebtModal .newDebtGrid > div.wideField{grid-column:1/-1!important;}
+.newDebtModal #newDebtContactFields .newDebtGrid > div{grid-column:span 4;}
+.newDebtModal #newDebtContactFields .wideField{display:none!important;}
+.newDebtModal input,.newDebtModal select,.newDebtModal textarea{min-height:40px!important;border-radius:12px!important;font-size:13px!important;padding:0 12px!important;background:#15243a!important;border:1px solid rgba(255,255,255,.08)!important;color:#e9f1ff!important;box-shadow:none!important;}
+.newDebtModal textarea{padding:10px 12px!important;min-height:52px!important;resize:vertical;}
+.newDebtModal select{appearance:auto;}
+.newDebtModal .statusPills{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:10px!important;}
+.newDebtModal .statusPill{min-height:38px!important;border-radius:12px!important;font-size:13px!important;padding:0 10px!important;display:flex!important;align-items:center;justify-content:center;}
+.newDebtModal .optionalFields[hidden]{display:block!important;}
+.newDebtModal .modalActions.newDebtFooter{display:grid!important;grid-template-columns:1fr 1fr 1.15fr!important;gap:10px!important;position:static!important;background:none!important;margin-top:12px!important;padding-top:0!important;}
+.newDebtModal #m_cancel,.newDebtModal #m_paste{background:#13233a!important;border:1px solid rgba(255,255,255,.08)!important;color:#eaf2ff!important;box-shadow:none!important;}
+.newDebtModal #m_add{background:linear-gradient(135deg,#1d56df,#377eff)!important;}
+.newDebtModal #m_add_more{display:none!important;}
+.newDebtModal #m_creditor_wrap{display:none!important;}
+@media (max-width:760px){
+  .newDebtModal{width:min(96vw,96vw)!important;padding:14px!important;}
+  .newDebtModal .newDebtGrid{grid-template-columns:1fr!important;}
+  .newDebtModal .newDebtGrid > div,.newDebtModal #newDebtContactFields .newDebtGrid > div{grid-column:auto!important;}
+  .newDebtModal .statusPills{grid-template-columns:1fr 1fr!important;}
+  .newDebtModal .modalActions.newDebtFooter{grid-template-columns:1fr!important;}
+}
+</style>
+<script id="v65-modal-1to1-js">
+(function(){
+  const CAT_KEY='schulden_creditor_categories_v56';
+  const DEFAULT_CATS=['Krankenkasse','Amt / Behörde','Gericht','Inkasso','Versicherung','Privatperson','Sonstiges'];
+  function $(id){return document.getElementById(id);}
+  function getCats(){
+    try{ const raw=JSON.parse(localStorage.getItem(CAT_KEY)||'null'); if(Array.isArray(raw)&&raw.length) return raw.map(String).filter(Boolean);}catch(e){}
+    return DEFAULT_CATS.slice();
+  }
+  function fillCats(){
+    const sel=$('m_category'); if(!sel) return;
+    const current=sel.value || 'Sonstiges';
+    const cats=getCats();
+    if(current && !cats.some(c=>c.toLowerCase()===current.toLowerCase())) cats.push(current);
+    sel.innerHTML=cats.map(c=>'<option value="'+escapeHtml(c)+'">'+escapeHtml(c)+'</option>').join('');
+    sel.value=current;
+  }
+  function escapeHtml(v){ return String(v??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#039;'); }
+  function parseAmount(t){ const n=parseFloat(String(t||'').replace(/[^\d,.-]/g,'').replace(/\.(?=\d{3}(\D|$))/g,'').replace(',','.')); return Number.isFinite(n)?n:NaN; }
+  function parseDate(t){ t=String(t||'').trim(); if(!t) return ''; if(/^\d{4}-\d{2}-\d{2}$/.test(t)) return t; const m=t.match(/^(\d{1,2})[.\/-](\d{1,2})[.\/-](\d{2,4})$/); if(m){ const y=m[3].length===2?'20'+m[3]:m[3]; return y+'-'+m[2].padStart(2,'0')+'-'+m[1].padStart(2,'0'); } const d=new Date(t); return isNaN(d)?'':d.toISOString().slice(0,10); }
+  function setVal(id,val){ const el=$(id); if(el && val!=null && val!=='') el.value=val; }
+  function toast(msg){ try{ if(typeof showToast==='function') showToast(msg); else alert(msg);}catch(e){ alert(msg); } }
+  function readDebts(){ if(Array.isArray(window.debts)) return window.debts; if(typeof debts!=='undefined' && Array.isArray(debts)) return debts; return []; }
+  function notesTextSafe(d){ try{ return typeof notesText==='function'?notesText(d):(d.notesHistory||[]).map(x=>x.text).join('
+'); }catch(e){ return ''; } }
+  function saveModal(keepOpen){
+    const name=$('m_name')?.value.trim()||'';
+    const grund=$('m_grund')?.value.trim()||'';
+    const betrag=parseAmount($('m_betrag')?.value);
+    const datum=$('m_datum')?.value||'';
+    const aktenzeichen=$('m_aktenzeichen')?.value.trim()||'';
+    const status=$('m_status')?.value||'offen';
+    const category=$('m_category')?.value||'Sonstiges';
+    if(!name){ toast('Bitte Name / Gläubiger eintragen.'); $('m_name')?.focus(); return false; }
+    if(!grund){ toast('Bitte Grund eintragen.'); $('m_grund')?.focus(); return false; }
+    if(!Number.isFinite(betrag) || betrag<=0){ toast('Bitte Betrag korrekt eintragen.'); $('m_betrag')?.focus(); return false; }
+    const contact={representative:$('m_contactRepresentative')?.value.trim()||'',address:$('m_contactAddress')?.value.trim()||'',email:$('m_contactEmail')?.value.trim()||'',phone:$('m_contactPhone')?.value.trim()||''};
+    const note=$('m_firstNote')?.value.trim()||'';
+    const debt={name,grund,betrag,datum,aktenzeichen,status,category,contactDetails:contact,contactPerson:[contact.representative,contact.address,contact.email,contact.phone].filter(Boolean).join(' | '),notes:'',notesHistory:note?[{at:new Date().toISOString(),text:note}]:[],history:[],correspondence:[]};
+    debt.notes=notesTextSafe(debt);
+    const arr=readDebts(); arr.push(debt);
+    try{ if(typeof save==='function') save(); else localStorage.setItem('godmode_debts',JSON.stringify(arr)); }catch(e){}
+    try{ if(typeof render==='function') render(); }catch(e){}
+    toast('Schulden gespeichert ✅');
+    clearForm();
+    if(keepOpen){ $('addModal').style.display='flex'; $('addModal').setAttribute('aria-hidden','false'); document.body.classList.add('modalOpen'); $('m_name')?.focus(); }
+    else if(typeof window.closeAddModal==='function') window.closeAddModal();
+    return true;
+  }
+  function clearForm(){ ['m_name','m_grund','m_betrag','m_datum','m_aktenzeichen','m_contactRepresentative','m_contactAddress','m_contactEmail','m_contactPhone','m_firstNote'].forEach(id=>{ const el=$(id); if(el) el.value=''; }); if($('m_category')) $('m_category').value='Sonstiges'; if(typeof setNewDebtStatus==='function') setNewDebtStatus('offen'); if(typeof setStatusV13==='function') setStatusV13('offen'); }
+  function openPaste(){ if(typeof window.openActionModal!=='function') return; window.openActionModal({title:'Daten einfügen',body:'Füge hier Daten ein. Beispiel:
+
+Name/Gläubiger: Stadtwerke
+Grund: Stromnachzahlung
+Betrag: 125,90
+Fällig am: 30.06.2026
+Aktenzeichen: AZ-123
+Telefon: 0151 123456
+E-Mail: kontakt@firma.de
+Notiz: Brief erhalten',textareaLabel:'Daten',textareaPlaceholder:'Name/Gläubiger: Stadtwerke
+Grund: Stromnachzahlung
+Betrag: 125,90
+Fällig am: 30.06.2026
+Aktenzeichen: AZ-123',onTextareaConfirm:function(text){ applyPasted(text||''); }}); }
+  function applyPasted(text){ const map={}; String(text||'').split(/?
+/).map(x=>x.trim()).filter(Boolean).forEach(line=>{ const m=line.match(/^([^:]+):\s*(.+)$/); if(m) map[m[1].trim().toLowerCase()]=m[2].trim(); }); const get=(...ks)=>{ for(const k of ks){ const v=map[k.toLowerCase()]; if(v!=null) return v; } return ''; }; setVal('m_name', get('name/gläubiger','name / gläubiger','name','gläubiger')); setVal('m_grund', get('grund')); const a=parseAmount(get('betrag','summe','restbetrag')); if(Number.isFinite(a)) setVal('m_betrag', a); const d=parseDate(get('fällig am','faellig am','fällig','datum')); if(d) setVal('m_datum', d); setVal('m_aktenzeichen', get('aktenzeichen','az')); setVal('m_contactRepresentative', get('ansprechpartner','name / vertreter','vertreter')); setVal('m_contactPhone', get('telefon','telefonnummer','phone')); setVal('m_contactEmail', get('e-mail','email','mail')); setVal('m_contactAddress', get('anschrift','adresse')); setVal('m_firstNote', get('notiz','notizen')); try{ if(typeof window.closeActionModal==='function') window.closeActionModal(); }catch(e){} toast('Daten eingefügt ✅'); }
+  function bindButtons(){
+    const add=$('m_add'), cancel=$('m_cancel'), paste=$('m_paste');
+    if(add && !add.dataset.v65){ add.dataset.v65='1'; add.addEventListener('click', function(e){ e.preventDefault(); e.stopImmediatePropagation(); saveModal(false); }, true); }
+    if(cancel && !cancel.dataset.v65){ cancel.dataset.v65='1'; cancel.addEventListener('click', function(e){ e.preventDefault(); e.stopImmediatePropagation(); if(typeof window.closeAddModal==='function') window.closeAddModal(); }, true); }
+    if(paste && !paste.dataset.v65){ paste.dataset.v65='1'; paste.addEventListener('click', function(e){ e.preventDefault(); e.stopImmediatePropagation(); openPaste(); }, true); }
+    const t=$('toggleContactFields'); if(t) t.addEventListener('click', function(e){ e.preventDefault(); }, true);
+  }
+  function init(){ fillCats(); bindButtons(); const wrap=$('m_creditor_wrap'); if(wrap) wrap.style.display='none'; const fields=$('newDebtContactFields'); if(fields) fields.hidden=false; const toggle=$('toggleContactFields'); if(toggle) toggle.setAttribute('aria-expanded','true'); }
+  document.addEventListener('DOMContentLoaded', function(){ setTimeout(init,200); setTimeout(init,900); });
+  setInterval(init,1500);
 })();
 </script>
 
