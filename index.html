@@ -8852,5 +8852,96 @@ Aktenzeichen: AZ-123',onTextareaConfirm:function(text){ applyPasted(text||''); }
 })();
 </script>
 
+
+<style id="v73-sidebar-version-stable-style">
+/* v73: linkes Menü stabil, kompakter, nur eine Versionsnummer. Handy bleibt unverändert. */
+@media (min-width:1121px){
+  :root{ --sidebar-w: clamp(202px, 14.2vw, 226px) !important; }
+  .sidebar{padding:22px 13px 16px !important;}
+  .sidebarNav.v59CalmMenu{gap:7px !important;}
+  .sideNavBtn{
+    min-height:50px !important;
+    padding:0 14px !important;
+    border-radius:16px !important;
+    gap:11px !important;
+    font-size:14px !important;
+    font-weight:800 !important;
+  }
+  .sideNavBtn .navIco{
+    width:24px !important;
+    height:24px !important;
+    flex:0 0 24px !important;
+    border-radius:9px !important;
+    font-size:12px !important;
+  }
+  .sideNavBtn.v59EditParent{min-height:48px !important;}
+  .v59EditGroup{padding:4px !important;border-radius:18px !important;}
+  .v59EditGroup > .sideNavBtn{margin-bottom:6px !important;}
+  .v59SubMenu{margin:0 0 2px 12px !important;padding:2px 0 2px 10px !important;gap:5px !important;}
+  .v59SubBtn{
+    min-height:34px !important;
+    padding:0 9px !important;
+    border-radius:12px !important;
+    font-size:12.5px !important;
+    font-weight:750 !important;
+    gap:8px !important;
+  }
+  .v59MenuSep{margin:12px 9px !important;}
+  .v59ModeLine{margin:10px 7px 0 !important;padding:10px 11px !important;border-radius:15px !important;font-size:12.5px !important;}
+
+  .v59MenuVersion,
+  .v67CurrentVersion,
+  .v70OnlyVersion,
+  #v67CurrentVersion,
+  #v68CurrentVersion,
+  #v69CurrentVersion,
+  #v70OnlyVersion,
+  #v71OnlyVersion,
+  #v72OnlyVersion{
+    display:none !important;
+    visibility:hidden !important;
+    height:0 !important;
+    min-height:0 !important;
+    max-height:0 !important;
+    margin:0 !important;
+    padding:0 !important;
+    overflow:hidden !important;
+  }
+  #v73OnlyVersion{
+    display:block !important;
+    visibility:visible !important;
+    height:auto !important;
+    margin:10px 8px 0 !important;
+    padding:6px 0 0 !important;
+    text-align:center !important;
+    color:#eaf2ff !important;
+    font-size:12px !important;
+    font-weight:900 !important;
+    letter-spacing:.05em !important;
+  }
+}
+@media (max-width:1120px){#v73OnlyVersion{display:none!important;}}
+</style>
+<script id="v73-sidebar-version-stable-js">
+(function(){
+  const APP_VERSION='v73';
+  function apply(){
+    try{ document.querySelectorAll('.v59MenuVersion,.v67CurrentVersion,.v70OnlyVersion,#v67CurrentVersion,#v68CurrentVersion,#v69CurrentVersion,#v70OnlyVersion,#v71OnlyVersion,#v72OnlyVersion').forEach(el=>{ el.style.display='none'; el.style.visibility='hidden'; }); }catch(e){}
+    const bottom=document.querySelector('.sidebarBottom');
+    if(bottom){
+      let box=document.getElementById('v73OnlyVersion');
+      if(!box){
+        box=document.createElement('div');
+        box.id='v73OnlyVersion';
+        bottom.appendChild(box);
+      }
+      box.textContent=APP_VERSION;
+    }
+  }
+  document.addEventListener('DOMContentLoaded', function(){ apply(); setTimeout(apply,100); setTimeout(apply,500); setTimeout(apply,1300); });
+  setInterval(apply,600);
+})();
+</script>
+
 </body>
 </html>
