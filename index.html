@@ -12,7 +12,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="assets/icons/icon-192.png">
 <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
-<title>Schulden Manager – v60</title>
+<title>Schulden Manager – v59</title>
 
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
@@ -2808,7 +2808,7 @@ body.force-mobile-view .dashboardShell{
     <section class="hero heroDashboard">
       <div class="heroMain dashboardHeader">
         <div class="dashboardGreetingWrap">
-          <div class="eyebrow">Ruhiges Dashboard</div>
+          <div class="eyebrow">Ruhiges Dashboard · v59</div>
           <h1 id="greetingTitle">Guten Abend!</h1>
           <p id="greetingText">Hier ist die Übersicht deiner Schulden.</p>
         </div>
@@ -7741,13 +7741,13 @@ if ('serviceWorker' in navigator) {
       <button class="sideNavBtn" type="button" data-v59="trash"><span class="navIco">🗑</span><span>Papierkorb</span></button>
       <div class="v59MenuSep"></div>
       <button class="sideNavBtn" type="button" data-v59="settings"><span class="navIco">⚙</span><span>Einstellungen</span></button>
-      <div class="v59MenuVersion">v60</div>`;
+      <div class="v59MenuVersion">v59</div>`;
     nav.addEventListener('click', function(e){
       const btn=e.target.closest('[data-v59]'); if(!btn) return;
       const act=btn.getAttribute('data-v59');
       if(btn.classList.contains('sideNavBtn')){ nav.querySelectorAll('.sideNavBtn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); }
       if(act==='overview') scrollToId('dashboardTop');
-      if(act==='new'){ if(typeof window.openAddModal==='function') window.openAddModal(); else scrollToId('newDebtSection'); }
+      if(act==='new') scrollToId('newDebtSection');
       if(act==='edit') $('v59EditGroup')?.classList.toggle('open');
       if(act==='creditors') openCreditors();
       if(act==='categories') openEdit();
@@ -7767,35 +7767,56 @@ if ('serviceWorker' in navigator) {
 </script>
 
 
-<style id="v60-calm-header-and-menu-fix">
-/* v60: Desktop ruhiger. Handy bleibt unverändert. */
+<style id="v62-sidebar-cleanup-style">
+/* v62: linkes Menü feiner, Verwaltungskasten entfernt, Handy bleibt unverändert */
 @media (min-width:1121px){
-  .dashboardGreetingWrap .eyebrow{display:none!important;}
-  #greetingTitle{font-size:clamp(24px,2vw,34px)!important;line-height:1.08!important;margin-bottom:4px!important;}
-  #greetingText{font-size:13px!important;line-height:1.35!important;opacity:.72!important;margin-top:0!important;}
-  .hero.heroDashboard{padding-top:18px!important;padding-bottom:18px!important;}
-  .heroMain.dashboardHeader{align-items:center!important;}
+  .v58AdminBox{display:none !important;}
+  .v59SubMenu{margin:2px 0 0 18px !important; padding-left:8px !important; gap:4px !important;}
+  .v59SubBtn{
+    min-height:32px !important;
+    padding:0 8px !important;
+    font-size:13px !important;
+    font-weight:700 !important;
+    gap:8px !important;
+    color:rgba(226,237,255,.72) !important;
+  }
+  .v59SubBtn span:first-child{font-size:12px !important; opacity:.85;}
 }
 </style>
-<script id="v60-new-debt-menu-fix">
+<script id="v62-sidebar-cleanup-js">
 (function(){
-  function bindNewDebtMenu(){
-    document.querySelectorAll('[data-v59="new"]').forEach(function(btn){
-      if(btn.dataset.v60OpenForm==='1') return;
-      btn.dataset.v60OpenForm='1';
-      btn.addEventListener('click', function(e){
-        e.preventDefault();
-        e.stopPropagation();
-        if(typeof window.openAddModal === 'function') window.openAddModal();
-        else document.getElementById('btnOpenAdd')?.click();
-      }, true);
-    });
+  function $(id){ return document.getElementById(id); }
+  function applyV62(){
+    try{ document.querySelector('.v58AdminBox')?.remove(); }catch(e){}
+    try{ document.querySelectorAll('.v59MenuVersion').forEach(el=>el.textContent='v62'); }catch(e){}
+  }
+  function openNewDebtFromMenu(){
+    try{
+      if(typeof window.openAddModal === 'function') return window.openAddModal();
+    }catch(e){}
+    const btn=$('btnOpenAdd');
+    if(btn) btn.click();
+  }
+  function bindMenu(){
+    const nav=document.querySelector('.sidebarNav');
+    if(!nav || nav.dataset.v62Bound==='1') return;
+    nav.dataset.v62Bound='1';
+    nav.addEventListener('click', function(e){
+      const btn=e.target.closest('[data-v59="new"]');
+      if(!btn) return;
+      e.preventDefault();
+      e.stopPropagation();
+      openNewDebtFromMenu();
+    }, true);
   }
   document.addEventListener('DOMContentLoaded', function(){
-    bindNewDebtMenu();
-    setTimeout(bindNewDebtMenu, 250);
-    setTimeout(bindNewDebtMenu, 900);
+    applyV62();
+    bindMenu();
+    setTimeout(applyV62,200);
+    setTimeout(applyV62,900);
+    setTimeout(bindMenu,200);
   });
+  setInterval(applyV62,1500);
 })();
 </script>
 

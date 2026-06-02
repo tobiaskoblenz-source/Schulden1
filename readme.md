@@ -15,7 +15,7 @@ Hinweis:
 PDF-Erstellung nutzt weiterhin die in der App vorhandene jsPDF-Bibliothek.
 
 
-## v60
+## v59
 - Linkes Desktop-Menü beruhigt: Übersicht, Neue Schulden, Bearbeiten mit Gläubiger/Kategorien, Papierkorb, Einstellungen.
 - Sichtbare Texte „Schuld“ auf „Schulden“ geändert.
 - Handy-Seite bleibt unverändert.
