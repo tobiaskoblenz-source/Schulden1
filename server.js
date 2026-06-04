@@ -200,23 +200,63 @@ function paperlessResultArray(data){
   return [];
 }
 
-async function resolvePaperlessTagId(req, tagName){
-  const wanted = String(tagName || "").trim().toLowerCase();
+async function listPaperlessTags(req){
+  const collected = [];
+  let page = 1;
+  for(let guard = 0; guard < 10; guard++){
+    const result = await paperlessRawJson(req, "/api/tags/?page_size=200&ordering=name&page=" + page);
+    const arr = paperlessResultArray(result.data);
+    collected.push(...arr);
+    if(!result.data || !result.data.next || !arr.length) break;
+    page += 1;
+  }
+  return collected;
+}
+
+async function resolvePaperlessTag(req, tagName){
+  const wantedRaw = String(tagName || "").trim();
+  const wanted = wantedRaw.toLowerCase();
   if(!wanted || wanted === "*" || wanted === "all") return null;
-  const params = new URLSearchParams();
-  params.set("page_size", "200");
-  params.set("ordering", "name");
-  params.set("name__icontains", tagName);
-  const result = await paperlessRawJson(req, "/api/tags/?" + params.toString());
-  let tags = paperlessResultArray(result.data);
+
+  // 1) Schnellversuch mit Suchparameter, 2) Fallback mit kompletter Tag-Liste.
+  let tags = [];
+  try{
+    const params = new URLSearchParams();
+    params.set("page_size", "200");
+    params.set("ordering", "name");
+    params.set("name__icontains", wantedRaw);
+    const result = await paperlessRawJson(req, "/api/tags/?" + params.toString());
+    tags = paperlessResultArray(result.data);
+  }catch(e){ tags = []; }
+  if(!tags.length) tags = await listPaperlessTags(req);
+  else {
+    const all = await listPaperlessTags(req).catch(()=>[]);
+    const ids = new Set(tags.map(t=>String(t.id)));
+    for(const t of all){ if(!ids.has(String(t.id))) tags.push(t); }
+  }
   let found = tags.find(t => String(t.name || "").trim().toLowerCase() === wanted);
   if(!found){
-    // Fallback für Paperless-Versionen, die name__icontains ignorieren.
-    const all = await paperlessRawJson(req, "/api/tags/?page_size=200&ordering=name");
-    tags = paperlessResultArray(all.data);
-    found = tags.find(t => String(t.name || "").trim().toLowerCase() === wanted);
+    // Falls Paperless bei verschachtelten Tags Namen wie "Schulden/App" liefert.
+    found = tags.find(t => String(t.name || "").trim().split('/').pop().toLowerCase() === wanted);
   }
-  return found ? found.id : null;
+  return found || null;
+}
+
+async function paperlessDocumentQuery(req, params){
+  return await paperlessRawJson(req, "/api/documents/?" + params.toString());
+}
+
+function dedupePaperlessDocuments(results){
+  const seen = new Set();
+  const out = [];
+  for(const r of results){
+    const arr = paperlessResultArray(r.data);
+    for(const d of arr){
+      const id = String(d && d.id);
+      if(id && !seen.has(id)){ seen.add(id); out.push(d); }
+    }
+  }
+  return out;
 }
 
 
@@ -330,7 +370,7 @@ const server = http.createServer(async (req, res)=>{
     const url = new URL(req.url, `http://${req.headers.host || "localhost"}`);
 
     if(url.pathname === "/api/health"){
-      return sendJson(res, 200, {ok:true, service:"schulden-manager", version:"v83", paperless:Boolean(process.env.PAPERLESS_URL || process.env.PAPERLESS_BASE_URL)});
+      return sendJson(res, 200, {ok:true, service:"schulden-manager", version:"v84", paperless:Boolean(process.env.PAPERLESS_URL || process.env.PAPERLESS_BASE_URL)});
     }
 
     if(url.pathname === "/api/config"){
@@ -347,35 +387,81 @@ const server = http.createServer(async (req, res)=>{
       return paperlessFetch(req, res, "/api/statistics/");
     }
 
+
+    if(url.pathname === "/api/paperless/tags" && req.method === "GET"){
+      try{
+        const tags = await listPaperlessTags(req);
+        return sendJson(res, 200, {ok:true, paperlessTag:paperlessTagName(req), data:{count:tags.length, results:tags.map(t=>({id:t.id,name:t.name,document_count:t.document_count}))}});
+      }catch(err){
+        return sendJson(res, err.status || 500, err.payload || {ok:false, error:err.message || "Paperless Tags Fehler"});
+      }
+    }
     if(url.pathname === "/api/paperless/search" && req.method === "GET"){
       const query = url.searchParams.get("q") || "";
       const pageSize = Math.min(Math.max(parseInt(url.searchParams.get("page_size") || "20", 10) || 20, 1), 50);
       const requiredTag = String(url.searchParams.get("tag") || paperlessTagName(req) || "App").trim();
-      const params = new URLSearchParams();
-      params.set("page_size", String(pageSize));
-      params.set("ordering", "-created");
-      if(query.trim()) params.set("query", query.trim());
+      let tag = null;
       if(requiredTag && requiredTag !== "*" && requiredTag.toLowerCase() !== "all"){
         try{
-          const tagId = await resolvePaperlessTagId(req, requiredTag);
-          if(!tagId){
+          tag = await resolvePaperlessTag(req, requiredTag);
+          if(!tag){
+            const availableTags = await listPaperlessTags(req).catch(()=>[]);
             return sendJson(res, 200, {
               ok:true,
               paperlessTag: requiredTag,
               paperlessTagMissing: true,
-              hint: 'In Paperless wurde kein Tag mit dem Namen "' + requiredTag + '" gefunden. Bitte Schreibweise prüfen und Dokumente damit markieren.',
+              availableTags: availableTags.slice(0,50).map(t=>({id:t.id,name:t.name,document_count:t.document_count})),
+              hint: 'In Paperless wurde kein Tag mit dem Namen "' + requiredTag + '" gefunden. Bitte Schreibweise prüfen. Gefundene Tags werden zur Diagnose mitgeliefert.',
               data:{count:0,next:null,previous:null,results:[]}
             });
           }
-          params.set("tags__id__all", String(tagId));
         }catch(err){
           return sendJson(res, err.status || 500, err.payload || {ok:false, error:err.message || "Paperless Tag-Filter Fehler"});
         }
       }
       try{
-        const result = await paperlessRawJson(req, "/api/documents/?" + params.toString());
-        result.paperlessTag = requiredTag || "";
-        return sendJson(res, 200, result);
+        const attempts = [];
+        const base = () => { const p = new URLSearchParams(); p.set("page_size", String(pageSize)); p.set("ordering", "-created"); return p; };
+        if(tag){
+          // Paperless-Versionen unterscheiden sich bei den Filter-Parametern. Darum testen wir mehrere sichere Varianten.
+          const p1 = base(); if(query.trim()) p1.set("query", query.trim()); p1.set("tags__id__all", String(tag.id)); attempts.push({mode:"tags__id__all", params:p1});
+          const p2 = base(); if(query.trim()) p2.set("query", query.trim()); p2.set("tags__id__in", String(tag.id)); attempts.push({mode:"tags__id__in", params:p2});
+          const p3 = base(); p3.set("query", (query.trim() ? query.trim() + " " : "") + 'tag:"' + String(tag.name).replace(/"/g,'') + '"'); attempts.push({mode:"query_tag_quoted", params:p3});
+          const p4 = base(); p4.set("query", (query.trim() ? query.trim() + " " : "") + 'tag:' + String(tag.name).replace(/\s+/g,'\ ')); attempts.push({mode:"query_tag", params:p4});
+          // Wenn die Akten-Suche zu eng ist, wenigstens alle App-Dokumente zeigen.
+          const p5 = base(); p5.set("tags__id__all", String(tag.id)); attempts.push({mode:"tag_only", params:p5, relaxed:true});
+        }else{
+          const p = base(); if(query.trim()) p.set("query", query.trim()); attempts.push({mode:"no_tag", params:p});
+        }
+        const successful = [];
+        let firstError = null;
+        for(const attempt of attempts){
+          try{
+            const r = await paperlessDocumentQuery(req, attempt.params);
+            r._mode = attempt.mode; r._relaxed = Boolean(attempt.relaxed);
+            successful.push(r);
+            const arr = paperlessResultArray(r.data);
+            if(arr.length && !attempt.relaxed) break;
+            if(arr.length && attempt.relaxed) break;
+          }catch(e){ if(!firstError) firstError = e; }
+        }
+        if(!successful.length && firstError) throw firstError;
+        const merged = dedupePaperlessDocuments(successful);
+        const used = successful[successful.length-1] || {data:{}};
+        const relaxed = Boolean(used._relaxed) && merged.length > 0;
+        return sendJson(res, 200, {
+          ok:true,
+          usingEnv: used.usingEnv,
+          baseUrl: used.baseUrl,
+          insecureTls: used.insecureTls,
+          paperlessTag: requiredTag || "",
+          paperlessTagId: tag ? tag.id : null,
+          paperlessTagDocumentCount: tag ? tag.document_count : null,
+          searchMode: used._mode || "unknown",
+          relaxedSearch: relaxed,
+          hint: relaxed ? 'Mit dem Akten-Suchbegriff wurde nichts gefunden. Es werden deshalb alle Dokumente mit dem Tag "' + requiredTag + '" angezeigt.' : '',
+          data:{count: merged.length, next:null, previous:null, results: merged}
+        });
       }catch(err){
         return sendJson(res, err.status || 500, err.payload || {ok:false, error:err.message || "Paperless Suche Fehler"});
       }
