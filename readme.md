@@ -19,3 +19,12 @@ PDF-Erstellung nutzt weiterhin die in der App vorhandene jsPDF-Bibliothek.
 - Linkes Desktop-Menü beruhigt: Übersicht, Neue Schulden, Bearbeiten mit Gläubiger/Kategorien, Papierkorb, Einstellungen.
 - Sichtbare Texte „Schuld“ auf „Schulden“ geändert.
 - Handy-Seite bleibt unverändert.
+
+
+## v79
+- Paperless-ngx-Anbindung in der Desktop-Schulden-Akte ergänzt.
+- Neue Paperless-Sektion pro Akte: Dokumente suchen, PDF öffnen, in Paperless öffnen und Dokumente verknüpfen/lösen.
+- Server-Proxy ergänzt: /api/paperless/status, /api/paperless/search und /api/paperless/document/:id.
+- Empfohlen auf Railway: Variablen PAPERLESS_URL und PAPERLESS_TOKEN setzen. Alternativ können URL und Token im Browser gespeichert werden.
+- Wichtig: Wenn Paperless nur lokal auf der Synology erreichbar ist, muss die Schulden-App auch im selben Netz laufen oder Paperless muss für Railway erreichbar gemacht werden, z. B. über sichere Domain/VPN/Tunnel.
+- Handy-Seite wurde nicht verändert.

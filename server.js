@@ -8,6 +8,55 @@ const ROOT = __dirname;
 const DATA_DIR = process.env.DATA_DIR || path.join(ROOT, "data");
 const DATA_FILE = process.env.SCHULDEN_DATA_FILE || path.join(DATA_DIR, "schulden-sync.json");
 
+function cleanPaperlessBase(value){
+  return String(value || "").trim().replace(/\/+$/, "");
+}
+
+function paperlessConfig(req){
+  const envUrl = cleanPaperlessBase(process.env.PAPERLESS_URL || process.env.PAPERLESS_BASE_URL || "");
+  const envToken = String(process.env.PAPERLESS_TOKEN || process.env.PAPERLESS_API_TOKEN || "").trim();
+  const headerUrl = cleanPaperlessBase(req.headers["x-paperless-url"] || "");
+  const headerToken = String(req.headers["x-paperless-token"] || "").trim();
+  return {
+    baseUrl: envUrl || headerUrl,
+    token: envToken || headerToken,
+    usingEnv: Boolean(envUrl && envToken)
+  };
+}
+
+async function paperlessFetch(req, res, targetPath, options = {}){
+  const cfg = paperlessConfig(req);
+  if(!cfg.baseUrl || !cfg.token){
+    return sendJson(res, 400, {ok:false, error:"Paperless URL oder API-Token fehlt"});
+  }
+  const url = cfg.baseUrl + targetPath;
+  const headers = {
+    "Authorization": "Token " + cfg.token,
+    "Accept": options.accept || "application/json"
+  };
+  const response = await fetch(url, {method: options.method || "GET", headers, redirect:"follow"});
+  if(!response.ok){
+    const text = await response.text().catch(()=>"");
+    return sendJson(res, response.status, {ok:false, error:"Paperless Fehler " + response.status, details:text.slice(0,500)});
+  }
+  if(options.stream){
+    res.writeHead(200, {
+      "Content-Type": response.headers.get("content-type") || "application/octet-stream",
+      "Content-Disposition": response.headers.get("content-disposition") || "inline"
+    });
+    if(response.body && response.body.pipeTo){
+      const { Writable } = require("stream");
+      await response.body.pipeTo(Writable.toWeb(res));
+    }else{
+      const buffer = Buffer.from(await response.arrayBuffer());
+      res.end(buffer);
+    }
+    return;
+  }
+  const data = await response.json();
+  return sendJson(res, 200, {ok:true, usingEnv:cfg.usingEnv, baseUrl:cfg.baseUrl, data});
+}
+
 const MIME = {
   ".html": "text/html; charset=utf-8",
   ".js": "application/javascript; charset=utf-8",
@@ -118,13 +167,36 @@ const server = http.createServer(async (req, res)=>{
     const url = new URL(req.url, `http://${req.headers.host || "localhost"}`);
 
     if(url.pathname === "/api/health"){
-      return sendJson(res, 200, {ok:true, service:"schulden-manager", version:"v24"});
+      return sendJson(res, 200, {ok:true, service:"schulden-manager", version:"v79", paperless:Boolean(process.env.PAPERLESS_URL || process.env.PAPERLESS_BASE_URL)});
     }
 
     if(url.pathname === "/api/config"){
       return sendJson(res, 200, {
-        googleClientId: process.env.GOOGLE_CLIENT_ID || process.env.GOOGLE_DRIVE_CLIENT_ID || ""
+        googleClientId: process.env.GOOGLE_CLIENT_ID || process.env.GOOGLE_DRIVE_CLIENT_ID || "",
+        paperlessConfigured: Boolean((process.env.PAPERLESS_URL || process.env.PAPERLESS_BASE_URL) && (process.env.PAPERLESS_TOKEN || process.env.PAPERLESS_API_TOKEN)),
+        paperlessUrl: cleanPaperlessBase(process.env.PAPERLESS_URL || process.env.PAPERLESS_BASE_URL || "")
       });
+    }
+
+    if(url.pathname === "/api/paperless/status" && req.method === "GET"){
+      return paperlessFetch(req, res, "/api/statistics/");
+    }
+
+    if(url.pathname === "/api/paperless/search" && req.method === "GET"){
+      const query = url.searchParams.get("q") || "";
+      const pageSize = Math.min(Math.max(parseInt(url.searchParams.get("page_size") || "20", 10) || 20, 1), 50);
+      const params = new URLSearchParams();
+      params.set("page_size", String(pageSize));
+      params.set("ordering", "-created");
+      if(query.trim()) params.set("query", query.trim());
+      return paperlessFetch(req, res, "/api/documents/?" + params.toString());
+    }
+
+    if(url.pathname.startsWith("/api/paperless/document/") && req.method === "GET"){
+      const parts = url.pathname.split("/");
+      const id = parts[4];
+      if(!/^\d+$/.test(String(id || ""))) return sendJson(res, 400, {ok:false, error:"Ungültige Dokument-ID"});
+      return paperlessFetch(req, res, "/api/documents/" + id + "/download/", {accept:"application/pdf,application/octet-stream", stream:true});
     }
 
     if(url.pathname === "/api/sync" && req.method === "GET"){

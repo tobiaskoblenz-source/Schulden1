@@ -2808,7 +2808,7 @@ body.force-mobile-view .dashboardShell{
     <section class="hero heroDashboard">
       <div class="heroMain dashboardHeader">
         <div class="dashboardGreetingWrap">
-          <div class="eyebrow">Ruhiges Dashboard · v59</div>
+          <div class="eyebrow">Ruhiges Dashboard · v79</div>
           <h1 id="greetingTitle">Guten Abend!</h1>
           <p id="greetingText">Hier ist die Übersicht deiner Schulden.</p>
         </div>
@@ -2982,13 +2982,24 @@ body.force-mobile-view .dashboardShell{
             <div id="sideCorrespondenceList" class="desktopCorrList"></div>
           </section>
 
+          <section class="desktopPanelSection paperlessPanelSection">
+            <div class="drawerSectionHead"><span>6</span><strong>Paperless</strong></div>
+            <div id="sidePaperlessStatus" class="paperlessStatusLine">Paperless: noch nicht verbunden</div>
+            <div id="sidePaperlessList" class="desktopCorrList paperlessLinkedList"></div>
+            <div class="paperlessSideActions">
+              <button id="desktopPaperlessSearchBtn" class="secondary desktopCardActionBtn" type="button">🔍 Paperless suchen</button>
+              <button id="desktopPaperlessSettingsBtn" class="secondary desktopCardActionBtn" type="button">⚙️ Verbindung</button>
+            </div>
+          </section>
+
           <section class="desktopPanelSection">
-            <div class="drawerSectionHead"><span>6</span><strong>Verlauf</strong></div>
+            <div class="drawerSectionHead"><span>7</span><strong>Verlauf</strong></div>
             <div id="sideTimelineList" class="desktopTimelineList"></div>
           </section>
         </div>
         <div class="desktopPanelFooter desktopAkteFooterV30">
           <button id="desktopUploadFileBtn" type="button">📎 Datei hochladen</button>
+          <button id="desktopPaperlessFooterBtn" class="secondary" type="button">📄 Paperless</button>
           <button id="desktopDriveSaveBtn" class="secondary" type="button">☁️ In Drive speichern</button>
           <button id="desktopDriveLoadBtn" class="secondary" type="button">⬇️ Aus Drive laden</button>
         </div>
@@ -8438,11 +8449,11 @@ body.force-mobile-view #fabAdd{display:flex !important;}
 </script>
 
 
-<style id="v78-menu-stability-style">
-/* v78: Menü stabilisieren, Versionsanzeigen vereinheitlichen */
+<style id="v79-menu-stability-style">
+/* v79: Menü stabilisieren, Versionsanzeigen vereinheitlichen + Paperless-Anbindung */
 @media (min-width:1121px){
   .v59MenuVersion,.v67CurrentVersion,.v70OnlyVersion,[id$="OnlyVersion"],[id$="CurrentVersion"]{display:none!important;visibility:hidden!important;height:0!important;min-height:0!important;margin:0!important;padding:0!important;overflow:hidden!important;}
-  #stableVersionV78{display:block!important;visibility:visible!important;height:auto!important;margin:10px 8px 0!important;padding:6px 0 0!important;text-align:center!important;color:#eaf2ff!important;font-size:12px!important;font-weight:900!important;letter-spacing:.05em;}
+  #stableVersionV79{display:block!important;visibility:visible!important;height:auto!important;margin:10px 8px 0!important;padding:6px 0 0!important;text-align:center!important;color:#eaf2ff!important;font-size:12px!important;font-weight:900!important;letter-spacing:.05em;}
   .sidebarNav.v59CalmMenu{gap:8px!important;}
   .sideNavBtn{min-height:54px!important;max-height:54px!important;padding:0 15px!important;border-radius:17px!important;font-size:15px!important;line-height:1!important;}
   .sideNavBtn span:not(.navIco):not(.v59Chevron){white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;}
@@ -8453,18 +8464,18 @@ body.force-mobile-view #fabAdd{display:flex !important;}
   .v59SubBtn{min-height:36px!important;max-height:36px!important;padding:0 10px!important;font-size:13px!important;}
   .v59MenuSep{margin:12px 10px!important;}
 }
-@media (max-width:1120px){#stableVersionV78{display:none!important;}}
+@media (max-width:1120px){#stableVersionV79{display:none!important;}}
 </style>
-<script id="v78-menu-stability-js">
+<script id="v79-menu-stability-js">
 (function(){
-  const VERSION='v78';
+  const VERSION='v79';
   function setText(el,txt){ if(el && el.textContent!==txt) el.textContent=txt; }
   function cleanup(){
     document.querySelectorAll('.v59MenuVersion,.v67CurrentVersion,.v70OnlyVersion,[id$="OnlyVersion"],[id$="CurrentVersion"]').forEach(el=>{ if(el.id!=='stableVersionV78') el.style.display='none'; });
     const bottom=document.querySelector('.sidebarBottom');
     if(bottom){
-      let box=document.getElementById('stableVersionV78');
-      if(!box){ box=document.createElement('div'); box.id='stableVersionV78'; bottom.appendChild(box); }
+      let box=document.getElementById('stableVersionV79');
+      if(!box){ box=document.createElement('div'); box.id='stableVersionV79'; bottom.appendChild(box); }
       box.textContent=VERSION;
     }
     document.querySelectorAll('[data-v59="new"] span:not(.navIco)').forEach(el=>setText(el,'Neue Schulden'));
@@ -8478,6 +8489,194 @@ body.force-mobile-view #fabAdd{display:flex !important;}
   }
   document.addEventListener('DOMContentLoaded',()=>{cleanup(); setTimeout(cleanup,200); setTimeout(cleanup,1000);});
   setInterval(cleanup,900);
+})();
+</script>
+
+
+<style id="v79-paperless-style">
+.paperlessPanelSection{background:linear-gradient(180deg,rgba(57,153,255,.09),rgba(255,255,255,.035))!important;border-color:rgba(114,185,255,.18)!important;}
+.paperlessStatusLine{margin:8px 0 12px;padding:9px 11px;border-radius:14px;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.08);color:#b8c8e6;font-size:12px;font-weight:800;}
+.paperlessStatusLine.ok{color:#b9ffd8;border-color:rgba(80,255,180,.22);background:rgba(48,211,126,.10);}
+.paperlessStatusLine.err{color:#ffd0d0;border-color:rgba(255,110,110,.25);background:rgba(255,80,80,.10);}
+.paperlessSideActions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;}
+.paperlessLinkedList .desktopCorrItem{border-color:rgba(114,185,255,.16)!important;}
+.paperlessDocActions{display:flex;flex-wrap:wrap;gap:7px;justify-content:flex-end;}
+.paperlessDocActions button,.paperlessDocActions a{min-height:30px;border-radius:10px;padding:0 9px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.07);color:#eaf2ff;text-decoration:none;font-size:12px;font-weight:900;display:inline-flex;align-items:center;}
+.paperlessDocActions button:hover,.paperlessDocActions a:hover{background:rgba(255,255,255,.12);}
+.paperlessOverlay{position:fixed;inset:0;background:rgba(2,6,18,.74);backdrop-filter:blur(12px);z-index:9999;display:none;align-items:center;justify-content:center;padding:18px;}
+.paperlessModal{width:min(920px,96vw);max-height:92vh;overflow:auto;border-radius:28px;background:#111a2b;border:1px solid rgba(255,255,255,.12);box-shadow:0 30px 90px rgba(0,0,0,.55);padding:20px;color:#eaf2ff;}
+.paperlessHead{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:14px;}
+.paperlessHead h3{margin:0;font-size:24px;}
+.paperlessHead p{margin:5px 0 0;color:#9fb0cc;font-size:13px;}
+.paperlessClose{width:42px;height:42px;border-radius:14px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.07);color:#fff;font-size:26px;cursor:pointer;}
+.paperlessGrid{display:grid;grid-template-columns:1.3fr 1fr;gap:14px;margin-bottom:14px;}
+.paperlessBox{padding:14px;border-radius:20px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.08);}
+.paperlessBox h4{margin:0 0 10px;font-size:15px;}
+.paperlessForm{display:grid;gap:9px;}
+.paperlessForm label{display:grid;gap:6px;color:#b8c8e6;font-size:12px;font-weight:900;}
+.paperlessForm input{height:42px;border-radius:13px;border:1px solid rgba(255,255,255,.12);background:rgba(2,6,18,.35);color:#fff;padding:0 12px;}
+.paperlessBtnRow{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;}
+.paperlessBtnRow button,.paperlessSearchLine button{min-height:40px;border-radius:13px;padding:0 13px;font-weight:950;}
+.paperlessSearchLine{display:grid;grid-template-columns:1fr auto auto;gap:8px;margin-top:10px;}
+.paperlessSearchLine input{height:42px;border-radius:13px;border:1px solid rgba(255,255,255,.12);background:rgba(2,6,18,.35);color:#fff;padding:0 12px;}
+.paperlessResultList{display:grid;gap:9px;margin-top:12px;}
+.paperlessResultItem{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px;border-radius:17px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);}
+.paperlessResultItem strong{display:block;font-size:14px;line-height:1.25;}
+.paperlessResultItem span{display:block;margin-top:4px;color:#9fb0cc;font-size:12px;}
+.paperlessResultActions{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end;}
+.paperlessResultActions button,.paperlessResultActions a{min-height:34px;border-radius:11px;padding:0 10px;font-size:12px;font-weight:900;text-decoration:none;display:inline-flex;align-items:center;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.07);color:#eaf2ff;}
+.paperlessHint{font-size:12px;color:#9fb0cc;line-height:1.45;margin-top:9px;}
+@media(max-width:800px){.paperlessGrid{grid-template-columns:1fr}.paperlessSearchLine{grid-template-columns:1fr}.paperlessResultItem{grid-template-columns:1fr}.paperlessSideActions{grid-template-columns:1fr}}
+</style>
+
+<script id="v79-paperless-js">
+(function(){
+  const SETTINGS_KEY = 'schulden_paperless_settings_v79';
+  let selectedIndex = 0;
+  let serverConfig = {paperlessConfigured:false, paperlessUrl:''};
+
+  function $(id){ return document.getElementById(id); }
+  function toast(msg){ if(typeof showToast === 'function') showToast(msg); else alert(msg); }
+  function esc(str){ return String(str||'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#039;'); }
+  function currentDebts(){ return Array.isArray(window.debts) ? window.debts : (typeof debts !== 'undefined' && Array.isArray(debts) ? debts : []); }
+  function settings(){ try{return JSON.parse(localStorage.getItem(SETTINGS_KEY)||'{}');}catch(e){return {};} }
+  function saveSettings(data){ localStorage.setItem(SETTINGS_KEY, JSON.stringify(data||{})); }
+  function cleanBase(v){ return String(v||'').trim().replace(/\/+$/,''); }
+  function headers(){ const st=settings(); const h={'Accept':'application/json'}; if(!serverConfig.paperlessConfigured){ if(st.url) h['x-paperless-url']=cleanBase(st.url); if(st.token) h['x-paperless-token']=String(st.token).trim(); } return h; }
+  function displayBase(){ const st=settings(); return cleanBase(serverConfig.paperlessUrl || st.url || ''); }
+  function frontendLink(id){ const base=displayBase(); return base && id ? base + '/documents/' + encodeURIComponent(id) + '/details' : ''; }
+  function docTitle(doc){ return doc.title || doc.original_filename || doc.archive_filename || ('Dokument #' + doc.id); }
+  function docMeta(doc){
+    const parts=[];
+    if(doc.created) parts.push(new Date(doc.created).toLocaleDateString('de-DE'));
+    if(doc.correspondent_name) parts.push(doc.correspondent_name);
+    if(doc.document_type_name) parts.push(doc.document_type_name);
+    if(doc.tags && Array.isArray(doc.tags) && doc.tags.length) parts.push(doc.tags.length + ' Tag(s)');
+    return parts.join(' · ') || 'Paperless-Dokument';
+  }
+  function ensureLinks(d){ if(!d) return []; if(!Array.isArray(d.paperlessLinks)) d.paperlessLinks=[]; return d.paperlessLinks; }
+  function api(path, opts={}){ return fetch(path, {...opts, headers:{...headers(), ...(opts.headers||{})}, cache:'no-store'}); }
+  async function apiJson(path){ const res=await api(path); const data=await res.json().catch(()=>({ok:false,error:'Keine JSON-Antwort'})); if(!res.ok || data.ok===false) throw new Error(data.error || ('HTTP '+res.status)); return data; }
+  async function loadConfig(){
+    try{ const r=await fetch('/api/config',{cache:'no-store'}); serverConfig=await r.json(); }catch(e){ serverConfig={paperlessConfigured:false,paperlessUrl:''}; }
+    updateStatus();
+  }
+  function updateStatus(mode,msg){
+    const el=$('sidePaperlessStatus'); if(!el) return;
+    const st=settings();
+    const ready=serverConfig.paperlessConfigured || (st.url && st.token);
+    el.classList.remove('ok','err');
+    if(mode==='ok') el.classList.add('ok');
+    if(mode==='err') el.classList.add('err');
+    if(msg){ el.textContent=msg; return; }
+    if(serverConfig.paperlessConfigured) el.textContent='Paperless: über Railway-Variablen verbunden';
+    else if(ready) el.textContent='Paperless: Browser-Einstellungen gespeichert';
+    else el.textContent='Paperless: URL/API-Token fehlt';
+  }
+  function buildQuery(d){
+    if(!d) return '';
+    return [d.name, d.aktenzeichen, d.caseNumber, d.referenceNumber, d.customerNumber, d.kundennummer, d.grund].filter(Boolean).join(' ');
+  }
+  function renderSide(){
+    const list=$('sidePaperlessList'); if(!list) return;
+    const d=currentDebts()[selectedIndex];
+    if(!d){ list.innerHTML='<div class="desktopEmptyState">Keine Schulden ausgewählt.</div>'; updateStatus(); return; }
+    const items=ensureLinks(d);
+    if(!items.length){ list.innerHTML='<div class="desktopEmptyState">Noch keine Paperless-Dokumente verknüpft.<br>Nutze „Paperless suchen“ und verknüpfe passende Dokumente.</div>'; updateStatus(); return; }
+    list.innerHTML=items.slice().reverse().map(item=>{
+      const link=frontendLink(item.id);
+      return '<div class="desktopCorrItem" data-pl-id="'+esc(item.id)+'"><div class="desktopCorrMeta"><strong>'+esc(item.title||('Dokument #'+item.id))+'</strong><span>'+esc(item.meta||item.created||'Paperless')+'</span></div><div class="paperlessDocActions"><button type="button" data-pl-open="'+esc(item.id)+'">PDF</button>'+(link?'<a target="_blank" rel="noopener" href="'+esc(link)+'">Paperless</a>':'')+'<button type="button" data-pl-unlink="'+esc(item.id)+'">Lösen</button></div></div>';
+    }).join('');
+  }
+  function ensureModal(){
+    let overlay=$('paperlessOverlay'); if(overlay) return overlay;
+    overlay=document.createElement('div'); overlay.id='paperlessOverlay'; overlay.className='paperlessOverlay';
+    overlay.innerHTML='<div class="paperlessModal" role="dialog" aria-modal="true"><div class="paperlessHead"><div><h3 id="paperlessTitle">Paperless-Anbindung</h3><p id="paperlessSub">Dokumente suchen und mit dieser Schulden-Akte verknüpfen.</p></div><button id="paperlessClose" class="paperlessClose" type="button">×</button></div><div class="paperlessGrid"><div class="paperlessBox"><h4>Verbindung</h4><div class="paperlessForm"><label>Paperless URL<input id="paperlessUrl" placeholder="https://paperless.example.de"></label><label>API Token<input id="paperlessToken" type="password" placeholder="Token aus Paperless"></label><div class="paperlessBtnRow"><button id="paperlessSaveSettings" type="button">Speichern</button><button id="paperlessTest" class="secondary" type="button">Testen</button></div><div id="paperlessConnectionHint" class="paperlessHint"></div></div></div><div class="paperlessBox"><h4>Aktuelle Akte</h4><div id="paperlessDebtInfo" class="paperlessHint">–</div><div class="paperlessHint">Empfohlen: Paperless-Tags wie <b>schulden-app</b>, Gläubigername und Aktenzeichen nutzen.</div></div></div><div class="paperlessBox"><h4>Dokumente suchen</h4><div class="paperlessSearchLine"><input id="paperlessQuery" placeholder="Suchbegriff, Gläubiger, Aktenzeichen"><button id="paperlessSearch" type="button">Suchen</button><button id="paperlessAutoQuery" class="secondary" type="button">Akte übernehmen</button></div><div id="paperlessResults" class="paperlessResultList"><div class="desktopEmptyState">Noch keine Suche gestartet.</div></div></div></div>';
+    document.body.appendChild(overlay);
+    overlay.addEventListener('click', e=>{ if(e.target===overlay) closeModal(); });
+    $('paperlessClose').addEventListener('click', closeModal);
+    $('paperlessSaveSettings').addEventListener('click', ()=>{
+      saveSettings({url:cleanBase($('paperlessUrl').value), token:$('paperlessToken').value.trim()});
+      updateStatus('ok','Paperless: Einstellungen gespeichert'); toast('Paperless-Einstellungen gespeichert ✅');
+    });
+    $('paperlessTest').addEventListener('click', testConnection);
+    $('paperlessSearch').addEventListener('click', searchDocs);
+    $('paperlessAutoQuery').addEventListener('click', ()=>{ const d=currentDebts()[selectedIndex]; $('paperlessQuery').value=buildQuery(d); });
+    return overlay;
+  }
+  function openModal(mode){
+    const overlay=ensureModal(); const st=settings(); const d=currentDebts()[selectedIndex];
+    $('paperlessUrl').value=serverConfig.paperlessUrl || st.url || '';
+    $('paperlessToken').value=serverConfig.paperlessConfigured ? '********' : (st.token || '');
+    $('paperlessUrl').disabled=Boolean(serverConfig.paperlessConfigured);
+    $('paperlessToken').disabled=Boolean(serverConfig.paperlessConfigured);
+    $('paperlessConnectionHint').innerHTML=serverConfig.paperlessConfigured ? 'Railway-Variablen erkannt: <b>PAPERLESS_URL</b> und <b>PAPERLESS_TOKEN</b>. Token wird nicht im Browser angezeigt.' : 'Ohne Railway-Variablen werden URL und Token nur in diesem Browser gespeichert.';
+    $('paperlessDebtInfo').innerHTML=d ? '<b>'+esc(d.name||'Ohne Name')+'</b><br>Grund: '+esc(d.grund||'–')+'<br>Aktenzeichen: '+esc(d.aktenzeichen||d.caseNumber||'–') : 'Keine Akte ausgewählt.';
+    $('paperlessQuery').value=d ? buildQuery(d) : '';
+    $('paperlessResults').innerHTML='<div class="desktopEmptyState">Noch keine Suche gestartet.</div>';
+    overlay.style.display='flex'; document.body.classList.add('modalOpen');
+    if(mode==='search') searchDocs().catch(()=>{});
+  }
+  function closeModal(){ const overlay=$('paperlessOverlay'); if(overlay) overlay.style.display='none'; document.body.classList.remove('modalOpen'); }
+  async function testConnection(){
+    if(!serverConfig.paperlessConfigured){ saveSettings({url:cleanBase($('paperlessUrl').value), token:$('paperlessToken').value.trim()}); }
+    try{ await apiJson('/api/paperless/status'); updateStatus('ok','Paperless: Verbindung funktioniert ✓'); toast('Paperless-Verbindung funktioniert ✅'); }
+    catch(err){ updateStatus('err','Paperless: Verbindung fehlgeschlagen'); toast('Paperless-Fehler: '+err.message); }
+  }
+  async function searchDocs(){
+    const box=$('paperlessResults'); if(!box) return;
+    const q=($('paperlessQuery')?.value||'').trim();
+    box.innerHTML='<div class="desktopEmptyState">Suche läuft…</div>';
+    try{
+      const data=await apiJson('/api/paperless/search?q='+encodeURIComponent(q)+'&page_size=20');
+      const results=(data.data && Array.isArray(data.data.results)) ? data.data.results : [];
+      if(!results.length){ box.innerHTML='<div class="desktopEmptyState">Keine passenden Paperless-Dokumente gefunden.</div>'; return; }
+      box.innerHTML=results.map(doc=>{
+        const title=docTitle(doc), meta=docMeta(doc), link=frontendLink(doc.id);
+        return '<div class="paperlessResultItem"><div><strong>'+esc(title)+'</strong><span>'+esc(meta)+'</span></div><div class="paperlessResultActions"><button type="button" data-pl-link="'+esc(doc.id)+'" data-pl-title="'+esc(title)+'" data-pl-meta="'+esc(meta)+'">Verknüpfen</button><button type="button" data-pl-open="'+esc(doc.id)+'">PDF</button>'+(link?'<a target="_blank" rel="noopener" href="'+esc(link)+'">Paperless</a>':'')+'</div></div>';
+      }).join('');
+      updateStatus('ok','Paperless: Suche erfolgreich');
+    }catch(err){ box.innerHTML='<div class="desktopEmptyState">Paperless-Suche fehlgeschlagen: '+esc(err.message)+'</div>'; updateStatus('err','Paperless: Suche fehlgeschlagen'); }
+  }
+  function linkDoc(id,title,meta){
+    const d=currentDebts()[selectedIndex]; if(!d) return;
+    const items=ensureLinks(d);
+    if(!items.some(x=>String(x.id)===String(id))){ items.push({id:String(id), title:String(title||('Dokument #'+id)), meta:String(meta||'Paperless'), linkedAt:new Date().toISOString()}); }
+    if(typeof save==='function') save(); if(typeof render==='function') render(); renderSide(); toast('Paperless-Dokument verknüpft ✅');
+  }
+  async function openPdf(id){
+    try{
+      const res=await api('/api/paperless/document/'+encodeURIComponent(id));
+      if(!res.ok) throw new Error('PDF konnte nicht geladen werden');
+      const blob=await res.blob(); const url=URL.createObjectURL(blob); window.open(url,'_blank','noopener'); setTimeout(()=>URL.revokeObjectURL(url),60000);
+    }catch(err){ toast('Paperless-PDF Fehler: '+err.message); }
+  }
+  document.addEventListener('click', function(e){
+    const linkBtn=e.target.closest('[data-pl-link]');
+    if(linkBtn){ linkDoc(linkBtn.getAttribute('data-pl-link'), linkBtn.getAttribute('data-pl-title'), linkBtn.getAttribute('data-pl-meta')); return; }
+    const openBtn=e.target.closest('[data-pl-open]');
+    if(openBtn){ openPdf(openBtn.getAttribute('data-pl-open')); return; }
+    const unlinkBtn=e.target.closest('[data-pl-unlink]');
+    if(unlinkBtn){ const d=currentDebts()[selectedIndex]; const items=ensureLinks(d); const id=unlinkBtn.getAttribute('data-pl-unlink'); const idx=items.findIndex(x=>String(x.id)===String(id)); if(idx>=0){items.splice(idx,1); if(typeof save==='function') save(); renderSide(); toast('Verknüpfung gelöst');} }
+  });
+  function hook(){
+    const prevShow=window.showInfo;
+    if(prevShow && !prevShow.__paperlessHook){
+      const wrapped=function(i){ selectedIndex=i; const r=prevShow.apply(this,arguments); setTimeout(renderSide,60); return r; };
+      wrapped.__paperlessHook=true; window.showInfo=wrapped;
+    }
+    const prevRender=window.render;
+    if(prevRender && !prevRender.__paperlessHook){
+      const wrapped=function(){ const r=prevRender.apply(this,arguments); setTimeout(renderSide,80); return r; };
+      wrapped.__paperlessHook=true; window.render=wrapped;
+    }
+    $('desktopPaperlessSearchBtn')?.addEventListener('click',()=>openModal('search'));
+    $('desktopPaperlessSettingsBtn')?.addEventListener('click',()=>openModal('settings'));
+    $('desktopPaperlessFooterBtn')?.addEventListener('click',()=>openModal('search'));
+    renderSide();
+  }
+  document.addEventListener('DOMContentLoaded',()=>{ loadConfig().then(()=>{hook(); setTimeout(hook,500); setTimeout(hook,1500);}); });
+  setTimeout(()=>{loadConfig(); hook();},1800);
 })();
 </script>
 
