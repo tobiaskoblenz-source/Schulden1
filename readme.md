@@ -47,3 +47,9 @@ Wenn Paperless mit einem selbstsignierten oder unvollständigen Zertifikat läuf
 1. Empfohlen: Im Reverse Proxy ein gültiges Let's-Encrypt-Zertifikat mit vollständiger Zertifikatskette/fullchain nutzen.
 2. Nur für private Installationen: Railway Variable `PAPERLESS_ALLOW_SELF_SIGNED=true` setzen oder in der App den Haken „Selbstsigniertes/privates HTTPS-Zertifikat erlauben“ aktivieren.
 
+
+
+## v82 - Paperless Zertifikat-Haken Fix
+- Der Haken „Selbstsigniertes/privates HTTPS-Zertifikat erlauben“ wirkt jetzt auch, wenn PAPERLESS_URL und PAPERLESS_TOKEN über Railway-Variablen gesetzt sind.
+- Alternative bleibt: PAPERLESS_ALLOW_SELF_SIGNED=true in Railway setzen.
+- Handy-Seite wurde nicht bewusst verändert.

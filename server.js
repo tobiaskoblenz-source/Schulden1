@@ -25,7 +25,7 @@ function paperlessConfig(req){
     baseUrl: envUrl || headerUrl,
     token: envToken || headerToken,
     usingEnv: Boolean(envUrl && envToken),
-    insecureTls: envInsecure || (!envUrl && headerInsecure)
+    insecureTls: envInsecure || headerInsecure
   };
 }
 
@@ -238,7 +238,7 @@ const server = http.createServer(async (req, res)=>{
     const url = new URL(req.url, `http://${req.headers.host || "localhost"}`);
 
     if(url.pathname === "/api/health"){
-      return sendJson(res, 200, {ok:true, service:"schulden-manager", version:"v81", paperless:Boolean(process.env.PAPERLESS_URL || process.env.PAPERLESS_BASE_URL)});
+      return sendJson(res, 200, {ok:true, service:"schulden-manager", version:"v82", paperless:Boolean(process.env.PAPERLESS_URL || process.env.PAPERLESS_BASE_URL)});
     }
 
     if(url.pathname === "/api/config"){

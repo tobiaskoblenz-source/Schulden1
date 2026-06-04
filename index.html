@@ -2808,7 +2808,7 @@ body.force-mobile-view .dashboardShell{
     <section class="hero heroDashboard">
       <div class="heroMain dashboardHeader">
         <div class="dashboardGreetingWrap">
-          <div class="eyebrow">Ruhiges Dashboard · v81</div>
+          <div class="eyebrow">Ruhiges Dashboard · v82</div>
           <h1 id="greetingTitle">Guten Abend!</h1>
           <p id="greetingText">Hier ist die Übersicht deiner Schulden.</p>
         </div>
@@ -8450,7 +8450,7 @@ body.force-mobile-view #fabAdd{display:flex !important;}
 
 
 <style id="v79-menu-stability-style">
-/* v81: Paperless-Anbindung mit besserer Diagnose bei HTTP 502 */
+/* v82: Paperless-Anbindung mit Zertifikats-Haken auch bei Railway-Variablen */
 @media (min-width:1121px){
   .v59MenuVersion,.v67CurrentVersion,.v70OnlyVersion,[id$="OnlyVersion"],[id$="CurrentVersion"]{display:none!important;visibility:hidden!important;height:0!important;min-height:0!important;margin:0!important;padding:0!important;overflow:hidden!important;}
   #stableVersionV79{display:block!important;visibility:visible!important;height:auto!important;margin:10px 8px 0!important;padding:6px 0 0!important;text-align:center!important;color:#eaf2ff!important;font-size:12px!important;font-weight:900!important;letter-spacing:.05em;}
@@ -8468,7 +8468,7 @@ body.force-mobile-view #fabAdd{display:flex !important;}
 </style>
 <script id="v79-menu-stability-js">
 (function(){
-  const VERSION='v81';
+  const VERSION='v82';
   function setText(el,txt){ if(el && el.textContent!==txt) el.textContent=txt; }
   function cleanup(){
     document.querySelectorAll('.v59MenuVersion,.v67CurrentVersion,.v70OnlyVersion,[id$="OnlyVersion"],[id$="CurrentVersion"]').forEach(el=>{ if(el.id!=='stableVersionV78') el.style.display='none'; });
@@ -8542,7 +8542,7 @@ body.force-mobile-view #fabAdd{display:flex !important;}
   function settings(){ try{return JSON.parse(localStorage.getItem(SETTINGS_KEY)||'{}');}catch(e){return {};} }
   function saveSettings(data){ localStorage.setItem(SETTINGS_KEY, JSON.stringify(data||{})); }
   function cleanBase(v){ return String(v||'').trim().replace(/\/+$/,''); }
-  function headers(){ const st=settings(); const h={'Accept':'application/json'}; if(!serverConfig.paperlessConfigured){ if(st.url) h['x-paperless-url']=cleanBase(st.url); if(st.token) h['x-paperless-token']=String(st.token).trim(); if(st.insecureTls) h['x-paperless-insecure-tls']='true'; } return h; }
+  function headers(){ const st=settings(); const h={'Accept':'application/json'}; if(!serverConfig.paperlessConfigured){ if(st.url) h['x-paperless-url']=cleanBase(st.url); if(st.token) h['x-paperless-token']=String(st.token).trim(); } if(st.insecureTls) h['x-paperless-insecure-tls']='true'; return h; }
   function displayBase(){ const st=settings(); return cleanBase(serverConfig.paperlessUrl || st.url || ''); }
   function frontendLink(id){ const base=displayBase(); return base && id ? base + '/documents/' + encodeURIComponent(id) + '/details' : ''; }
   function docTitle(doc){ return doc.title || doc.original_filename || doc.archive_filename || ('Dokument #' + doc.id); }
@@ -8619,8 +8619,8 @@ body.force-mobile-view #fabAdd{display:flex !important;}
     if($('paperlessInsecureTls')) $('paperlessInsecureTls').checked=Boolean(serverConfig.paperlessInsecureTls || st.insecureTls);
     $('paperlessUrl').disabled=Boolean(serverConfig.paperlessConfigured);
     $('paperlessToken').disabled=Boolean(serverConfig.paperlessConfigured);
-    if($('paperlessInsecureTls')) $('paperlessInsecureTls').disabled=Boolean(serverConfig.paperlessConfigured);
-    $('paperlessConnectionHint').innerHTML=serverConfig.paperlessConfigured ? 'Railway-Variablen erkannt: <b>PAPERLESS_URL</b> und <b>PAPERLESS_TOKEN</b>. Token wird nicht im Browser angezeigt. Für private Zertifikate kann zusätzlich <b>PAPERLESS_ALLOW_SELF_SIGNED=true</b> gesetzt werden.' : 'Ohne Railway-Variablen werden URL und Token nur in diesem Browser gespeichert.';
+    if($('paperlessInsecureTls')) $('paperlessInsecureTls').disabled=false;
+    $('paperlessConnectionHint').innerHTML=serverConfig.paperlessConfigured ? 'Railway-Variablen erkannt: <b>PAPERLESS_URL</b> und <b>PAPERLESS_TOKEN</b>. Token wird nicht im Browser angezeigt. Für private Zertifikate kannst du jetzt auch hier den Haken aktivieren; alternativ <b>PAPERLESS_ALLOW_SELF_SIGNED=true</b> in Railway setzen.' : 'Ohne Railway-Variablen werden URL und Token nur in diesem Browser gespeichert.';
     $('paperlessDebtInfo').innerHTML=d ? '<b>'+esc(d.name||'Ohne Name')+'</b><br>Grund: '+esc(d.grund||'–')+'<br>Aktenzeichen: '+esc(d.aktenzeichen||d.caseNumber||'–') : 'Keine Akte ausgewählt.';
     $('paperlessQuery').value=d ? buildQuery(d) : '';
     $('paperlessResults').innerHTML='<div class="desktopEmptyState">Noch keine Suche gestartet.</div>';
@@ -8629,7 +8629,7 @@ body.force-mobile-view #fabAdd{display:flex !important;}
   }
   function closeModal(){ const overlay=$('paperlessOverlay'); if(overlay) overlay.style.display='none'; document.body.classList.remove('modalOpen'); }
   async function testConnection(){
-    if(!serverConfig.paperlessConfigured){ saveSettings({url:cleanBase($('paperlessUrl').value), token:$('paperlessToken').value.trim(), insecureTls:Boolean($('paperlessInsecureTls')?.checked)}); }
+    saveSettings({url: serverConfig.paperlessConfigured ? (settings().url||'') : cleanBase($('paperlessUrl').value), token: serverConfig.paperlessConfigured ? (settings().token||'') : $('paperlessToken').value.trim(), insecureTls:Boolean($('paperlessInsecureTls')?.checked)});
     try{ await apiJson('/api/paperless/status'); updateStatus('ok','Paperless: Verbindung funktioniert ✓'); toast('Paperless-Verbindung funktioniert ✅'); }
     catch(err){ updateStatus('err','Paperless: Verbindung fehlgeschlagen'); alert('Paperless-Verbindung fehlgeschlagen:\n\n'+err.message); }
   }
