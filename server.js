@@ -2,6 +2,8 @@
 const http = require("http");
 const fs = require("fs");
 const path = require("path");
+let UndiciAgent = null;
+try { UndiciAgent = require("undici").Agent; } catch(e) { UndiciAgent = null; }
 
 const PORT = process.env.PORT || 3000;
 const ROOT = __dirname;
@@ -17,10 +19,13 @@ function paperlessConfig(req){
   const envToken = String(process.env.PAPERLESS_TOKEN || process.env.PAPERLESS_API_TOKEN || "").trim();
   const headerUrl = cleanPaperlessBase(req.headers["x-paperless-url"] || "");
   const headerToken = String(req.headers["x-paperless-token"] || "").trim();
+  const envInsecure = /^(1|true|yes|ja)$/i.test(String(process.env.PAPERLESS_ALLOW_SELF_SIGNED || process.env.PAPERLESS_INSECURE_TLS || ""));
+  const headerInsecure = /^(1|true|yes|ja)$/i.test(String(req.headers["x-paperless-insecure-tls"] || ""));
   return {
     baseUrl: envUrl || headerUrl,
     token: envToken || headerToken,
-    usingEnv: Boolean(envUrl && envToken)
+    usingEnv: Boolean(envUrl && envToken),
+    insecureTls: envInsecure || (!envUrl && headerInsecure)
   };
 }
 
@@ -39,6 +44,9 @@ function paperlessReachabilityHint(baseUrl, err){
   }
   if(String(code).includes("AbortError") || String(code).includes("TimeoutError")){
     return "Paperless antwortet nicht rechtzeitig. Prüfe, ob die Adresse von Railway aus erreichbar ist.";
+  }
+  if(String(code).includes("UNABLE_TO_VERIFY_LEAF_SIGNATURE") || String(code).includes("SELF_SIGNED_CERT") || String(code).includes("CERT_HAS_EXPIRED") || String(code).includes("DEPTH_ZERO_SELF_SIGNED_CERT")){
+    return "HTTPS-Zertifikat wird nicht vertraut. Am besten im Reverse Proxy ein gültiges Let's-Encrypt-Zertifikat mit vollständiger fullchain nutzen. Für private Synology/Paperless kannst du vorübergehend PAPERLESS_ALLOW_SELF_SIGNED=true setzen oder in der App den Haken für private Zertifikate aktivieren.";
   }
   return "Schulden-App konnte Paperless nicht erreichen. Prüfe URL, Token, Reverse Proxy und HTTPS.";
 }
@@ -65,7 +73,15 @@ async function paperlessFetch(req, res, targetPath, options = {}){
 
   let response;
   try{
-    response = await fetch(url, {method: options.method || "GET", headers, redirect:"follow", signal:controller.signal});
+    const fetchOptions = {method: options.method || "GET", headers, redirect:"follow", signal:controller.signal};
+    if(cfg.insecureTls && /^https:/i.test(cfg.baseUrl)){
+      if(UndiciAgent){
+        fetchOptions.dispatcher = new UndiciAgent({ connect: { rejectUnauthorized: false } });
+      }else{
+        process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+      }
+    }
+    response = await fetch(url, fetchOptions);
   }catch(err){
     clearTimeout(timer);
     console.error("Paperless fetch failed", {baseUrl:cfg.baseUrl, path:targetPath, error:err && (err.stack || err.message || err)});
@@ -76,7 +92,8 @@ async function paperlessFetch(req, res, targetPath, options = {}){
       details:String(err && (err.cause?.code || err.code || err.message || err)).slice(0,500),
       hint:paperlessReachabilityHint(cfg.baseUrl, err),
       baseUrl:cfg.baseUrl,
-      usingEnv:cfg.usingEnv
+      usingEnv:cfg.usingEnv,
+      insecureTls:cfg.insecureTls
     });
   }finally{
     clearTimeout(timer);
@@ -88,7 +105,7 @@ async function paperlessFetch(req, res, targetPath, options = {}){
     if(response.status === 401 || response.status === 403) hint = "API-Token ist falsch, abgelaufen oder hat keinen Zugriff.";
     if(response.status === 404) hint = "Paperless API-Pfad wurde nicht gefunden. Prüfe, ob PAPERLESS_URL nur die Basisadresse enthält, ohne /api.";
     if(response.status >= 500) hint = "Paperless selbst oder der Reverse Proxy meldet einen Serverfehler.";
-    return sendJson(res, response.status, {ok:false, error:"Paperless Fehler " + response.status, status:response.status, details:text.slice(0,800), hint, baseUrl:cfg.baseUrl, usingEnv:cfg.usingEnv});
+    return sendJson(res, response.status, {ok:false, error:"Paperless Fehler " + response.status, status:response.status, details:text.slice(0,800), hint, baseUrl:cfg.baseUrl, usingEnv:cfg.usingEnv, insecureTls:cfg.insecureTls});
   }
 
   if(options.stream){
@@ -107,7 +124,7 @@ async function paperlessFetch(req, res, targetPath, options = {}){
   }
 
   const data = await response.json().catch(async()=>({raw:(await response.text().catch(()=>"")).slice(0,800)}));
-  return sendJson(res, 200, {ok:true, usingEnv:cfg.usingEnv, baseUrl:cfg.baseUrl, data});
+  return sendJson(res, 200, {ok:true, usingEnv:cfg.usingEnv, baseUrl:cfg.baseUrl, insecureTls:cfg.insecureTls, data});
 }
 
 
@@ -221,14 +238,15 @@ const server = http.createServer(async (req, res)=>{
     const url = new URL(req.url, `http://${req.headers.host || "localhost"}`);
 
     if(url.pathname === "/api/health"){
-      return sendJson(res, 200, {ok:true, service:"schulden-manager", version:"v80", paperless:Boolean(process.env.PAPERLESS_URL || process.env.PAPERLESS_BASE_URL)});
+      return sendJson(res, 200, {ok:true, service:"schulden-manager", version:"v81", paperless:Boolean(process.env.PAPERLESS_URL || process.env.PAPERLESS_BASE_URL)});
     }
 
     if(url.pathname === "/api/config"){
       return sendJson(res, 200, {
         googleClientId: process.env.GOOGLE_CLIENT_ID || process.env.GOOGLE_DRIVE_CLIENT_ID || "",
         paperlessConfigured: Boolean((process.env.PAPERLESS_URL || process.env.PAPERLESS_BASE_URL) && (process.env.PAPERLESS_TOKEN || process.env.PAPERLESS_API_TOKEN)),
-        paperlessUrl: cleanPaperlessBase(process.env.PAPERLESS_URL || process.env.PAPERLESS_BASE_URL || "")
+        paperlessUrl: cleanPaperlessBase(process.env.PAPERLESS_URL || process.env.PAPERLESS_BASE_URL || ""),
+        paperlessInsecureTls: /^(1|true|yes|ja)$/i.test(String(process.env.PAPERLESS_ALLOW_SELF_SIGNED || process.env.PAPERLESS_INSECURE_TLS || ""))
       });
     }
 

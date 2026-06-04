@@ -30,7 +30,7 @@ PDF-Erstellung nutzt weiterhin die in der App vorhandene jsPDF-Bibliothek.
 - Handy-Seite wurde nicht verändert.
 
 
-## v80 - Paperless 502 Diagnose
+## v81 - Paperless 502 Diagnose
 
 Diese Version verbessert die Paperless-Anbindung bei HTTP 502:
 - Timeout statt endlosem Warten
@@ -39,3 +39,11 @@ Diese Version verbessert die Paperless-Anbindung bei HTTP 502:
 - Hinweise bei falschem Token, falscher URL oder Reverse-Proxy-Fehler
 
 Wichtig: Läuft die Schulden-App auf Railway und Paperless nur lokal auf der Synology, kann Railway die lokale Adresse nicht erreichen. Nutze dann eine sichere HTTPS-Adresse für Paperless oder betreibe die Schulden-App im selben Netzwerk.
+
+
+## Paperless HTTPS / Synology Zertifikat
+Wenn Paperless mit einem selbstsignierten oder unvollständigen Zertifikat läuft und die Meldung `UNABLE_TO_VERIFY_LEAF_SIGNATURE` erscheint, gibt es zwei Wege:
+
+1. Empfohlen: Im Reverse Proxy ein gültiges Let's-Encrypt-Zertifikat mit vollständiger Zertifikatskette/fullchain nutzen.
+2. Nur für private Installationen: Railway Variable `PAPERLESS_ALLOW_SELF_SIGNED=true` setzen oder in der App den Haken „Selbstsigniertes/privates HTTPS-Zertifikat erlauben“ aktivieren.
+

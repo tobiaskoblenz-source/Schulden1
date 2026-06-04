@@ -2808,7 +2808,7 @@ body.force-mobile-view .dashboardShell{
     <section class="hero heroDashboard">
       <div class="heroMain dashboardHeader">
         <div class="dashboardGreetingWrap">
-          <div class="eyebrow">Ruhiges Dashboard · v80</div>
+          <div class="eyebrow">Ruhiges Dashboard · v81</div>
           <h1 id="greetingTitle">Guten Abend!</h1>
           <p id="greetingText">Hier ist die Übersicht deiner Schulden.</p>
         </div>
@@ -8450,7 +8450,7 @@ body.force-mobile-view #fabAdd{display:flex !important;}
 
 
 <style id="v79-menu-stability-style">
-/* v80: Paperless-Anbindung mit besserer Diagnose bei HTTP 502 */
+/* v81: Paperless-Anbindung mit besserer Diagnose bei HTTP 502 */
 @media (min-width:1121px){
   .v59MenuVersion,.v67CurrentVersion,.v70OnlyVersion,[id$="OnlyVersion"],[id$="CurrentVersion"]{display:none!important;visibility:hidden!important;height:0!important;min-height:0!important;margin:0!important;padding:0!important;overflow:hidden!important;}
   #stableVersionV79{display:block!important;visibility:visible!important;height:auto!important;margin:10px 8px 0!important;padding:6px 0 0!important;text-align:center!important;color:#eaf2ff!important;font-size:12px!important;font-weight:900!important;letter-spacing:.05em;}
@@ -8468,7 +8468,7 @@ body.force-mobile-view #fabAdd{display:flex !important;}
 </style>
 <script id="v79-menu-stability-js">
 (function(){
-  const VERSION='v80';
+  const VERSION='v81';
   function setText(el,txt){ if(el && el.textContent!==txt) el.textContent=txt; }
   function cleanup(){
     document.querySelectorAll('.v59MenuVersion,.v67CurrentVersion,.v70OnlyVersion,[id$="OnlyVersion"],[id$="CurrentVersion"]').forEach(el=>{ if(el.id!=='stableVersionV78') el.style.display='none'; });
@@ -8533,7 +8533,7 @@ body.force-mobile-view #fabAdd{display:flex !important;}
 (function(){
   const SETTINGS_KEY = 'schulden_paperless_settings_v79';
   let selectedIndex = 0;
-  let serverConfig = {paperlessConfigured:false, paperlessUrl:''};
+  let serverConfig = {paperlessConfigured:false, paperlessUrl:'', paperlessInsecureTls:false};
 
   function $(id){ return document.getElementById(id); }
   function toast(msg){ if(typeof showToast === 'function') showToast(msg); else alert(msg); }
@@ -8542,7 +8542,7 @@ body.force-mobile-view #fabAdd{display:flex !important;}
   function settings(){ try{return JSON.parse(localStorage.getItem(SETTINGS_KEY)||'{}');}catch(e){return {};} }
   function saveSettings(data){ localStorage.setItem(SETTINGS_KEY, JSON.stringify(data||{})); }
   function cleanBase(v){ return String(v||'').trim().replace(/\/+$/,''); }
-  function headers(){ const st=settings(); const h={'Accept':'application/json'}; if(!serverConfig.paperlessConfigured){ if(st.url) h['x-paperless-url']=cleanBase(st.url); if(st.token) h['x-paperless-token']=String(st.token).trim(); } return h; }
+  function headers(){ const st=settings(); const h={'Accept':'application/json'}; if(!serverConfig.paperlessConfigured){ if(st.url) h['x-paperless-url']=cleanBase(st.url); if(st.token) h['x-paperless-token']=String(st.token).trim(); if(st.insecureTls) h['x-paperless-insecure-tls']='true'; } return h; }
   function displayBase(){ const st=settings(); return cleanBase(serverConfig.paperlessUrl || st.url || ''); }
   function frontendLink(id){ const base=displayBase(); return base && id ? base + '/documents/' + encodeURIComponent(id) + '/details' : ''; }
   function docTitle(doc){ return doc.title || doc.original_filename || doc.archive_filename || ('Dokument #' + doc.id); }
@@ -8566,7 +8566,7 @@ body.force-mobile-view #fabAdd{display:flex !important;}
     return data;
   }
   async function loadConfig(){
-    try{ const r=await fetch('/api/config',{cache:'no-store'}); serverConfig=await r.json(); }catch(e){ serverConfig={paperlessConfigured:false,paperlessUrl:''}; }
+    try{ const r=await fetch('/api/config',{cache:'no-store'}); serverConfig=await r.json(); }catch(e){ serverConfig={paperlessConfigured:false,paperlessUrl:'',paperlessInsecureTls:false}; }
     updateStatus();
   }
   function updateStatus(mode,msg){
@@ -8577,7 +8577,7 @@ body.force-mobile-view #fabAdd{display:flex !important;}
     if(mode==='ok') el.classList.add('ok');
     if(mode==='err') el.classList.add('err');
     if(msg){ el.textContent=msg; return; }
-    if(serverConfig.paperlessConfigured) el.textContent='Paperless: über Railway-Variablen verbunden';
+    if(serverConfig.paperlessConfigured) el.textContent='Paperless: über Railway-Variablen verbunden' + (serverConfig.paperlessInsecureTls ? ' · Zertifikat-Prüfung aus' : '');
     else if(ready) el.textContent='Paperless: Browser-Einstellungen gespeichert';
     else el.textContent='Paperless: URL/API-Token fehlt';
   }
@@ -8599,12 +8599,12 @@ body.force-mobile-view #fabAdd{display:flex !important;}
   function ensureModal(){
     let overlay=$('paperlessOverlay'); if(overlay) return overlay;
     overlay=document.createElement('div'); overlay.id='paperlessOverlay'; overlay.className='paperlessOverlay';
-    overlay.innerHTML='<div class="paperlessModal" role="dialog" aria-modal="true"><div class="paperlessHead"><div><h3 id="paperlessTitle">Paperless-Anbindung</h3><p id="paperlessSub">Dokumente suchen und mit dieser Schulden-Akte verknüpfen.</p></div><button id="paperlessClose" class="paperlessClose" type="button">×</button></div><div class="paperlessGrid"><div class="paperlessBox"><h4>Verbindung</h4><div class="paperlessForm"><label>Paperless URL<input id="paperlessUrl" placeholder="https://paperless.example.de"></label><label>API Token<input id="paperlessToken" type="password" placeholder="Token aus Paperless"></label><div class="paperlessBtnRow"><button id="paperlessSaveSettings" type="button">Speichern</button><button id="paperlessTest" class="secondary" type="button">Testen</button></div><div id="paperlessConnectionHint" class="paperlessHint"></div></div></div><div class="paperlessBox"><h4>Aktuelle Akte</h4><div id="paperlessDebtInfo" class="paperlessHint">–</div><div class="paperlessHint">Empfohlen: Paperless-Tags wie <b>schulden-app</b>, Gläubigername und Aktenzeichen nutzen.</div></div></div><div class="paperlessBox"><h4>Dokumente suchen</h4><div class="paperlessSearchLine"><input id="paperlessQuery" placeholder="Suchbegriff, Gläubiger, Aktenzeichen"><button id="paperlessSearch" type="button">Suchen</button><button id="paperlessAutoQuery" class="secondary" type="button">Akte übernehmen</button></div><div id="paperlessResults" class="paperlessResultList"><div class="desktopEmptyState">Noch keine Suche gestartet.</div></div></div></div>';
+    overlay.innerHTML='<div class="paperlessModal" role="dialog" aria-modal="true"><div class="paperlessHead"><div><h3 id="paperlessTitle">Paperless-Anbindung</h3><p id="paperlessSub">Dokumente suchen und mit dieser Schulden-Akte verknüpfen.</p></div><button id="paperlessClose" class="paperlessClose" type="button">×</button></div><div class="paperlessGrid"><div class="paperlessBox"><h4>Verbindung</h4><div class="paperlessForm"><label>Paperless URL<input id="paperlessUrl" placeholder="https://paperless.example.de"></label><label>API Token<input id="paperlessToken" type="password" placeholder="Token aus Paperless"></label><label style="display:flex;align-items:center;gap:9px;grid-template-columns:auto 1fr;"><input id="paperlessInsecureTls" type="checkbox" style="width:18px;height:18px;"><span>Selbstsigniertes/privates HTTPS-Zertifikat erlauben</span></label><div class="paperlessBtnRow"><button id="paperlessSaveSettings" type="button">Speichern</button><button id="paperlessTest" class="secondary" type="button">Testen</button></div><div id="paperlessConnectionHint" class="paperlessHint"></div></div></div><div class="paperlessBox"><h4>Aktuelle Akte</h4><div id="paperlessDebtInfo" class="paperlessHint">–</div><div class="paperlessHint">Empfohlen: Paperless-Tags wie <b>schulden-app</b>, Gläubigername und Aktenzeichen nutzen.</div></div></div><div class="paperlessBox"><h4>Dokumente suchen</h4><div class="paperlessSearchLine"><input id="paperlessQuery" placeholder="Suchbegriff, Gläubiger, Aktenzeichen"><button id="paperlessSearch" type="button">Suchen</button><button id="paperlessAutoQuery" class="secondary" type="button">Akte übernehmen</button></div><div id="paperlessResults" class="paperlessResultList"><div class="desktopEmptyState">Noch keine Suche gestartet.</div></div></div></div>';
     document.body.appendChild(overlay);
     overlay.addEventListener('click', e=>{ if(e.target===overlay) closeModal(); });
     $('paperlessClose').addEventListener('click', closeModal);
     $('paperlessSaveSettings').addEventListener('click', ()=>{
-      saveSettings({url:cleanBase($('paperlessUrl').value), token:$('paperlessToken').value.trim()});
+      saveSettings({url:cleanBase($('paperlessUrl').value), token:$('paperlessToken').value.trim(), insecureTls:Boolean($('paperlessInsecureTls')?.checked)});
       updateStatus('ok','Paperless: Einstellungen gespeichert'); toast('Paperless-Einstellungen gespeichert ✅');
     });
     $('paperlessTest').addEventListener('click', testConnection);
@@ -8616,9 +8616,11 @@ body.force-mobile-view #fabAdd{display:flex !important;}
     const overlay=ensureModal(); const st=settings(); const d=currentDebts()[selectedIndex];
     $('paperlessUrl').value=serverConfig.paperlessUrl || st.url || '';
     $('paperlessToken').value=serverConfig.paperlessConfigured ? '********' : (st.token || '');
+    if($('paperlessInsecureTls')) $('paperlessInsecureTls').checked=Boolean(serverConfig.paperlessInsecureTls || st.insecureTls);
     $('paperlessUrl').disabled=Boolean(serverConfig.paperlessConfigured);
     $('paperlessToken').disabled=Boolean(serverConfig.paperlessConfigured);
-    $('paperlessConnectionHint').innerHTML=serverConfig.paperlessConfigured ? 'Railway-Variablen erkannt: <b>PAPERLESS_URL</b> und <b>PAPERLESS_TOKEN</b>. Token wird nicht im Browser angezeigt.' : 'Ohne Railway-Variablen werden URL und Token nur in diesem Browser gespeichert.';
+    if($('paperlessInsecureTls')) $('paperlessInsecureTls').disabled=Boolean(serverConfig.paperlessConfigured);
+    $('paperlessConnectionHint').innerHTML=serverConfig.paperlessConfigured ? 'Railway-Variablen erkannt: <b>PAPERLESS_URL</b> und <b>PAPERLESS_TOKEN</b>. Token wird nicht im Browser angezeigt. Für private Zertifikate kann zusätzlich <b>PAPERLESS_ALLOW_SELF_SIGNED=true</b> gesetzt werden.' : 'Ohne Railway-Variablen werden URL und Token nur in diesem Browser gespeichert.';
     $('paperlessDebtInfo').innerHTML=d ? '<b>'+esc(d.name||'Ohne Name')+'</b><br>Grund: '+esc(d.grund||'–')+'<br>Aktenzeichen: '+esc(d.aktenzeichen||d.caseNumber||'–') : 'Keine Akte ausgewählt.';
     $('paperlessQuery').value=d ? buildQuery(d) : '';
     $('paperlessResults').innerHTML='<div class="desktopEmptyState">Noch keine Suche gestartet.</div>';
@@ -8627,7 +8629,7 @@ body.force-mobile-view #fabAdd{display:flex !important;}
   }
   function closeModal(){ const overlay=$('paperlessOverlay'); if(overlay) overlay.style.display='none'; document.body.classList.remove('modalOpen'); }
   async function testConnection(){
-    if(!serverConfig.paperlessConfigured){ saveSettings({url:cleanBase($('paperlessUrl').value), token:$('paperlessToken').value.trim()}); }
+    if(!serverConfig.paperlessConfigured){ saveSettings({url:cleanBase($('paperlessUrl').value), token:$('paperlessToken').value.trim(), insecureTls:Boolean($('paperlessInsecureTls')?.checked)}); }
     try{ await apiJson('/api/paperless/status'); updateStatus('ok','Paperless: Verbindung funktioniert ✓'); toast('Paperless-Verbindung funktioniert ✅'); }
     catch(err){ updateStatus('err','Paperless: Verbindung fehlgeschlagen'); alert('Paperless-Verbindung fehlgeschlagen:\n\n'+err.message); }
   }
