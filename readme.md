@@ -53,3 +53,11 @@ Wenn Paperless mit einem selbstsignierten oder unvollständigen Zertifikat läuf
 - Der Haken „Selbstsigniertes/privates HTTPS-Zertifikat erlauben“ wirkt jetzt auch, wenn PAPERLESS_URL und PAPERLESS_TOKEN über Railway-Variablen gesetzt sind.
 - Alternative bleibt: PAPERLESS_ALLOW_SELF_SIGNED=true in Railway setzen.
 - Handy-Seite wurde nicht bewusst verändert.
+
+
+## v83 - Paperless Tag-Filter App
+
+- Paperless-Suche filtert jetzt fest auf den Tag `App`.
+- Es werden nur Dokumente angezeigt, die in Paperless mit `App` markiert sind.
+- Optional kann der Tag in Railway mit `PAPERLESS_TAG=App` angepasst werden.
+- Handy-Seite wurde nicht bewusst verändert.

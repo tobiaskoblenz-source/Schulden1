@@ -128,6 +128,98 @@ async function paperlessFetch(req, res, targetPath, options = {}){
 }
 
 
+function paperlessTagName(req){
+  const headerTag = String(req.headers["x-paperless-tag"] || "").trim();
+  const envTag = String(process.env.PAPERLESS_TAG || process.env.PAPERLESS_REQUIRED_TAG || "App").trim();
+  return headerTag || envTag || "App";
+}
+
+async function paperlessRawJson(req, targetPath, options = {}){
+  const cfg = paperlessConfig(req);
+  if(!cfg.baseUrl || !cfg.token){
+    const err = new Error("Paperless URL oder API-Token fehlt"); err.status = 400; err.payload = {ok:false, error:err.message}; throw err;
+  }
+  if(!/^https?:\/\//i.test(cfg.baseUrl)){
+    const err = new Error("Paperless URL muss mit http:// oder https:// beginnen"); err.status = 400; err.payload = {ok:false, error:err.message, hint:"Beispiel: https://paperless.deine-domain.de"}; throw err;
+  }
+
+  const controller = new AbortController();
+  const timeoutMs = Number(options.timeoutMs || process.env.PAPERLESS_TIMEOUT_MS || 12000);
+  const timer = setTimeout(()=>controller.abort(), timeoutMs);
+  let response;
+  try{
+    const fetchOptions = {
+      method: options.method || "GET",
+      headers: {"Authorization":"Token " + cfg.token, "Accept": options.accept || "application/json"},
+      redirect:"follow",
+      signal:controller.signal
+    };
+    if(cfg.insecureTls && /^https:/i.test(cfg.baseUrl)){
+      if(UndiciAgent) fetchOptions.dispatcher = new UndiciAgent({ connect: { rejectUnauthorized: false } });
+      else process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+    }
+    response = await fetch(cfg.baseUrl + targetPath, fetchOptions);
+  }catch(err){
+    clearTimeout(timer);
+    const e = new Error("Paperless nicht erreichbar");
+    e.status = 502;
+    e.payload = {
+      ok:false,
+      error:"Paperless nicht erreichbar",
+      status:502,
+      details:String(err && (err.cause?.code || err.code || err.message || err)).slice(0,500),
+      hint:paperlessReachabilityHint(cfg.baseUrl, err),
+      baseUrl:cfg.baseUrl,
+      usingEnv:cfg.usingEnv,
+      insecureTls:cfg.insecureTls
+    };
+    throw e;
+  }finally{
+    clearTimeout(timer);
+  }
+
+  if(!response.ok){
+    const text = await response.text().catch(()=>"");
+    let hint = "";
+    if(response.status === 401 || response.status === 403) hint = "API-Token ist falsch, abgelaufen oder hat keinen Zugriff.";
+    if(response.status === 404) hint = "Paperless API-Pfad wurde nicht gefunden. Prüfe, ob PAPERLESS_URL nur die Basisadresse enthält, ohne /api.";
+    if(response.status >= 500) hint = "Paperless selbst oder der Reverse Proxy meldet einen Serverfehler.";
+    const e = new Error("Paperless Fehler " + response.status);
+    e.status = response.status;
+    e.payload = {ok:false, error:e.message, status:response.status, details:text.slice(0,800), hint, baseUrl:cfg.baseUrl, usingEnv:cfg.usingEnv, insecureTls:cfg.insecureTls};
+    throw e;
+  }
+
+  const data = await response.json().catch(async()=>({raw:(await response.text().catch(()=>"")).slice(0,800)}));
+  return {ok:true, usingEnv:cfg.usingEnv, baseUrl:cfg.baseUrl, insecureTls:cfg.insecureTls, data};
+}
+
+function paperlessResultArray(data){
+  if(Array.isArray(data)) return data;
+  if(data && Array.isArray(data.results)) return data.results;
+  return [];
+}
+
+async function resolvePaperlessTagId(req, tagName){
+  const wanted = String(tagName || "").trim().toLowerCase();
+  if(!wanted || wanted === "*" || wanted === "all") return null;
+  const params = new URLSearchParams();
+  params.set("page_size", "200");
+  params.set("ordering", "name");
+  params.set("name__icontains", tagName);
+  const result = await paperlessRawJson(req, "/api/tags/?" + params.toString());
+  let tags = paperlessResultArray(result.data);
+  let found = tags.find(t => String(t.name || "").trim().toLowerCase() === wanted);
+  if(!found){
+    // Fallback für Paperless-Versionen, die name__icontains ignorieren.
+    const all = await paperlessRawJson(req, "/api/tags/?page_size=200&ordering=name");
+    tags = paperlessResultArray(all.data);
+    found = tags.find(t => String(t.name || "").trim().toLowerCase() === wanted);
+  }
+  return found ? found.id : null;
+}
+
+
 const MIME = {
   ".html": "text/html; charset=utf-8",
   ".js": "application/javascript; charset=utf-8",
@@ -238,7 +330,7 @@ const server = http.createServer(async (req, res)=>{
     const url = new URL(req.url, `http://${req.headers.host || "localhost"}`);
 
     if(url.pathname === "/api/health"){
-      return sendJson(res, 200, {ok:true, service:"schulden-manager", version:"v82", paperless:Boolean(process.env.PAPERLESS_URL || process.env.PAPERLESS_BASE_URL)});
+      return sendJson(res, 200, {ok:true, service:"schulden-manager", version:"v83", paperless:Boolean(process.env.PAPERLESS_URL || process.env.PAPERLESS_BASE_URL)});
     }
 
     if(url.pathname === "/api/config"){
@@ -246,7 +338,8 @@ const server = http.createServer(async (req, res)=>{
         googleClientId: process.env.GOOGLE_CLIENT_ID || process.env.GOOGLE_DRIVE_CLIENT_ID || "",
         paperlessConfigured: Boolean((process.env.PAPERLESS_URL || process.env.PAPERLESS_BASE_URL) && (process.env.PAPERLESS_TOKEN || process.env.PAPERLESS_API_TOKEN)),
         paperlessUrl: cleanPaperlessBase(process.env.PAPERLESS_URL || process.env.PAPERLESS_BASE_URL || ""),
-        paperlessInsecureTls: /^(1|true|yes|ja)$/i.test(String(process.env.PAPERLESS_ALLOW_SELF_SIGNED || process.env.PAPERLESS_INSECURE_TLS || ""))
+        paperlessInsecureTls: /^(1|true|yes|ja)$/i.test(String(process.env.PAPERLESS_ALLOW_SELF_SIGNED || process.env.PAPERLESS_INSECURE_TLS || "")),
+        paperlessTag: String(process.env.PAPERLESS_TAG || process.env.PAPERLESS_REQUIRED_TAG || "App").trim() || "App"
       });
     }
 
@@ -257,11 +350,35 @@ const server = http.createServer(async (req, res)=>{
     if(url.pathname === "/api/paperless/search" && req.method === "GET"){
       const query = url.searchParams.get("q") || "";
       const pageSize = Math.min(Math.max(parseInt(url.searchParams.get("page_size") || "20", 10) || 20, 1), 50);
+      const requiredTag = String(url.searchParams.get("tag") || paperlessTagName(req) || "App").trim();
       const params = new URLSearchParams();
       params.set("page_size", String(pageSize));
       params.set("ordering", "-created");
       if(query.trim()) params.set("query", query.trim());
-      return paperlessFetch(req, res, "/api/documents/?" + params.toString());
+      if(requiredTag && requiredTag !== "*" && requiredTag.toLowerCase() !== "all"){
+        try{
+          const tagId = await resolvePaperlessTagId(req, requiredTag);
+          if(!tagId){
+            return sendJson(res, 200, {
+              ok:true,
+              paperlessTag: requiredTag,
+              paperlessTagMissing: true,
+              hint: 'In Paperless wurde kein Tag mit dem Namen "' + requiredTag + '" gefunden. Bitte Schreibweise prüfen und Dokumente damit markieren.',
+              data:{count:0,next:null,previous:null,results:[]}
+            });
+          }
+          params.set("tags__id__all", String(tagId));
+        }catch(err){
+          return sendJson(res, err.status || 500, err.payload || {ok:false, error:err.message || "Paperless Tag-Filter Fehler"});
+        }
+      }
+      try{
+        const result = await paperlessRawJson(req, "/api/documents/?" + params.toString());
+        result.paperlessTag = requiredTag || "";
+        return sendJson(res, 200, result);
+      }catch(err){
+        return sendJson(res, err.status || 500, err.payload || {ok:false, error:err.message || "Paperless Suche Fehler"});
+      }
     }
 
     if(url.pathname.startsWith("/api/paperless/document/") && req.method === "GET"){
