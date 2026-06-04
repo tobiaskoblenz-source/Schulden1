@@ -28,3 +28,14 @@ PDF-Erstellung nutzt weiterhin die in der App vorhandene jsPDF-Bibliothek.
 - Empfohlen auf Railway: Variablen PAPERLESS_URL und PAPERLESS_TOKEN setzen. Alternativ können URL und Token im Browser gespeichert werden.
 - Wichtig: Wenn Paperless nur lokal auf der Synology erreichbar ist, muss die Schulden-App auch im selben Netz laufen oder Paperless muss für Railway erreichbar gemacht werden, z. B. über sichere Domain/VPN/Tunnel.
 - Handy-Seite wurde nicht verändert.
+
+
+## v80 - Paperless 502 Diagnose
+
+Diese Version verbessert die Paperless-Anbindung bei HTTP 502:
+- Timeout statt endlosem Warten
+- klare Fehlermeldung, wenn Railway Paperless nicht erreichen kann
+- Hinweis bei lokalen Synology/LAN-Adressen wie 192.168.x.x
+- Hinweise bei falschem Token, falscher URL oder Reverse-Proxy-Fehler
+
+Wichtig: Läuft die Schulden-App auf Railway und Paperless nur lokal auf der Synology, kann Railway die lokale Adresse nicht erreichen. Nutze dann eine sichere HTTPS-Adresse für Paperless oder betreibe die Schulden-App im selben Netzwerk.

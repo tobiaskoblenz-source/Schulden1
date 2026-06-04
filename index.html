@@ -2808,7 +2808,7 @@ body.force-mobile-view .dashboardShell{
     <section class="hero heroDashboard">
       <div class="heroMain dashboardHeader">
         <div class="dashboardGreetingWrap">
-          <div class="eyebrow">Ruhiges Dashboard · v79</div>
+          <div class="eyebrow">Ruhiges Dashboard · v80</div>
           <h1 id="greetingTitle">Guten Abend!</h1>
           <p id="greetingText">Hier ist die Übersicht deiner Schulden.</p>
         </div>
@@ -8450,7 +8450,7 @@ body.force-mobile-view #fabAdd{display:flex !important;}
 
 
 <style id="v79-menu-stability-style">
-/* v79: Menü stabilisieren, Versionsanzeigen vereinheitlichen + Paperless-Anbindung */
+/* v80: Paperless-Anbindung mit besserer Diagnose bei HTTP 502 */
 @media (min-width:1121px){
   .v59MenuVersion,.v67CurrentVersion,.v70OnlyVersion,[id$="OnlyVersion"],[id$="CurrentVersion"]{display:none!important;visibility:hidden!important;height:0!important;min-height:0!important;margin:0!important;padding:0!important;overflow:hidden!important;}
   #stableVersionV79{display:block!important;visibility:visible!important;height:auto!important;margin:10px 8px 0!important;padding:6px 0 0!important;text-align:center!important;color:#eaf2ff!important;font-size:12px!important;font-weight:900!important;letter-spacing:.05em;}
@@ -8468,7 +8468,7 @@ body.force-mobile-view #fabAdd{display:flex !important;}
 </style>
 <script id="v79-menu-stability-js">
 (function(){
-  const VERSION='v79';
+  const VERSION='v80';
   function setText(el,txt){ if(el && el.textContent!==txt) el.textContent=txt; }
   function cleanup(){
     document.querySelectorAll('.v59MenuVersion,.v67CurrentVersion,.v70OnlyVersion,[id$="OnlyVersion"],[id$="CurrentVersion"]').forEach(el=>{ if(el.id!=='stableVersionV78') el.style.display='none'; });
@@ -8556,7 +8556,15 @@ body.force-mobile-view #fabAdd{display:flex !important;}
   }
   function ensureLinks(d){ if(!d) return []; if(!Array.isArray(d.paperlessLinks)) d.paperlessLinks=[]; return d.paperlessLinks; }
   function api(path, opts={}){ return fetch(path, {...opts, headers:{...headers(), ...(opts.headers||{})}, cache:'no-store'}); }
-  async function apiJson(path){ const res=await api(path); const data=await res.json().catch(()=>({ok:false,error:'Keine JSON-Antwort'})); if(!res.ok || data.ok===false) throw new Error(data.error || ('HTTP '+res.status)); return data; }
+  async function apiJson(path){
+    const res=await api(path);
+    const data=await res.json().catch(()=>({ok:false,error:'Keine JSON-Antwort'}));
+    if(!res.ok || data.ok===false){
+      const msg=[data.error || ('HTTP '+res.status), data.hint, data.details ? ('Details: '+String(data.details).slice(0,220)) : ''].filter(Boolean).join('\n');
+      const err=new Error(msg); err.data=data; err.status=res.status; throw err;
+    }
+    return data;
+  }
   async function loadConfig(){
     try{ const r=await fetch('/api/config',{cache:'no-store'}); serverConfig=await r.json(); }catch(e){ serverConfig={paperlessConfigured:false,paperlessUrl:''}; }
     updateStatus();
@@ -8621,7 +8629,7 @@ body.force-mobile-view #fabAdd{display:flex !important;}
   async function testConnection(){
     if(!serverConfig.paperlessConfigured){ saveSettings({url:cleanBase($('paperlessUrl').value), token:$('paperlessToken').value.trim()}); }
     try{ await apiJson('/api/paperless/status'); updateStatus('ok','Paperless: Verbindung funktioniert ✓'); toast('Paperless-Verbindung funktioniert ✅'); }
-    catch(err){ updateStatus('err','Paperless: Verbindung fehlgeschlagen'); toast('Paperless-Fehler: '+err.message); }
+    catch(err){ updateStatus('err','Paperless: Verbindung fehlgeschlagen'); alert('Paperless-Verbindung fehlgeschlagen:\n\n'+err.message); }
   }
   async function searchDocs(){
     const box=$('paperlessResults'); if(!box) return;
@@ -8636,7 +8644,7 @@ body.force-mobile-view #fabAdd{display:flex !important;}
         return '<div class="paperlessResultItem"><div><strong>'+esc(title)+'</strong><span>'+esc(meta)+'</span></div><div class="paperlessResultActions"><button type="button" data-pl-link="'+esc(doc.id)+'" data-pl-title="'+esc(title)+'" data-pl-meta="'+esc(meta)+'">Verknüpfen</button><button type="button" data-pl-open="'+esc(doc.id)+'">PDF</button>'+(link?'<a target="_blank" rel="noopener" href="'+esc(link)+'">Paperless</a>':'')+'</div></div>';
       }).join('');
       updateStatus('ok','Paperless: Suche erfolgreich');
-    }catch(err){ box.innerHTML='<div class="desktopEmptyState">Paperless-Suche fehlgeschlagen: '+esc(err.message)+'</div>'; updateStatus('err','Paperless: Suche fehlgeschlagen'); }
+    }catch(err){ box.innerHTML='<div class="desktopEmptyState" style="white-space:pre-line;text-align:left">Paperless-Suche fehlgeschlagen:\n'+esc(err.message)+'</div>'; updateStatus('err','Paperless: Suche fehlgeschlagen'); }
   }
   function linkDoc(id,title,meta){
     const d=currentDebts()[selectedIndex]; if(!d) return;

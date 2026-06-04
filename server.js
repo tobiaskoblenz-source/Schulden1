@@ -24,21 +24,73 @@ function paperlessConfig(req){
   };
 }
 
+function paperlessReachabilityHint(baseUrl, err){
+  const target = String(baseUrl || "");
+  const isLocal = /^https?:\/\/(localhost|127\.|10\.|192\.168\.|172\.(1[6-9]|2\d|3[0-1])\.)/i.test(target) || /^https?:\/\/[^.\/:]+(:\d+)?$/i.test(target);
+  const code = err && (err.code || err.cause?.code || err.name || "");
+  if(isLocal){
+    return "Paperless-Adresse sieht lokal aus. Wenn die Schulden-App auf Railway läuft, kann Railway deine Synology/LAN-Adresse nicht erreichen. Nutze eine erreichbare HTTPS-Adresse oder betreibe die App im selben Netzwerk.";
+  }
+  if(String(code).includes("ENOTFOUND")){
+    return "Domain wurde nicht gefunden. Prüfe PAPERLESS_URL bzw. die eingegebene Paperless-Adresse.";
+  }
+  if(String(code).includes("ECONNREFUSED")){
+    return "Verbindung wurde abgelehnt. Prüfe Port, Reverse Proxy und ob Paperless läuft.";
+  }
+  if(String(code).includes("AbortError") || String(code).includes("TimeoutError")){
+    return "Paperless antwortet nicht rechtzeitig. Prüfe, ob die Adresse von Railway aus erreichbar ist.";
+  }
+  return "Schulden-App konnte Paperless nicht erreichen. Prüfe URL, Token, Reverse Proxy und HTTPS.";
+}
+
 async function paperlessFetch(req, res, targetPath, options = {}){
   const cfg = paperlessConfig(req);
   if(!cfg.baseUrl || !cfg.token){
     return sendJson(res, 400, {ok:false, error:"Paperless URL oder API-Token fehlt"});
   }
+
+  if(!/^https?:\/\//i.test(cfg.baseUrl)){
+    return sendJson(res, 400, {ok:false, error:"Paperless URL muss mit http:// oder https:// beginnen", hint:"Beispiel: https://paperless.deine-domain.de"});
+  }
+
   const url = cfg.baseUrl + targetPath;
   const headers = {
     "Authorization": "Token " + cfg.token,
     "Accept": options.accept || "application/json"
   };
-  const response = await fetch(url, {method: options.method || "GET", headers, redirect:"follow"});
+
+  const controller = new AbortController();
+  const timeoutMs = Number(options.timeoutMs || process.env.PAPERLESS_TIMEOUT_MS || 12000);
+  const timer = setTimeout(()=>controller.abort(), timeoutMs);
+
+  let response;
+  try{
+    response = await fetch(url, {method: options.method || "GET", headers, redirect:"follow", signal:controller.signal});
+  }catch(err){
+    clearTimeout(timer);
+    console.error("Paperless fetch failed", {baseUrl:cfg.baseUrl, path:targetPath, error:err && (err.stack || err.message || err)});
+    return sendJson(res, 502, {
+      ok:false,
+      error:"Paperless nicht erreichbar",
+      status:502,
+      details:String(err && (err.cause?.code || err.code || err.message || err)).slice(0,500),
+      hint:paperlessReachabilityHint(cfg.baseUrl, err),
+      baseUrl:cfg.baseUrl,
+      usingEnv:cfg.usingEnv
+    });
+  }finally{
+    clearTimeout(timer);
+  }
+
   if(!response.ok){
     const text = await response.text().catch(()=>"");
-    return sendJson(res, response.status, {ok:false, error:"Paperless Fehler " + response.status, details:text.slice(0,500)});
+    let hint = "";
+    if(response.status === 401 || response.status === 403) hint = "API-Token ist falsch, abgelaufen oder hat keinen Zugriff.";
+    if(response.status === 404) hint = "Paperless API-Pfad wurde nicht gefunden. Prüfe, ob PAPERLESS_URL nur die Basisadresse enthält, ohne /api.";
+    if(response.status >= 500) hint = "Paperless selbst oder der Reverse Proxy meldet einen Serverfehler.";
+    return sendJson(res, response.status, {ok:false, error:"Paperless Fehler " + response.status, status:response.status, details:text.slice(0,800), hint, baseUrl:cfg.baseUrl, usingEnv:cfg.usingEnv});
   }
+
   if(options.stream){
     res.writeHead(200, {
       "Content-Type": response.headers.get("content-type") || "application/octet-stream",
@@ -53,9 +105,11 @@ async function paperlessFetch(req, res, targetPath, options = {}){
     }
     return;
   }
-  const data = await response.json();
+
+  const data = await response.json().catch(async()=>({raw:(await response.text().catch(()=>"")).slice(0,800)}));
   return sendJson(res, 200, {ok:true, usingEnv:cfg.usingEnv, baseUrl:cfg.baseUrl, data});
 }
+
 
 const MIME = {
   ".html": "text/html; charset=utf-8",
@@ -167,7 +221,7 @@ const server = http.createServer(async (req, res)=>{
     const url = new URL(req.url, `http://${req.headers.host || "localhost"}`);
 
     if(url.pathname === "/api/health"){
-      return sendJson(res, 200, {ok:true, service:"schulden-manager", version:"v79", paperless:Boolean(process.env.PAPERLESS_URL || process.env.PAPERLESS_BASE_URL)});
+      return sendJson(res, 200, {ok:true, service:"schulden-manager", version:"v80", paperless:Boolean(process.env.PAPERLESS_URL || process.env.PAPERLESS_BASE_URL)});
     }
 
     if(url.pathname === "/api/config"){
