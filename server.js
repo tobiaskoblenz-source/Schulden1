@@ -603,7 +603,7 @@ const server = http.createServer(async (req, res)=>{
     const url = new URL(req.url, `http://${req.headers.host || "localhost"}`);
 
     if(url.pathname === "/api/health"){
-      return sendJson(res, 200, {ok:true, service:"schulden-manager", version:"v91", paperless:Boolean(process.env.PAPERLESS_URL || process.env.PAPERLESS_BASE_URL)});
+      return sendJson(res, 200, {ok:true, service:"schulden-manager", version:"v92", paperless:Boolean(process.env.PAPERLESS_URL || process.env.PAPERLESS_BASE_URL)});
     }
 
     if(url.pathname === "/api/config"){
@@ -649,7 +649,7 @@ const server = http.createServer(async (req, res)=>{
                 ok:true, usingEnv:byText.usingEnv, baseUrl:byText.baseUrl, insecureTls:byText.insecureTls,
                 paperlessTag: requiredTag, paperlessTagId:null, paperlessTagDocumentCount:null,
                 paperlessTagMissing:true, searchMode:"query_tag_text_fallback", tagQueryModes:byText.modes,
-                hint:'Paperless hat keine Tag-Liste geliefert. v91 nutzt deshalb die Paperless-Suche mit tag:' + requiredTag + '.',
+                hint:'Paperless hat keine Tag-Liste geliefert. v92 nutzt deshalb die Paperless-Suche mit tag:' + requiredTag + '.',
                 data:byText.data
               });
             }
@@ -666,7 +666,7 @@ const server = http.createServer(async (req, res)=>{
               availableTags: availableTags.slice(0,80).map(t=>({id:t.id,name:t.name,document_count:t.document_count})),
               searchMode: latest ? (latest._mode || 'latest_without_tag_after_missing_tag') : 'missing_tag_no_latest',
               relaxedSearch: latestArr.length > 0,
-              hint: 'Paperless hat den Tag "' + requiredTag + '" nicht über die API geliefert. v91 zeigt deshalb testweise neueste Dokumente ohne Tag-Filter. Wenn hier Dokumente erscheinen, liegt es an Tag-Rechten/Tag-Syntax; wenn nicht, hat der API-Token keinen Dokumentzugriff.',
+              hint: 'Paperless hat den Tag "' + requiredTag + '" nicht über die API geliefert. v92 zeigt deshalb testweise neueste Dokumente ohne Tag-Filter. Wenn hier Dokumente erscheinen, liegt es an Tag-Rechten/Tag-Syntax; wenn nicht, hat der API-Token keinen Dokumentzugriff.',
               data: latest ? {count:latestArr.length,next:null,previous:null,results:latestArr} : {count:0,next:null,previous:null,results:[]}
             });
           }
@@ -675,6 +675,49 @@ const server = http.createServer(async (req, res)=>{
         }
       }
       try{
+        if(tag){
+          // v92: Paperless liefert Dokumente mit Tags als IDs (z.B. App = ID 9).
+          // Darum filtern wir zuerst lokal über die Tag-ID. Das ist robuster als serverseitige
+          // Filterparameter, die je nach Paperless-Version/Proxy abweichen können.
+          const localStrict = await localPaperlessTagScan(req, tag, query, pageSize);
+          let localArr = paperlessResultArray(localStrict.data);
+          if(localArr.length){
+            return sendJson(res, 200, {
+              ok:true,
+              usingEnv: localStrict.usingEnv,
+              baseUrl: localStrict.baseUrl,
+              insecureTls: localStrict.insecureTls,
+              paperlessTag: requiredTag || tag.name || '',
+              paperlessTagId: tag.id,
+              paperlessTagDocumentCount: tag.document_count,
+              searchMode: 'v92_local_tag_id_first',
+              localScan: {scanned:localStrict.scanned, maxPages:localStrict.pages},
+              relaxedSearch:false,
+              hint: 'v92 filtert lokal über die Paperless-Tag-ID '+tag.id+' ('+(tag.name||requiredTag)+').',
+              data:{count: localArr.length, next:null, previous:null, results: localArr}
+            });
+          }
+          if(String(query||'').trim()){
+            const localAll = await localPaperlessTagScan(req, tag, '', pageSize);
+            localArr = paperlessResultArray(localAll.data);
+            if(localArr.length){
+              return sendJson(res, 200, {
+                ok:true,
+                usingEnv: localAll.usingEnv,
+                baseUrl: localAll.baseUrl,
+                insecureTls: localAll.insecureTls,
+                paperlessTag: requiredTag || tag.name || '',
+                paperlessTagId: tag.id,
+                paperlessTagDocumentCount: tag.document_count,
+                searchMode: 'v92_local_tag_id_relaxed',
+                localScan: {scanned:localAll.scanned, maxPages:localAll.pages},
+                relaxedSearch:true,
+                hint: 'Mit dem Akten-Suchbegriff wurde nichts gefunden. v92 zeigt deshalb alle Dokumente mit dem Tag '+(tag.name||requiredTag)+' (ID '+tag.id+').',
+                data:{count: localArr.length, next:null, previous:null, results: localArr}
+              });
+            }
+          }
+        }
         const attempts = [];
         const base = () => { const p = new URLSearchParams(); p.set("page_size", String(pageSize)); p.set("ordering", "-created"); return p; };
         if(tag){
@@ -732,7 +775,7 @@ const server = http.createServer(async (req, res)=>{
           searchMode: used._mode || "unknown",
           localScan: localScan ? {scanned:localScan.scanned, maxPages:localScan.pages} : null,
           relaxedSearch: relaxed,
-          hint: used._mode === "local_scan_tag_ids" ? 'Server-Tagfilter lieferte nichts. v91 hat deshalb lokal nach Dokumenten mit Tag "' + requiredTag + '" gesucht.' : (relaxed ? 'Mit dem Akten-Suchbegriff wurde nichts gefunden. Es werden deshalb alle Dokumente mit dem Tag "' + requiredTag + '" angezeigt.' : ''),
+          hint: used._mode === "local_scan_tag_ids" ? 'Server-Tagfilter lieferte nichts. v92 hat deshalb lokal nach Dokumenten mit Tag "' + requiredTag + '" gesucht.' : (relaxed ? 'Mit dem Akten-Suchbegriff wurde nichts gefunden. Es werden deshalb alle Dokumente mit dem Tag "' + requiredTag + '" angezeigt.' : ''),
           data:{count: merged.length, next:null, previous:null, results: merged}
         });
       }catch(err){
@@ -788,7 +831,7 @@ const server = http.createServer(async (req, res)=>{
         }else if(tests.documents && tests.documents.isJson && tests.documents.resultsLength > 0){
           globalHint = "Dokumentzugriff funktioniert. Wenn der Tag App nicht gefunden wird, liegt es nur am Tag-Namen/Tag-Filter.";
         }
-        return sendJson(res, 200, {ok:true, version:"v91", hint:globalHint, tests});
+        return sendJson(res, 200, {ok:true, version:"v92", hint:globalHint, tests});
       }catch(err){
         return sendJson(res, err.status || 500, err.payload || {ok:false, error:err.message || "Paperless Rohdiagnose Fehler"});
       }
