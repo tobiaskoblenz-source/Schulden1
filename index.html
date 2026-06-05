@@ -9039,5 +9039,77 @@ body.force-mobile-view #fabAdd{display:flex !important;}
 })();
 </script>
 
+
+
+<style id="v100-category-dropdown-style">
+/* v100: Kategorie-Auswahl in der Desktop-Neu-Schulden-Maske repariert */
+#addModal #m_category{color:#eaf2ff!important;background:#132238!important;border:1px solid rgba(255,255,255,.09)!important;}
+#addModal #m_category option{background:#132238;color:#eaf2ff;}
+</style>
+<script id="v100-category-dropdown-fix-js">
+(function(){
+  const VERSION='v100';
+  const CAT_KEY='schulden_creditor_categories_v56';
+  const CRED_KEY='schulden_creditors_v37';
+  const DEFAULT_CATS=['Krankenkasse','Amt / Behörde','Gericht','Inkasso','Versicherung','Privatperson','Sonstiges'];
+  function $(id){return document.getElementById(id);}
+  function readJson(key, fallback){ try{ const v=JSON.parse(localStorage.getItem(key)||'null'); return v??fallback; }catch(e){ return fallback; } }
+  function norm(s){return String(s||'').trim();}
+  function addUnique(arr, v){ v=norm(v); if(!v) return; if(!arr.some(x=>x.toLowerCase()===v.toLowerCase())) arr.push(v); }
+  function getDebts(){ try{ if(Array.isArray(window.debts)) return window.debts; }catch(e){} try{ if(typeof debts!=='undefined' && Array.isArray(debts)) return debts; }catch(e){} return []; }
+  function getCats(){
+    const out=[];
+    const saved=readJson(CAT_KEY, null);
+    if(Array.isArray(saved)) saved.forEach(c=>addUnique(out,c));
+    DEFAULT_CATS.forEach(c=>addUnique(out,c));
+    const creditors=readJson(CRED_KEY, []);
+    if(Array.isArray(creditors)) creditors.forEach(c=>addUnique(out,c && c.category));
+    const debtsArr=getDebts();
+    if(Array.isArray(debtsArr)) debtsArr.forEach(d=>{ addUnique(out,d && (d.category||d.kategorie)); });
+    return out.length?out:DEFAULT_CATS.slice();
+  }
+  function optionHtml(v){ const e=String(v).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#039;'); return '<option value="'+e+'">'+e+'</option>'; }
+  function fillCategorySelect(force){
+    const sel=$('m_category'); if(!sel) return false;
+    const current=norm(sel.value) || norm(sel.getAttribute('data-last-value')) || 'Sonstiges';
+    const cats=getCats();
+    if(force || sel.options.length===0 || !sel.textContent.trim()){
+      if(current) addUnique(cats,current);
+      sel.innerHTML=cats.map(optionHtml).join('');
+    }else{
+      const existing=[...sel.options].map(o=>o.value);
+      cats.forEach(c=>{ if(!existing.some(x=>x.toLowerCase()===String(c).toLowerCase())){ const opt=document.createElement('option'); opt.value=c; opt.textContent=c; sel.appendChild(opt); } });
+    }
+    if([...sel.options].some(o=>o.value===current)) sel.value=current; else sel.value='Sonstiges';
+    sel.setAttribute('data-last-value', sel.value||'Sonstiges');
+    return true;
+  }
+  function bindSelect(){
+    const sel=$('m_category'); if(!sel || sel.dataset.v100Category==='1') return;
+    sel.dataset.v100Category='1';
+    ['pointerdown','mousedown','click','focus','touchstart'].forEach(ev=>sel.addEventListener(ev,()=>fillCategorySelect(true),true));
+    sel.addEventListener('change',()=>sel.setAttribute('data-last-value', sel.value||'Sonstiges'));
+  }
+  function fix(){
+    try{
+      fillCategorySelect(false); bindSelect();
+      document.querySelectorAll('.v59MenuVersion').forEach(el=>el.textContent=VERSION);
+      const b=document.getElementById('v98OnlyVersion'); if(b) b.textContent=VERSION;
+      const v76=document.getElementById('v76OnlyVersion'); if(v76) v76.textContent=VERSION;
+    }catch(e){ console.error('v100 category dropdown fix', e); }
+  }
+  const oldOpen=window.openAddModal;
+  if(typeof oldOpen==='function' && !oldOpen.__v100CategoryFix){
+    const wrapped=function(){ const r=oldOpen.apply(this,arguments); setTimeout(()=>fillCategorySelect(true),0); setTimeout(fix,80); setTimeout(fix,300); return r; };
+    wrapped.__v100CategoryFix=true; window.openAddModal=wrapped; try{ openAddModal=wrapped; }catch(e){}
+  }
+  window.addEventListener('storage', e=>{ if(e.key===CAT_KEY || e.key===CRED_KEY) setTimeout(()=>fillCategorySelect(true),50); });
+  document.addEventListener('DOMContentLoaded',()=>{ setTimeout(fix,100); setTimeout(fix,500); setTimeout(()=>fillCategorySelect(true),1000); });
+  window.addEventListener('load',()=>{ fix(); setTimeout(()=>fillCategorySelect(true),500); });
+  setInterval(fix,1200);
+  fix();
+})();
+</script>
+
 </body>
 </html>

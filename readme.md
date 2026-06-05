@@ -1,1 +1,1 @@
-Schulden v99 - Kategorie beim Desktop-Neuanlegen korrigiert. Paperless bleibt Desktop, Handy-Seite bleibt ohne Paperless.
+Schulden v100 - Kategorie-Dropdown in der Desktop-Neu-Schulden-Maske repariert. Paperless bleibt Desktop, Handy-Seite nicht umgebaut.
