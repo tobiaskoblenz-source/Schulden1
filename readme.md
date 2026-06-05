@@ -1,1 +1,1 @@
-Schulden Manager v93 - Paperless Auto-Zuordnung nach Gläubiger/Aktenzeichen/Kundennummer.
+Schulden Manager v95 - Paperless-Dokumente werden direkt bei Korrespondenz/Daten angezeigt.
