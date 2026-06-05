@@ -416,6 +416,64 @@ function dedupePaperlessDocuments(results){
 }
 
 
+async function paperlessRawDetailed(req, targetPath, authMode){
+  const cfg = paperlessConfig(req);
+  if(!cfg.baseUrl || !cfg.token) return {ok:false, error:"Paperless URL oder API-Token fehlt"};
+  const controller = new AbortController();
+  const timeoutMs = Number(process.env.PAPERLESS_TIMEOUT_MS || 12000);
+  const timer = setTimeout(()=>controller.abort(), timeoutMs);
+  try{
+    const headers = {"Accept": paperlessJsonAccept()};
+    if(authMode === "bearer") headers.Authorization = "Bearer " + cfg.token;
+    else if(authMode === "none") {}
+    else headers.Authorization = "Token " + cfg.token;
+    const fetchOptions = {method:"GET", headers, redirect:"follow", signal:controller.signal};
+    if(cfg.insecureTls && /^https:/i.test(cfg.baseUrl)){
+      if(UndiciAgent) fetchOptions.dispatcher = new UndiciAgent({ connect: { rejectUnauthorized: false } });
+      else process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+    }
+    const response = await fetch(cfg.baseUrl + targetPath, fetchOptions);
+    const contentType = response.headers.get("content-type") || "";
+    const finalUrl = response.url || "";
+    const text = await response.text().catch(()=>"");
+    let json = null;
+    try{ json = text ? JSON.parse(text) : null; }catch(e){ json = null; }
+    const arr = paperlessResultArray(json);
+    const looksHtml = /<html|<!doctype html|<title|<form/i.test(text.slice(0,1000));
+    const looksLogin = /login|csrf|password|username|sign in|anmelden/i.test(text.slice(0,2000));
+    return {
+      ok: response.ok,
+      httpStatus: response.status,
+      contentType,
+      finalUrl,
+      authMode: authMode || "token",
+      isJson: Boolean(json),
+      jsonTopKeys: json && typeof json === "object" ? Object.keys(json).slice(0,30) : [],
+      count: json && typeof json.count !== "undefined" ? json.count : (Array.isArray(json) ? json.length : undefined),
+      resultsLength: arr.length,
+      sample: arr.slice(0,3).map(x=>({
+        id:x && x.id,
+        name:x && x.name,
+        title:x && x.title,
+        created:x && x.created,
+        tags:x && x.tags,
+        correspondent:x && x.correspondent,
+        document_type:x && x.document_type,
+        keys:x ? Object.keys(x).slice(0,30) : []
+      })),
+      rawPreview: json ? "" : text.slice(0,700),
+      looksHtml,
+      looksLogin,
+      hint: (!json && looksHtml) ? "Paperless/Reverse Proxy liefert HTML statt JSON. Meist ist das die Login-Seite oder der Authorization-Header kommt nicht bei Paperless an." : ""
+    };
+  }catch(e){
+    return {ok:false, authMode:authMode||"token", error:String(e && (e.cause?.code || e.code || e.message || e)).slice(0,500)};
+  }finally{
+    clearTimeout(timer);
+  }
+}
+
+
 const MIME = {
   ".html": "text/html; charset=utf-8",
   ".js": "application/javascript; charset=utf-8",
@@ -526,7 +584,7 @@ const server = http.createServer(async (req, res)=>{
     const url = new URL(req.url, `http://${req.headers.host || "localhost"}`);
 
     if(url.pathname === "/api/health"){
-      return sendJson(res, 200, {ok:true, service:"schulden-manager", version:"v89", paperless:Boolean(process.env.PAPERLESS_URL || process.env.PAPERLESS_BASE_URL)});
+      return sendJson(res, 200, {ok:true, service:"schulden-manager", version:"v90", paperless:Boolean(process.env.PAPERLESS_URL || process.env.PAPERLESS_BASE_URL)});
     }
 
     if(url.pathname === "/api/config"){
@@ -572,7 +630,7 @@ const server = http.createServer(async (req, res)=>{
                 ok:true, usingEnv:byText.usingEnv, baseUrl:byText.baseUrl, insecureTls:byText.insecureTls,
                 paperlessTag: requiredTag, paperlessTagId:null, paperlessTagDocumentCount:null,
                 paperlessTagMissing:true, searchMode:"query_tag_text_fallback", tagQueryModes:byText.modes,
-                hint:'Paperless hat keine Tag-Liste geliefert. v88 nutzt deshalb die Paperless-Suche mit tag:' + requiredTag + '.',
+                hint:'Paperless hat keine Tag-Liste geliefert. v90 nutzt deshalb die Paperless-Suche mit tag:' + requiredTag + '.',
                 data:byText.data
               });
             }
@@ -589,7 +647,7 @@ const server = http.createServer(async (req, res)=>{
               availableTags: availableTags.slice(0,80).map(t=>({id:t.id,name:t.name,document_count:t.document_count})),
               searchMode: latest ? (latest._mode || 'latest_without_tag_after_missing_tag') : 'missing_tag_no_latest',
               relaxedSearch: latestArr.length > 0,
-              hint: 'Paperless hat den Tag "' + requiredTag + '" nicht über die API geliefert. v88 zeigt deshalb testweise neueste Dokumente ohne Tag-Filter. Wenn hier Dokumente erscheinen, liegt es an Tag-Rechten/Tag-Syntax; wenn nicht, hat der API-Token keinen Dokumentzugriff.',
+              hint: 'Paperless hat den Tag "' + requiredTag + '" nicht über die API geliefert. v90 zeigt deshalb testweise neueste Dokumente ohne Tag-Filter. Wenn hier Dokumente erscheinen, liegt es an Tag-Rechten/Tag-Syntax; wenn nicht, hat der API-Token keinen Dokumentzugriff.',
               data: latest ? {count:latestArr.length,next:null,previous:null,results:latestArr} : {count:0,next:null,previous:null,results:[]}
             });
           }
@@ -655,7 +713,7 @@ const server = http.createServer(async (req, res)=>{
           searchMode: used._mode || "unknown",
           localScan: localScan ? {scanned:localScan.scanned, maxPages:localScan.pages} : null,
           relaxedSearch: relaxed,
-          hint: used._mode === "local_scan_tag_ids" ? 'Server-Tagfilter lieferte nichts. v88 hat deshalb lokal nach Dokumenten mit Tag "' + requiredTag + '" gesucht.' : (relaxed ? 'Mit dem Akten-Suchbegriff wurde nichts gefunden. Es werden deshalb alle Dokumente mit dem Tag "' + requiredTag + '" angezeigt.' : ''),
+          hint: used._mode === "local_scan_tag_ids" ? 'Server-Tagfilter lieferte nichts. v90 hat deshalb lokal nach Dokumenten mit Tag "' + requiredTag + '" gesucht.' : (relaxed ? 'Mit dem Akten-Suchbegriff wurde nichts gefunden. Es werden deshalb alle Dokumente mit dem Tag "' + requiredTag + '" angezeigt.' : ''),
           data:{count: merged.length, next:null, previous:null, results: merged}
         });
       }catch(err){
@@ -691,38 +749,27 @@ const server = http.createServer(async (req, res)=>{
 
     if(url.pathname === "/api/paperless/rawtest" && req.method === "GET"){
       try{
-        async function safe(name, path){
-          try{
-            const r = await paperlessRawJson(req, path);
-            const arr = paperlessResultArray(r.data);
-            return {
-              ok:true,
-              count: (r.data && typeof r.data.count !== "undefined") ? r.data.count : arr.length,
-              resultsLength: arr.length,
-              sample: arr.slice(0,3).map(x=>({
-                id:x && x.id,
-                name:x && x.name,
-                title:x && x.title,
-                created:x && x.created,
-                tags:x && x.tags,
-                correspondent:x && x.correspondent,
-                document_type:x && x.document_type,
-                keys:x ? Object.keys(x).slice(0,20) : []
-              }))
-            };
-          }catch(e){
-            return {ok:false, status:e.status || 500, error:(e.payload && (e.payload.error || e.payload.details)) || e.message || String(e)};
-          }
-        }
-        const out = {
-          documents: await safe("documents", "/api/documents/?page_size=10&ordering=-created"),
-          documentsNoOrdering: await safe("documentsNoOrdering", "/api/documents/?page_size=10"),
-          documentsSearchApp: await safe("documentsSearchApp", "/api/documents/?page_size=10&query=" + encodeURIComponent("App")),
-          tags: await safe("tags", "/api/tags/?page_size=50"),
-          correspondents: await safe("correspondents", "/api/correspondents/?page_size=20"),
-          documentTypes: await safe("documentTypes", "/api/document_types/?page_size=20")
+        const tests = {
+          documents: await paperlessRawDetailed(req, "/api/documents/?page_size=10&ordering=-created", "token"),
+          documentsNoOrdering: await paperlessRawDetailed(req, "/api/documents/?page_size=10", "token"),
+          documentsSearchApp: await paperlessRawDetailed(req, "/api/documents/?page_size=10&query=" + encodeURIComponent("App"), "token"),
+          tags: await paperlessRawDetailed(req, "/api/tags/?page_size=50", "token"),
+          correspondents: await paperlessRawDetailed(req, "/api/correspondents/?page_size=20", "token"),
+          documentTypes: await paperlessRawDetailed(req, "/api/document_types/?page_size=20", "token"),
+          tokenAuthCheck: await paperlessRawDetailed(req, "/api/documents/?page_size=1", "token"),
+          bearerAuthCheck: await paperlessRawDetailed(req, "/api/documents/?page_size=1", "bearer"),
+          noAuthCheck: await paperlessRawDetailed(req, "/api/documents/?page_size=1", "none")
         };
-        return sendJson(res, 200, {ok:true, version:"v89", tests:out});
+        let globalHint = "";
+        const vals = Object.values(tests);
+        if(vals.some(x=>x && x.looksHtml)){
+          globalHint = "Paperless liefert HTML statt JSON. Das ist fast immer Login-Seite/Reverse-Proxy/Auth-Header. In Synology Reverse Proxy muss der Authorization-Header an Paperless weitergereicht werden; alternativ Paperless-URL direkt ohne vorgeschaltete Login-Seite verwenden.";
+        }else if(tests.documents && tests.documents.isJson && Number(tests.documents.count||0) === 0 && tests.tags && tests.tags.isJson && Number(tests.tags.count||0) === 0){
+          globalHint = "Die API liefert echtes JSON, aber Dokumente/Tags/Korrespondenten sind leer. Dann nutzt du sehr wahrscheinlich einen Paperless-Benutzer/Token, der keine Dokumente sieht, oder du bist mit der App mit einer leeren Paperless-Instanz verbunden.";
+        }else if(tests.documents && tests.documents.isJson && tests.documents.resultsLength > 0){
+          globalHint = "Dokumentzugriff funktioniert. Wenn der Tag App nicht gefunden wird, liegt es nur am Tag-Namen/Tag-Filter.";
+        }
+        return sendJson(res, 200, {ok:true, version:"v90", hint:globalHint, tests});
       }catch(err){
         return sendJson(res, err.status || 500, err.payload || {ok:false, error:err.message || "Paperless Rohdiagnose Fehler"});
       }
