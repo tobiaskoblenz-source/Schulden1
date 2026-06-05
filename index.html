@@ -8450,7 +8450,7 @@ body.force-mobile-view #fabAdd{display:flex !important;}
 
 
 <style id="v79-menu-stability-style">
-/* v95: Paperless-Dokumente direkt in Korrespondenz/Daten anzeigen */
+/* v96: Paperless-Dokumente direkt in Korrespondenz/Daten anzeigen */
 @media (min-width:1121px){
   .v59MenuVersion,.v67CurrentVersion,.v70OnlyVersion,[id$="OnlyVersion"],[id$="CurrentVersion"]{display:none!important;visibility:hidden!important;height:0!important;min-height:0!important;margin:0!important;padding:0!important;overflow:hidden!important;}
   #stableVersionV79{display:block!important;visibility:visible!important;height:auto!important;margin:10px 8px 0!important;padding:6px 0 0!important;text-align:center!important;color:#eaf2ff!important;font-size:12px!important;font-weight:900!important;letter-spacing:.05em;}
@@ -8468,7 +8468,7 @@ body.force-mobile-view #fabAdd{display:flex !important;}
 </style>
 <script id="v79-menu-stability-js">
 (function(){
-  const VERSION='v95';
+  const VERSION='v96';
   function setText(el,txt){ if(el && el.textContent!==txt) el.textContent=txt; }
   function cleanup(){
     document.querySelectorAll('.v59MenuVersion,.v67CurrentVersion,.v70OnlyVersion,[id$="OnlyVersion"],[id$="CurrentVersion"]').forEach(el=>{ if(el.id!=='stableVersionV78') el.style.display='none'; });
@@ -8656,7 +8656,7 @@ body.force-mobile-view #fabAdd{display:flex !important;}
   function ensureModal(){
     let overlay=$('paperlessOverlay'); if(overlay) return overlay;
     overlay=document.createElement('div'); overlay.id='paperlessOverlay'; overlay.className='paperlessOverlay';
-    overlay.innerHTML='<div class="paperlessModal" role="dialog" aria-modal="true"><div class="paperlessHead"><div><h3 id="paperlessTitle">Paperless-Dokumente</h3><p id="paperlessSub">Verknüpfte Dokumente sehen, neue Dokumente suchen und mit dieser Schuld verknüpfen.</p></div><button id="paperlessClose" class="paperlessClose" type="button">×</button></div><div class="paperlessGrid"><div class="paperlessBox"><h4>Verbindung</h4><div class="paperlessForm"><label>Paperless URL<input id="paperlessUrl" placeholder="https://paperless.example.de"></label><label>API Token<input id="paperlessToken" type="password" placeholder="Token aus Paperless"></label><label>Paperless-Tag für Schulden-Briefe<input id="paperlessTagInput" placeholder="App"></label><label style="display:flex;align-items:center;gap:9px;grid-template-columns:auto 1fr;"><input id="paperlessInsecureTls" type="checkbox" style="width:18px;height:18px;"><span>Selbstsigniertes/privates HTTPS-Zertifikat erlauben</span></label><div class="paperlessBtnRow"><button id="paperlessSaveSettings" type="button">Speichern</button><button id="paperlessTest" class="secondary" type="button">Testen</button><button id="paperlessLoadTags" class="secondary" type="button">Tags laden</button><button id="paperlessDebug" class="secondary" type="button">Diagnose</button><button id="paperlessRawDebug" class="secondary" type="button">Roh-Test</button></div><div id="paperlessConnectionHint" class="paperlessHint"></div></div></div><div class="paperlessBox"><h4>Aktuelle Akte</h4><div id="paperlessDebtInfo" class="paperlessHint">–</div><div class="paperlessHint">Filter: Es werden nur Paperless-Dokumente mit dem eingestellten Tag angezeigt. v95 zeigt verknüpfte Paperless-Dokumente direkt in der Korrespondenz/Daten-Liste.</div></div></div><div class="paperlessBox paperlessModalLinkedBox"><h4>📎 Verknüpfte Paperless-Dokumente dieser Schuld</h4><div class="paperlessLinkedHint">Hier erscheinen die Dokumente, nachdem du bei einem Suchtreffer auf „Verknüpfen“ geklickt hast.</div><div id="paperlessLinkedDocs" class="desktopCorrList paperlessLinkedList"></div></div><div class="paperlessBox"><h4>Dokumente suchen</h4><div class="paperlessSearchLine"><input id="paperlessQuery" placeholder="Suchbegriff, Gläubiger, Aktenzeichen"><button id="paperlessSearch" type="button">Suchen</button><button id="paperlessAutoSearch" class="secondary" type="button">Automatisch zuordnen</button><button id="paperlessAutoQuery" class="secondary" type="button">Akte übernehmen</button><button id="paperlessOnlyTag" class="secondary" type="button">Nur eingestellter Tag</button><button id="paperlessAllDocs" class="secondary" type="button">Alle testen</button><button id="paperlessTextApp" class="secondary" type="button">Volltext App</button></div><div id="paperlessResults" class="paperlessResultList"><div class="desktopEmptyState">Noch keine Suche gestartet.</div></div></div></div>';
+    overlay.innerHTML='<div class="paperlessModal" role="dialog" aria-modal="true"><div class="paperlessHead"><div><h3 id="paperlessTitle">Paperless-Dokumente</h3><p id="paperlessSub">Verknüpfte Dokumente sehen, neue Dokumente suchen und mit dieser Schuld verknüpfen.</p></div><button id="paperlessClose" class="paperlessClose" type="button">×</button></div><div class="paperlessGrid"><div class="paperlessBox"><h4>Verbindung</h4><div class="paperlessForm"><label>Paperless URL<input id="paperlessUrl" placeholder="https://paperless.example.de"></label><label>API Token<input id="paperlessToken" type="password" placeholder="Token aus Paperless"></label><label>Paperless-Tag für Schulden-Briefe<input id="paperlessTagInput" placeholder="App"></label><label style="display:flex;align-items:center;gap:9px;grid-template-columns:auto 1fr;"><input id="paperlessInsecureTls" type="checkbox" style="width:18px;height:18px;"><span>Selbstsigniertes/privates HTTPS-Zertifikat erlauben</span></label><div class="paperlessBtnRow"><button id="paperlessSaveSettings" type="button">Speichern</button><button id="paperlessTest" class="secondary" type="button">Testen</button><button id="paperlessLoadTags" class="secondary" type="button">Tags laden</button><button id="paperlessDebug" class="secondary" type="button">Diagnose</button><button id="paperlessRawDebug" class="secondary" type="button">Roh-Test</button></div><div id="paperlessConnectionHint" class="paperlessHint"></div></div></div><div class="paperlessBox"><h4>Aktuelle Akte</h4><div id="paperlessDebtInfo" class="paperlessHint">–</div><div class="paperlessHint">Filter: Es werden nur Paperless-Dokumente mit dem eingestellten Tag angezeigt. v96 zeigt verknüpfte Paperless-Dokumente direkt in der Korrespondenz/Daten-Liste.</div></div></div><div class="paperlessBox paperlessModalLinkedBox"><h4>📎 Verknüpfte Paperless-Dokumente dieser Schuld</h4><div class="paperlessLinkedHint">Hier erscheinen die Dokumente, nachdem du bei einem Suchtreffer auf „Verknüpfen“ geklickt hast.</div><div id="paperlessLinkedDocs" class="desktopCorrList paperlessLinkedList"></div></div><div class="paperlessBox"><h4>Dokumente suchen</h4><div class="paperlessSearchLine"><input id="paperlessQuery" placeholder="Suchbegriff, Gläubiger, Aktenzeichen"><button id="paperlessSearch" type="button">Suchen</button><button id="paperlessAutoSearch" class="secondary" type="button">Automatisch zuordnen</button><button id="paperlessAutoQuery" class="secondary" type="button">Akte übernehmen</button><button id="paperlessOnlyTag" class="secondary" type="button">Nur eingestellter Tag</button><button id="paperlessAllDocs" class="secondary" type="button">Alle testen</button><button id="paperlessTextApp" class="secondary" type="button">Volltext App</button></div><div id="paperlessResults" class="paperlessResultList"><div class="desktopEmptyState">Noch keine Suche gestartet.</div></div></div></div>';
     document.body.appendChild(overlay);
     overlay.addEventListener('click', e=>{ if(e.target===overlay) closeModal(); });
     $('paperlessClose').addEventListener('click', closeModal);
@@ -8681,7 +8681,7 @@ body.force-mobile-view #fabAdd{display:flex !important;}
     $('paperlessToken').disabled=Boolean(serverConfig.paperlessConfigured);
     if($('paperlessInsecureTls')) $('paperlessInsecureTls').disabled=false;
     $('paperlessConnectionHint').innerHTML=serverConfig.paperlessConfigured ? 'Railway-Variablen erkannt: <b>PAPERLESS_URL</b> und <b>PAPERLESS_TOKEN</b>. Token wird nicht im Browser angezeigt. Für private Zertifikate kannst du jetzt auch hier den Haken aktivieren; alternativ <b>PAPERLESS_ALLOW_SELF_SIGNED=true</b> in Railway setzen.' : 'Ohne Railway-Variablen werden URL und Token nur in diesem Browser gespeichert.';
-    $('paperlessDebtInfo').innerHTML=d ? '<b>'+esc(d.name||'Ohne Name')+'</b><br>Grund: '+esc(d.grund||'–')+'<br>Aktenzeichen: '+esc(d.aktenzeichen||d.caseNumber||'–')+'<br>Kundennummer: '+esc(d.customerNumber||d.kundennummer||d.customerId||'–')+'<br>Paperless-Tag: <b>'+esc(activeTag())+'</b><br><br><b>v95:</b> Verknüpfte Dokumente werden in der Korrespondenz/Daten-Liste angezeigt.' : 'Keine Akte ausgewählt.';
+    $('paperlessDebtInfo').innerHTML=d ? '<b>'+esc(d.name||'Ohne Name')+'</b><br>Grund: '+esc(d.grund||'–')+'<br>Aktenzeichen: '+esc(d.aktenzeichen||d.caseNumber||'–')+'<br>Kundennummer: '+esc(d.customerNumber||d.kundennummer||d.customerId||'–')+'<br>Paperless-Tag: <b>'+esc(activeTag())+'</b><br><br><b>v96:</b> Verknüpfte Dokumente werden in der Korrespondenz/Daten-Liste angezeigt.' : 'Keine Akte ausgewählt.';
     $('paperlessQuery').value=d ? buildQuery(d) : '';
     $('paperlessResults').innerHTML='<div class="desktopEmptyState">Noch keine Suche gestartet.</div>';
     renderModalLinked();
@@ -8700,7 +8700,7 @@ body.force-mobile-view #fabAdd{display:flex !important;}
     try{
       const data=await apiJson('/api/paperless/tags');
       const tags=((data.data&&data.data.results)||[]);
-      if(!tags.length){ if(box) box.innerHTML='<div class="desktopEmptyState">Paperless hat keine Tags über die API geliefert. v95 prüft zusätzlich den Dokumentzugriff und Volltext App.</div>'; return; }
+      if(!tags.length){ if(box) box.innerHTML='<div class="desktopEmptyState">Paperless hat keine Tags über die API geliefert. v96 prüft zusätzlich den Dokumentzugriff und Volltext App.</div>'; return; }
       if(box) box.innerHTML='<div class="paperlessHint"><b>Gefundene Paperless-Tags:</b> Klicke auf den richtigen Tag für deine Schulden-Briefe. Aktuell eingestellt: <b>'+esc(activeTag())+'</b></div>' + tags.map(t=>'<div class="paperlessResultItem"><div><strong>'+esc(t.name||('Tag #'+t.id))+'</strong><span>ID '+esc(t.id)+' · Dokumente: '+esc(t.document_count ?? '–')+'</span></div><div class="paperlessResultActions"><button type="button" data-pl-settag="'+esc(t.name||'')+'">Diesen Tag nutzen</button></div></div>').join('');
       box.querySelectorAll('[data-pl-settag]').forEach(btn=>btn.addEventListener('click',()=>{ const name=btn.getAttribute('data-pl-settag')||''; if($('paperlessTagInput')) $('paperlessTagInput').value=name; const st=settings(); saveSettings({...st, tag:name}); updateStatus('ok','Paperless: Tag-Filter gesetzt auf '+name); toast('Tag gesetzt: '+name); openModal(); }));
     }catch(err){ if(box) box.innerHTML='<div class="desktopEmptyState">Tags laden fehlgeschlagen: '+esc(err.message||String(err))+'</div>'; }
@@ -8744,7 +8744,7 @@ body.force-mobile-view #fabAdd{display:flex !important;}
         const raw = obj.rawPreview ? '<div class="paperlessHint" style="white-space:pre-wrap;max-height:160px;overflow:auto"><b>Roh-Antwort:</b> '+esc(obj.rawPreview)+'</div>' : '';
         return '<h4 style="margin-top:12px">'+esc(title)+'</h4><div class="paperlessHint">HTTP '+esc(obj.httpStatus)+' · '+esc(obj.contentType||'kein content-type')+flag(obj)+'<br>count: '+esc(obj.count ?? '–')+' · results: '+esc(obj.resultsLength ?? '–')+' · Keys: '+esc((obj.jsonTopKeys||[]).join(', ')||'–')+(obj.finalUrl?'<br>URL: '+esc(obj.finalUrl):'')+(obj.hint?'<br><b>Hinweis:</b> '+esc(obj.hint):'')+'</div>'+samples+raw;
       }
-      if(box) box.innerHTML='<div class="paperlessHint"><b>v95 Roh-Test:</b><br>'+esc(data.hint||'Der Test zeigt jetzt auch, ob Paperless JSON oder nur eine HTML/Login-Seite zurückgibt.')+'</div>'+ 
+      if(box) box.innerHTML='<div class="paperlessHint"><b>v96 Roh-Test:</b><br>'+esc(data.hint||'Der Test zeigt jetzt auch, ob Paperless JSON oder nur eine HTML/Login-Seite zurückgibt.')+'</div>'+ 
         block('Dokumente /api/documents/', t.documents)+
         block('Dokumente ohne Sortierung', t.documentsNoOrdering)+
         block('Volltextsuche App', t.documentsSearchApp)+
@@ -8773,7 +8773,7 @@ body.force-mobile-view #fabAdd{display:flex !important;}
         if(tagName==='*' || String(tagName).toLowerCase()==='all'){
           hint='Paperless hat auch ohne Tag-Filter keine Dokumente geliefert. Prüfe den API-Token: Er muss Dokumente lesen dürfen.';
         }else{
-          hint=data.paperlessTagMissing ? ('Der Paperless-Tag <b>'+esc(tagName)+'</b> wurde über die API nicht gefunden. v95 testet danach ohne Tag-Filter. Drücke zusätzlich „Roh-Test“, um Dokument-/Tag-Rechte zu prüfen.') : ('Keine passenden Paperless-Dokumente mit Tag <b>'+esc(tagName)+'</b> gefunden.');
+          hint=data.paperlessTagMissing ? ('Der Paperless-Tag <b>'+esc(tagName)+'</b> wurde über die API nicht gefunden. v96 testet danach ohne Tag-Filter. Drücke zusätzlich „Roh-Test“, um Dokument-/Tag-Rechte zu prüfen.') : ('Keine passenden Paperless-Dokumente mit Tag <b>'+esc(tagName)+'</b> gefunden.');
         }
         if(data.availableTags && data.availableTags.length){ hint += '<br><br>Gefundene Tags: '+data.availableTags.map(t=>esc(t.name)+' ('+esc(t.document_count||0)+')').join(', '); }
         if(data.hint){ hint += '<br><br>'+esc(data.hint); }
@@ -8832,6 +8832,115 @@ body.force-mobile-view #fabAdd{display:flex !important;}
   }
   document.addEventListener('DOMContentLoaded',()=>{ loadConfig().then(()=>{hook(); setTimeout(hook,500); setTimeout(hook,1500);}); });
   setTimeout(()=>{loadConfig(); hook();},1800);
+})();
+</script>
+
+
+
+<style id="v96-unified-data-style">
+/* v96: Desktop- und Handy-Daten/Korrespondenz zeigen dieselbe Liste */
+.paperlessCorrDivider{margin:12px 0 6px;padding:8px 10px;border-radius:12px;background:rgba(57,153,255,.10);border:1px solid rgba(114,185,255,.18);color:#ddecff;font-size:12px;font-weight:950;text-transform:uppercase;letter-spacing:.04em;}
+.paperlessCorrBadge{display:inline-flex;margin-left:8px;padding:3px 7px;border-radius:999px;background:rgba(57,153,255,.16);border:1px solid rgba(114,185,255,.24);color:#cfe7ff;font-size:10px;font-weight:950;vertical-align:middle;}
+.paperlessCorrHint{margin-top:8px;color:#9fb0cc;font-size:12px;line-height:1.4;}
+.corrItem.paperlessCorrItem{border-color:rgba(114,185,255,.22);background:linear-gradient(180deg,rgba(57,153,255,.10),rgba(255,255,255,.045));}
+.corrActions .plBtn{border:0;border-radius:12px;padding:9px 11px;text-decoration:none;background:rgba(255,255,255,.10);color:#fff;font-weight:800;cursor:pointer;}
+</style>
+<script id="v96-unified-data-js">
+(function(){
+  const VERSION='v96';
+  const SETTINGS_KEY='schulden_paperless_settings_v79';
+  let paperlessBase='';
+  let corrObserver=null;
+  let rendering=false;
+  let lastCorrIndex=null;
+
+  function $(id){return document.getElementById(id);}
+  function getDebts(){try{return Array.isArray(debts)?debts:[]}catch(e){return [];}}
+  try{
+    Object.defineProperty(window,'debts',{configurable:true,get:function(){return getDebts();},set:function(v){try{debts=Array.isArray(v)?v:[]}catch(e){}}});
+  }catch(e){try{window.debts=getDebts();}catch(_){}}
+  function esc(v){return String(v??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#039;');}
+  function bytes(n){n=Number(n)||0;if(n>1024*1024)return (n/1024/1024).toFixed(1).replace('.',',')+' MB';if(n>1024)return (n/1024).toFixed(1).replace('.',',')+' KB';return n+' B';}
+  function fileDate(v){if(!v)return 'Ohne Datum';const d=new Date(v);return Number.isNaN(d.getTime())?String(v):d.toLocaleDateString('de-DE');}
+  function settings(){try{return JSON.parse(localStorage.getItem(SETTINGS_KEY)||'{}')}catch(e){return {};}}
+  function base(){const st=settings();return String(st.url||paperlessBase||'').trim().replace(/\/+$/,'');}
+  function paperlessUrl(id){const b=base();return b&&id?b+'/documents/'+encodeURIComponent(id)+'/details':'';}
+  function toast(msg){if(typeof showToast==='function')showToast(msg);else alert(msg);}
+  function ensureCorrespondence(d){if(!d)return [];if(!Array.isArray(d.correspondence))d.correspondence=[];return d.correspondence;}
+  function ensurePaperless(d){if(!d)return [];if(!Array.isArray(d.paperlessLinks))d.paperlessLinks=[];return d.paperlessLinks;}
+  function saveNow(){try{if(typeof save==='function')save();else localStorage.setItem('godmode_debts',JSON.stringify(getDebts()));}catch(e){}}
+  function renderSideAgain(){try{if(typeof render==='function')render();}catch(e){}}
+
+  fetch('/api/config',{cache:'no-store'}).then(r=>r.ok?r.json():{}).then(cfg=>{paperlessBase=String(cfg.paperlessUrl||'').trim().replace(/\/+$/,'');}).catch(()=>{});
+
+  function localHtml(d,index){
+    const items=ensureCorrespondence(d);
+    if(!items.length)return '';
+    return items.slice().reverse().map(item=>{
+      const link=item.webViewLink || (item.driveFileId?'https://drive.google.com/file/d/'+encodeURIComponent(item.driveFileId)+'/view':'');
+      return '<div class="corrItem" data-corr-id="'+esc(item.id)+'"><div><strong>'+esc(item.name||item.driveName||'Datei')+'</strong><span>'+esc(fileDate(item.date||item.uploadedAt))+' · '+esc(item.mimeType||'Datei')+' · '+esc(bytes(item.size))+'</span></div><div class="corrActions">'+(link?'<a href="'+esc(link)+'" target="_blank" rel="noopener">Öffnen</a>':'')+'<button type="button" data-v96-delete-corr="'+esc(item.id)+'">Löschen</button></div></div>';
+    }).join('');
+  }
+  function paperlessHtml(d){
+    const items=ensurePaperless(d);
+    if(!items.length)return '';
+    return '<div class="paperlessCorrDivider">Paperless-Dokumente</div>'+items.slice().reverse().map(item=>{
+      const link=paperlessUrl(item.id);
+      const title=item.title||('Dokument #'+item.id);
+      const meta=item.meta||item.created||'Paperless';
+      return '<div class="corrItem paperlessCorrItem" data-pl-id="'+esc(item.id)+'"><div><strong>'+esc(title)+'<span class="paperlessCorrBadge">Paperless</span></strong><span>'+esc(meta)+' · verknüpft</span></div><div class="corrActions"><button class="plBtn" type="button" data-pl-open="'+esc(item.id)+'">PDF öffnen</button>'+(link?'<a href="'+esc(link)+'" target="_blank" rel="noopener">In Paperless öffnen</a>':'')+'<button class="plBtn" type="button" data-v96-pl-unlink="'+esc(item.id)+'">Lösen</button></div></div>';
+    }).join('')+'<div class="paperlessCorrHint">Diese Paperless-Einträge sind nur verknüpft, nicht in die App kopiert.</div>';
+  }
+  function bindCorrActions(index){
+    const list=$('corrList'); if(!list)return;
+    list.querySelectorAll('[data-v96-delete-corr]').forEach(btn=>{
+      btn.onclick=function(){
+        const d=getDebts()[index]; if(!d)return;
+        const items=ensureCorrespondence(d); const id=btn.getAttribute('data-v96-delete-corr');
+        const pos=items.findIndex(x=>String(x.id)===String(id));
+        if(pos>=0 && confirm('Korrespondenz-Eintrag aus der App-Liste löschen? Die Datei in Google Drive bleibt erhalten.')){items.splice(pos,1);saveNow();renderUnifiedCorr(index);}
+      };
+    });
+    list.querySelectorAll('[data-v96-pl-unlink]').forEach(btn=>{
+      btn.onclick=function(e){
+        e.preventDefault(); e.stopPropagation();
+        const d=getDebts()[index]; if(!d)return;
+        const items=ensurePaperless(d); const id=btn.getAttribute('data-v96-pl-unlink');
+        const pos=items.findIndex(x=>String(x.id)===String(id));
+        if(pos>=0){items.splice(pos,1);saveNow();renderUnifiedCorr(index);renderSideAgain();toast('Paperless-Verknüpfung gelöst');}
+      };
+    });
+  }
+  function renderUnifiedCorr(index){
+    const list=$('corrList'); const d=getDebts()[index]; if(!list||!d)return;
+    rendering=true; lastCorrIndex=index; const local=localHtml(d,index); const pl=paperlessHtml(d);
+    list.innerHTML=(local||pl)?(local+pl):'<div class="corrEmpty">Noch keine Korrespondenz oder Paperless-Dokumente hinterlegt.</div>';
+    bindCorrActions(index);
+    setTimeout(()=>{rendering=false;},30);
+  }
+  function observeCorr(index){
+    const list=$('corrList'); if(!list)return;
+    if(corrObserver)corrObserver.disconnect();
+    corrObserver=new MutationObserver(()=>{if(rendering)return; clearTimeout(observeCorr._t); observeCorr._t=setTimeout(()=>{ if(lastCorrIndex!==null) renderUnifiedCorr(lastCorrIndex); },80);});
+    corrObserver.observe(list,{childList:true,subtree:false});
+  }
+  const oldShow=window.showCorrespondence;
+  window.showCorrespondence=function(index){
+    lastCorrIndex=Number(index);
+    const r=oldShow?oldShow.apply(this,arguments):undefined;
+    setTimeout(()=>{renderUnifiedCorr(lastCorrIndex);observeCorr(lastCorrIndex);},80);
+    setTimeout(()=>renderUnifiedCorr(lastCorrIndex),350);
+    return r;
+  };
+  try{showCorrespondence=window.showCorrespondence;}catch(e){}
+
+  const oldRender=window.render;
+  if(oldRender && !oldRender.__v96Unified){
+    const wrapped=function(){const r=oldRender.apply(this,arguments);setTimeout(()=>{if($('corrOverlay')?.style.display==='flex' && lastCorrIndex!==null)renderUnifiedCorr(lastCorrIndex);document.querySelectorAll('.v59MenuVersion,#v76OnlyVersion').forEach(el=>el.textContent=VERSION);},80);return r;};
+    wrapped.__v96Unified=true; window.render=wrapped; try{render=wrapped;}catch(e){}
+  }
+  document.addEventListener('DOMContentLoaded',()=>{document.querySelectorAll('.v59MenuVersion,#v76OnlyVersion').forEach(el=>el.textContent=VERSION);});
+  setTimeout(()=>document.querySelectorAll('.v59MenuVersion,#v76OnlyVersion').forEach(el=>el.textContent=VERSION),1200);
 })();
 </script>
 
