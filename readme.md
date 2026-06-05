@@ -1,1 +1,1 @@
-Schulden v92 - Paperless Tag-ID-Filter lokal-first (App/ID robust)
+Schulden Manager v93 - Paperless Auto-Zuordnung nach Gläubiger/Aktenzeichen/Kundennummer.

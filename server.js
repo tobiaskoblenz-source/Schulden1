@@ -383,15 +383,58 @@ function textFromPaperlessValue(value){
   return "";
 }
 
-function paperlessDocMatchesQuery(doc, query){
-  const q = String(query || "").trim().toLowerCase();
-  if(!q) return true;
-  const hay = [
-    doc.title, doc.archive_filename, doc.original_filename, doc.content,
+function normalizePaperlessText(value){
+  return String(value || "")
+    .toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9äöüß]+/gi, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function paperlessDocHaystack(doc){
+  return [
+    doc.title, doc.archive_filename, doc.archived_file_name, doc.original_filename, doc.original_file_name, doc.content,
     textFromPaperlessValue(doc.correspondent), textFromPaperlessValue(doc.document_type),
-    textFromPaperlessValue(doc.storage_path), doc.created, doc.added, doc.asn
-  ].filter(Boolean).join(" ").toLowerCase();
-  return q.split(/\s+/).filter(Boolean).every(part => hay.includes(part));
+    textFromPaperlessValue(doc.storage_path), doc.created, doc.created_date, doc.added, doc.asn, doc.archive_serial_number
+  ].filter(Boolean).join(" ");
+}
+
+function importantPaperlessTokens(query){
+  const stop = new Set(["und","oder","der","die","das","ein","eine","einer","mit","ohne","von","vom","zur","zum","den","dem","des","fur","fuer","bei","in","im","am","an","nr","nummer","aktenzeichen","az","kundennummer"]);
+  return normalizePaperlessText(query).split(/\s+/).filter(t => t && t.length >= 3 && !stop.has(t));
+}
+
+function paperlessDocMatchScore(doc, query){
+  const qRaw = String(query || "").trim();
+  if(!qRaw) return {score:0, matches:[], tokenCount:0, hay:""};
+  const hayRaw = paperlessDocHaystack(doc);
+  const hay = normalizePaperlessText(hayRaw);
+  const q = normalizePaperlessText(qRaw);
+  const tokens = importantPaperlessTokens(qRaw);
+  let score = 0;
+  const matches = [];
+  if(q && hay.includes(q)){ score += 80; matches.push("ganzer Suchtext"); }
+  for(const token of tokens){
+    if(hay.includes(token)){
+      score += token.length >= 6 ? 18 : 10;
+      matches.push(token);
+    }
+  }
+  // Zahlen wie Aktenzeichen, Kundennummern oder Jahreszahlen sind besonders wichtig.
+  const numberTokens = normalizePaperlessText(qRaw).split(/\s+/).filter(t => /\d{3,}/.test(t));
+  for(const n of numberTokens){
+    if(hay.includes(n)){ score += 35; if(!matches.includes(n)) matches.push(n); }
+  }
+  return {score, matches:[...new Set(matches)].slice(0,8), tokenCount:tokens.length, hay};
+}
+
+function paperlessDocMatchesQuery(doc, query){
+  const q = String(query || "").trim();
+  if(!q) return true;
+  const m = paperlessDocMatchScore(doc, q);
+  if(m.tokenCount <= 1) return m.score > 0;
+  return m.score >= 18;
 }
 
 async function localPaperlessTagScan(req, tag, query, pageSize){
@@ -399,7 +442,9 @@ async function localPaperlessTagScan(req, tag, query, pageSize){
   const perPage = Math.min(Math.max(parseInt(process.env.PAPERLESS_LOCAL_SCAN_PAGE_SIZE || "100", 10) || 100, 20), 200);
   const found = [];
   let scanned = 0;
+  let tagged = 0;
   let lastResult = null;
+  const hasQuery = Boolean(String(query || "").trim());
   for(let page = 1; page <= maxPages; page++){
     const params = new URLSearchParams();
     params.set("page_size", String(perPage));
@@ -410,15 +455,21 @@ async function localPaperlessTagScan(req, tag, query, pageSize){
     const arr = paperlessResultArray(r.data);
     scanned += arr.length;
     for(const d of arr){
-      if(paperlessDocHasTag(d, tag) && paperlessDocMatchesQuery(d, query)){
-        found.push(d);
-        if(found.length >= pageSize) break;
+      if(!paperlessDocHasTag(d, tag)) continue;
+      tagged++;
+      if(!hasQuery){ found.push(d); continue; }
+      const m = paperlessDocMatchScore(d, query);
+      if(m.score > 0){
+        found.push({...d, __match_score:m.score, __match_reason:m.matches.join(", ")});
       }
     }
-    if(found.length >= pageSize) break;
     if(!r.data || !r.data.next || !arr.length) break;
   }
-  return {ok:true, data:{count:found.length,next:null,previous:null,results:found}, scanned, pages:maxPages, usingEnv:lastResult?.usingEnv, baseUrl:lastResult?.baseUrl, insecureTls:lastResult?.insecureTls};
+  if(hasQuery){
+    found.sort((a,b)=>(Number(b.__match_score||0)-Number(a.__match_score||0)) || String(b.created||b.added||"").localeCompare(String(a.created||a.added||"")));
+  }
+  const limited = found.slice(0, pageSize);
+  return {ok:true, data:{count:found.length,next:null,previous:null,results:limited}, scanned, tagged, pages:maxPages, usingEnv:lastResult?.usingEnv, baseUrl:lastResult?.baseUrl, insecureTls:lastResult?.insecureTls};
 }
 
 function dedupePaperlessDocuments(results){
@@ -603,7 +654,7 @@ const server = http.createServer(async (req, res)=>{
     const url = new URL(req.url, `http://${req.headers.host || "localhost"}`);
 
     if(url.pathname === "/api/health"){
-      return sendJson(res, 200, {ok:true, service:"schulden-manager", version:"v92", paperless:Boolean(process.env.PAPERLESS_URL || process.env.PAPERLESS_BASE_URL)});
+      return sendJson(res, 200, {ok:true, service:"schulden-manager", version:"v93", paperless:Boolean(process.env.PAPERLESS_URL || process.env.PAPERLESS_BASE_URL)});
     }
 
     if(url.pathname === "/api/config"){
@@ -649,7 +700,7 @@ const server = http.createServer(async (req, res)=>{
                 ok:true, usingEnv:byText.usingEnv, baseUrl:byText.baseUrl, insecureTls:byText.insecureTls,
                 paperlessTag: requiredTag, paperlessTagId:null, paperlessTagDocumentCount:null,
                 paperlessTagMissing:true, searchMode:"query_tag_text_fallback", tagQueryModes:byText.modes,
-                hint:'Paperless hat keine Tag-Liste geliefert. v92 nutzt deshalb die Paperless-Suche mit tag:' + requiredTag + '.',
+                hint:'Paperless hat keine Tag-Liste geliefert. v93 nutzt deshalb die Paperless-Suche mit tag:' + requiredTag + '.',
                 data:byText.data
               });
             }
@@ -666,7 +717,7 @@ const server = http.createServer(async (req, res)=>{
               availableTags: availableTags.slice(0,80).map(t=>({id:t.id,name:t.name,document_count:t.document_count})),
               searchMode: latest ? (latest._mode || 'latest_without_tag_after_missing_tag') : 'missing_tag_no_latest',
               relaxedSearch: latestArr.length > 0,
-              hint: 'Paperless hat den Tag "' + requiredTag + '" nicht über die API geliefert. v92 zeigt deshalb testweise neueste Dokumente ohne Tag-Filter. Wenn hier Dokumente erscheinen, liegt es an Tag-Rechten/Tag-Syntax; wenn nicht, hat der API-Token keinen Dokumentzugriff.',
+              hint: 'Paperless hat den Tag "' + requiredTag + '" nicht über die API geliefert. v93 zeigt deshalb testweise neueste Dokumente ohne Tag-Filter. Wenn hier Dokumente erscheinen, liegt es an Tag-Rechten/Tag-Syntax; wenn nicht, hat der API-Token keinen Dokumentzugriff.',
               data: latest ? {count:latestArr.length,next:null,previous:null,results:latestArr} : {count:0,next:null,previous:null,results:[]}
             });
           }
@@ -676,7 +727,7 @@ const server = http.createServer(async (req, res)=>{
       }
       try{
         if(tag){
-          // v92: Paperless liefert Dokumente mit Tags als IDs (z.B. App = ID 9).
+          // v93: Paperless liefert Dokumente mit Tags als IDs (z.B. App = ID 9).
           // Darum filtern wir zuerst lokal über die Tag-ID. Das ist robuster als serverseitige
           // Filterparameter, die je nach Paperless-Version/Proxy abweichen können.
           const localStrict = await localPaperlessTagScan(req, tag, query, pageSize);
@@ -690,10 +741,10 @@ const server = http.createServer(async (req, res)=>{
               paperlessTag: requiredTag || tag.name || '',
               paperlessTagId: tag.id,
               paperlessTagDocumentCount: tag.document_count,
-              searchMode: 'v92_local_tag_id_first',
+              searchMode: 'v93_local_tag_id_first',
               localScan: {scanned:localStrict.scanned, maxPages:localStrict.pages},
               relaxedSearch:false,
-              hint: 'v92 filtert lokal über die Paperless-Tag-ID '+tag.id+' ('+(tag.name||requiredTag)+').',
+              hint: 'v93 filtert lokal über die Paperless-Tag-ID '+tag.id+' ('+(tag.name||requiredTag)+').',
               data:{count: localArr.length, next:null, previous:null, results: localArr}
             });
           }
@@ -709,10 +760,10 @@ const server = http.createServer(async (req, res)=>{
                 paperlessTag: requiredTag || tag.name || '',
                 paperlessTagId: tag.id,
                 paperlessTagDocumentCount: tag.document_count,
-                searchMode: 'v92_local_tag_id_relaxed',
+                searchMode: 'v93_local_tag_id_relaxed',
                 localScan: {scanned:localAll.scanned, maxPages:localAll.pages},
                 relaxedSearch:true,
-                hint: 'Mit dem Akten-Suchbegriff wurde nichts gefunden. v92 zeigt deshalb alle Dokumente mit dem Tag '+(tag.name||requiredTag)+' (ID '+tag.id+').',
+                hint: 'Mit dem Akten-Suchbegriff wurde nichts gefunden. v93 zeigt deshalb alle Dokumente mit dem Tag '+(tag.name||requiredTag)+' (ID '+tag.id+').',
                 data:{count: localArr.length, next:null, previous:null, results: localArr}
               });
             }
@@ -775,7 +826,7 @@ const server = http.createServer(async (req, res)=>{
           searchMode: used._mode || "unknown",
           localScan: localScan ? {scanned:localScan.scanned, maxPages:localScan.pages} : null,
           relaxedSearch: relaxed,
-          hint: used._mode === "local_scan_tag_ids" ? 'Server-Tagfilter lieferte nichts. v92 hat deshalb lokal nach Dokumenten mit Tag "' + requiredTag + '" gesucht.' : (relaxed ? 'Mit dem Akten-Suchbegriff wurde nichts gefunden. Es werden deshalb alle Dokumente mit dem Tag "' + requiredTag + '" angezeigt.' : ''),
+          hint: used._mode === "local_scan_tag_ids" ? 'Server-Tagfilter lieferte nichts. v93 hat deshalb lokal nach Dokumenten mit Tag "' + requiredTag + '" gesucht.' : (relaxed ? 'Mit dem Akten-Suchbegriff wurde nichts gefunden. Es werden deshalb alle Dokumente mit dem Tag "' + requiredTag + '" angezeigt.' : ''),
           data:{count: merged.length, next:null, previous:null, results: merged}
         });
       }catch(err){
@@ -831,7 +882,7 @@ const server = http.createServer(async (req, res)=>{
         }else if(tests.documents && tests.documents.isJson && tests.documents.resultsLength > 0){
           globalHint = "Dokumentzugriff funktioniert. Wenn der Tag App nicht gefunden wird, liegt es nur am Tag-Namen/Tag-Filter.";
         }
-        return sendJson(res, 200, {ok:true, version:"v92", hint:globalHint, tests});
+        return sendJson(res, 200, {ok:true, version:"v93", hint:globalHint, tests});
       }catch(err){
         return sendJson(res, err.status || 500, err.payload || {ok:false, error:err.message || "Paperless Rohdiagnose Fehler"});
       }
