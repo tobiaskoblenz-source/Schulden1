@@ -435,7 +435,7 @@ const server = http.createServer(async (req, res)=>{
     const url = new URL(req.url, `http://${req.headers.host || "localhost"}`);
 
     if(url.pathname === "/api/health"){
-      return sendJson(res, 200, {ok:true, service:"schulden-manager", version:"v85", paperless:Boolean(process.env.PAPERLESS_URL || process.env.PAPERLESS_BASE_URL)});
+      return sendJson(res, 200, {ok:true, service:"schulden-manager", version:"v86", paperless:Boolean(process.env.PAPERLESS_URL || process.env.PAPERLESS_BASE_URL)});
     }
 
     if(url.pathname === "/api/config"){
@@ -534,7 +534,7 @@ const server = http.createServer(async (req, res)=>{
           searchMode: used._mode || "unknown",
           localScan: localScan ? {scanned:localScan.scanned, maxPages:localScan.pages} : null,
           relaxedSearch: relaxed,
-          hint: used._mode === "local_scan_tag_ids" ? 'Server-Tagfilter lieferte nichts. v85 hat deshalb lokal nach Dokumenten mit Tag "' + requiredTag + '" gesucht.' : (relaxed ? 'Mit dem Akten-Suchbegriff wurde nichts gefunden. Es werden deshalb alle Dokumente mit dem Tag "' + requiredTag + '" angezeigt.' : ''),
+          hint: used._mode === "local_scan_tag_ids" ? 'Server-Tagfilter lieferte nichts. v86 hat deshalb lokal nach Dokumenten mit Tag "' + requiredTag + '" gesucht.' : (relaxed ? 'Mit dem Akten-Suchbegriff wurde nichts gefunden. Es werden deshalb alle Dokumente mit dem Tag "' + requiredTag + '" angezeigt.' : ''),
           data:{count: merged.length, next:null, previous:null, results: merged}
         });
       }catch(err){
