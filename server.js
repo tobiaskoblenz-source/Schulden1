@@ -11,7 +11,26 @@ const DATA_DIR = process.env.DATA_DIR || path.join(ROOT, "data");
 const DATA_FILE = process.env.SCHULDEN_DATA_FILE || path.join(DATA_DIR, "schulden-sync.json");
 
 function cleanPaperlessBase(value){
-  return String(value || "").trim().replace(/\/+$/, "");
+  let raw = String(value || "").trim();
+  if(!raw) return "";
+  raw = raw.replace(/\/+$/, "");
+  try{
+    const u = new URL(raw);
+    let path = u.pathname || "";
+    // Paperless-ngx API is served at /api/ on the Paperless base URL.
+    // Users sometimes paste /dashboard, /api, or a login redirect URL.
+    path = path.replace(/\/+$/, "");
+    path = path.replace(/\/accounts\/login.*$/i, "");
+    path = path.replace(/\/dashboard$/i, "");
+    path = path.replace(/\/api$/i, "");
+    path = path.replace(/\/api\/.*$/i, "");
+    u.pathname = path || "/";
+    u.search = "";
+    u.hash = "";
+    return u.toString().replace(/\/+$/, "");
+  }catch(e){
+    return raw.replace(/\/dashboard$/i, "").replace(/\/api$/i, "").replace(/\/+$/, "");
+  }
 }
 
 function paperlessJsonAccept(){
@@ -108,7 +127,7 @@ async function paperlessFetch(req, res, targetPath, options = {}){
     const text = await response.text().catch(()=>"");
     let hint = "";
     if(response.status === 401 || response.status === 403) hint = "API-Token ist falsch, abgelaufen oder hat keinen Zugriff.";
-    if(response.status === 404) hint = "Paperless API-Pfad wurde nicht gefunden. Prüfe, ob PAPERLESS_URL nur die Basisadresse enthält, ohne /api.";
+    if(response.status === 404) hint = "Paperless API-Pfad wurde nicht gefunden. Prüfe, ob PAPERLESS_URL nur die Basisadresse enthält, ohne /dashboard und ohne /api. Beispiel: https://deine-paperless-domain.de";
     if(response.status >= 500) hint = "Paperless selbst oder der Reverse Proxy meldet einen Serverfehler.";
     return sendJson(res, response.status, {ok:false, error:"Paperless Fehler " + response.status, status:response.status, details:text.slice(0,800), hint, baseUrl:cfg.baseUrl, usingEnv:cfg.usingEnv, insecureTls:cfg.insecureTls});
   }
@@ -187,7 +206,7 @@ async function paperlessRawJson(req, targetPath, options = {}){
     const text = await response.text().catch(()=>"");
     let hint = "";
     if(response.status === 401 || response.status === 403) hint = "API-Token ist falsch, abgelaufen oder hat keinen Zugriff.";
-    if(response.status === 404) hint = "Paperless API-Pfad wurde nicht gefunden. Prüfe, ob PAPERLESS_URL nur die Basisadresse enthält, ohne /api.";
+    if(response.status === 404) hint = "Paperless API-Pfad wurde nicht gefunden. Prüfe, ob PAPERLESS_URL nur die Basisadresse enthält, ohne /dashboard und ohne /api. Beispiel: https://deine-paperless-domain.de";
     if(response.status >= 500) hint = "Paperless selbst oder der Reverse Proxy meldet einen Serverfehler.";
     const e = new Error("Paperless Fehler " + response.status);
     e.status = response.status;
@@ -584,7 +603,7 @@ const server = http.createServer(async (req, res)=>{
     const url = new URL(req.url, `http://${req.headers.host || "localhost"}`);
 
     if(url.pathname === "/api/health"){
-      return sendJson(res, 200, {ok:true, service:"schulden-manager", version:"v90", paperless:Boolean(process.env.PAPERLESS_URL || process.env.PAPERLESS_BASE_URL)});
+      return sendJson(res, 200, {ok:true, service:"schulden-manager", version:"v91", paperless:Boolean(process.env.PAPERLESS_URL || process.env.PAPERLESS_BASE_URL)});
     }
 
     if(url.pathname === "/api/config"){
@@ -630,7 +649,7 @@ const server = http.createServer(async (req, res)=>{
                 ok:true, usingEnv:byText.usingEnv, baseUrl:byText.baseUrl, insecureTls:byText.insecureTls,
                 paperlessTag: requiredTag, paperlessTagId:null, paperlessTagDocumentCount:null,
                 paperlessTagMissing:true, searchMode:"query_tag_text_fallback", tagQueryModes:byText.modes,
-                hint:'Paperless hat keine Tag-Liste geliefert. v90 nutzt deshalb die Paperless-Suche mit tag:' + requiredTag + '.',
+                hint:'Paperless hat keine Tag-Liste geliefert. v91 nutzt deshalb die Paperless-Suche mit tag:' + requiredTag + '.',
                 data:byText.data
               });
             }
@@ -647,7 +666,7 @@ const server = http.createServer(async (req, res)=>{
               availableTags: availableTags.slice(0,80).map(t=>({id:t.id,name:t.name,document_count:t.document_count})),
               searchMode: latest ? (latest._mode || 'latest_without_tag_after_missing_tag') : 'missing_tag_no_latest',
               relaxedSearch: latestArr.length > 0,
-              hint: 'Paperless hat den Tag "' + requiredTag + '" nicht über die API geliefert. v90 zeigt deshalb testweise neueste Dokumente ohne Tag-Filter. Wenn hier Dokumente erscheinen, liegt es an Tag-Rechten/Tag-Syntax; wenn nicht, hat der API-Token keinen Dokumentzugriff.',
+              hint: 'Paperless hat den Tag "' + requiredTag + '" nicht über die API geliefert. v91 zeigt deshalb testweise neueste Dokumente ohne Tag-Filter. Wenn hier Dokumente erscheinen, liegt es an Tag-Rechten/Tag-Syntax; wenn nicht, hat der API-Token keinen Dokumentzugriff.',
               data: latest ? {count:latestArr.length,next:null,previous:null,results:latestArr} : {count:0,next:null,previous:null,results:[]}
             });
           }
@@ -713,7 +732,7 @@ const server = http.createServer(async (req, res)=>{
           searchMode: used._mode || "unknown",
           localScan: localScan ? {scanned:localScan.scanned, maxPages:localScan.pages} : null,
           relaxedSearch: relaxed,
-          hint: used._mode === "local_scan_tag_ids" ? 'Server-Tagfilter lieferte nichts. v90 hat deshalb lokal nach Dokumenten mit Tag "' + requiredTag + '" gesucht.' : (relaxed ? 'Mit dem Akten-Suchbegriff wurde nichts gefunden. Es werden deshalb alle Dokumente mit dem Tag "' + requiredTag + '" angezeigt.' : ''),
+          hint: used._mode === "local_scan_tag_ids" ? 'Server-Tagfilter lieferte nichts. v91 hat deshalb lokal nach Dokumenten mit Tag "' + requiredTag + '" gesucht.' : (relaxed ? 'Mit dem Akten-Suchbegriff wurde nichts gefunden. Es werden deshalb alle Dokumente mit dem Tag "' + requiredTag + '" angezeigt.' : ''),
           data:{count: merged.length, next:null, previous:null, results: merged}
         });
       }catch(err){
@@ -769,7 +788,7 @@ const server = http.createServer(async (req, res)=>{
         }else if(tests.documents && tests.documents.isJson && tests.documents.resultsLength > 0){
           globalHint = "Dokumentzugriff funktioniert. Wenn der Tag App nicht gefunden wird, liegt es nur am Tag-Namen/Tag-Filter.";
         }
-        return sendJson(res, 200, {ok:true, version:"v90", hint:globalHint, tests});
+        return sendJson(res, 200, {ok:true, version:"v91", hint:globalHint, tests});
       }catch(err){
         return sendJson(res, err.status || 500, err.payload || {ok:false, error:err.message || "Paperless Rohdiagnose Fehler"});
       }
