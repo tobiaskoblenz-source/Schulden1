@@ -526,7 +526,7 @@ const server = http.createServer(async (req, res)=>{
     const url = new URL(req.url, `http://${req.headers.host || "localhost"}`);
 
     if(url.pathname === "/api/health"){
-      return sendJson(res, 200, {ok:true, service:"schulden-manager", version:"v88", paperless:Boolean(process.env.PAPERLESS_URL || process.env.PAPERLESS_BASE_URL)});
+      return sendJson(res, 200, {ok:true, service:"schulden-manager", version:"v89", paperless:Boolean(process.env.PAPERLESS_URL || process.env.PAPERLESS_BASE_URL)});
     }
 
     if(url.pathname === "/api/config"){
@@ -685,6 +685,46 @@ const server = http.createServer(async (req, res)=>{
         });
       }catch(err){
         return sendJson(res, err.status || 500, err.payload || {ok:false, error:err.message || "Paperless Diagnose Fehler"});
+      }
+    }
+
+
+    if(url.pathname === "/api/paperless/rawtest" && req.method === "GET"){
+      try{
+        async function safe(name, path){
+          try{
+            const r = await paperlessRawJson(req, path);
+            const arr = paperlessResultArray(r.data);
+            return {
+              ok:true,
+              count: (r.data && typeof r.data.count !== "undefined") ? r.data.count : arr.length,
+              resultsLength: arr.length,
+              sample: arr.slice(0,3).map(x=>({
+                id:x && x.id,
+                name:x && x.name,
+                title:x && x.title,
+                created:x && x.created,
+                tags:x && x.tags,
+                correspondent:x && x.correspondent,
+                document_type:x && x.document_type,
+                keys:x ? Object.keys(x).slice(0,20) : []
+              }))
+            };
+          }catch(e){
+            return {ok:false, status:e.status || 500, error:(e.payload && (e.payload.error || e.payload.details)) || e.message || String(e)};
+          }
+        }
+        const out = {
+          documents: await safe("documents", "/api/documents/?page_size=10&ordering=-created"),
+          documentsNoOrdering: await safe("documentsNoOrdering", "/api/documents/?page_size=10"),
+          documentsSearchApp: await safe("documentsSearchApp", "/api/documents/?page_size=10&query=" + encodeURIComponent("App")),
+          tags: await safe("tags", "/api/tags/?page_size=50"),
+          correspondents: await safe("correspondents", "/api/correspondents/?page_size=20"),
+          documentTypes: await safe("documentTypes", "/api/document_types/?page_size=20")
+        };
+        return sendJson(res, 200, {ok:true, version:"v89", tests:out});
+      }catch(err){
+        return sendJson(res, err.status || 500, err.payload || {ok:false, error:err.message || "Paperless Rohdiagnose Fehler"});
       }
     }
 
