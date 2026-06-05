@@ -7505,7 +7505,7 @@ if ('serviceWorker' in navigator) {
     const oldC=cf.value, oldCat=cat.value;
     const names=[...new Set(list.map(c=>String(c.name||'').trim()).filter(Boolean).concat(debtsArr().map(d=>String(d.name||'').trim()).filter(Boolean)))].sort((a,b)=>a.localeCompare(b,'de'));
     cf.innerHTML='<option value="alle">Alle Gläubiger</option>'+names.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('');
-    const cats=[...new Set(list.map(c=>String(c.category||'').trim()).filter(Boolean).concat(['Krankenkasse','Amt / Behörde','Gericht','Inkasso','Versicherung','Privatperson','Sonstiges']))].sort((a,b)=>a.localeCompare(b,'de'));
+    const cats=[...new Set(list.map(c=>String(c.category||'').trim()).filter(Boolean).concat(debtsArr().map(d=>String(d.category||d.kategorie||'').trim()).filter(Boolean)).concat(['Krankenkasse','Amt / Behörde','Gericht','Inkasso','Versicherung','Privatperson','Sonstiges']))].sort((a,b)=>a.localeCompare(b,'de'));
     cat.innerHTML='<option value="alle">Alle Kategorien</option>'+cats.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('');
     if([...cf.options].some(o=>o.value===oldC)) cf.value=oldC;
     if([...cat.options].some(o=>o.value===oldCat)) cat.value=oldCat;
@@ -7522,7 +7522,7 @@ if ('serviceWorker' in navigator) {
       if(search && !full.includes(search)) return false;
       if(status!=='alle' && String(d.status||'offen')!==status) return false;
       if(cred!=='alle' && String((c?.name || d.name || '')).trim()!==cred) return false;
-      if(cat!=='alle' && String(c?.category||'Sonstiges')!==cat) return false;
+      if(cat!=='alle' && String(d.category||d.kategorie||c?.category||'Sonstiges')!==cat) return false;
       const du=daysUntil(d.datum);
       if(due==='overdue' && !(du!==null && du<0 && isOpenV58(d.status))) return false;
       if(due==='soon' && !(du!==null && du>=0 && du<=14 && isOpenV58(d.status))) return false;
@@ -7946,7 +7946,7 @@ if ('serviceWorker' in navigator) {
       const statusClass = overdue ? 'overdue' : (String(d.status||'').toLowerCase()==='bezahlt' ? 'paid' : 'open');
       const first = d.grund || d.name || '–';
       const second = (c && c.name) ? c.name : (d.name || '–');
-      const cat = d.kategorie || d.category || (c && c.category) || '–';
+      const cat = d.category || d.kategorie || (c && c.category) || '–';
       tr.innerHTML=''
         + '<td><span class="v63NameStrong">'+escapeHtml(first)+'</span></td>'
         + '<td><span class="v63NameStrong">'+escapeHtml(second)+'</span>'+(c&&c.extra?'<span class="v63CredSub">'+escapeHtml(c.extra)+'</span>':'')+'</td>'
@@ -8171,7 +8171,7 @@ Aktenzeichen: AZ-123',
     if(!Number.isFinite(betrag) || betrag<=0){ toast('Bitte Betrag korrekt eintragen.'); $('m_betrag')?.focus(); return false; }
     const contact={representative:$('m_contactRepresentative')?.value.trim()||'',address:$('m_contactAddress')?.value.trim()||'',email:$('m_contactEmail')?.value.trim()||'',phone:$('m_contactPhone')?.value.trim()||''};
     const note=$('m_firstNote')?.value.trim()||'';
-    const debt={name,grund,betrag,datum,aktenzeichen,status,category,contactDetails:contact,contactPerson:[contact.representative,contact.address,contact.email,contact.phone].filter(Boolean).join(' | '),notes:'',notesHistory:note?[{at:new Date().toISOString(),text:note}]:[],history:[],correspondence:[]};
+    const debt={name,grund,betrag,datum,aktenzeichen,status,category,kategorie:category,contactDetails:contact,contactPerson:[contact.representative,contact.address,contact.email,contact.phone].filter(Boolean).join(' | '),notes:'',notesHistory:note?[{at:new Date().toISOString(),text:note}]:[],history:[],correspondence:[]};
     debt.notes=notesTextSafe(debt);
     const arr=readDebts(); arr.push(debt);
     try{ if(typeof save==='function') save(); else localStorage.setItem('godmode_debts',JSON.stringify(arr)); }catch(e){}
@@ -8308,7 +8308,7 @@ body.force-mobile-view #fabAdd{display:flex !important;}
   function readArr(){try{if(typeof debts!=='undefined'&&Array.isArray(debts)) return debts;}catch(e){} if(Array.isArray(window.debts)) return window.debts; return null;}
   function closeModal(){if(typeof window.closeAddModal==='function') window.closeAddModal(); else {const m=$('addModal'); if(m){m.style.display='none';m.setAttribute('aria-hidden','true');document.body.classList.remove('modalOpen');}}}
   function clearForm(){['m_name','m_grund','m_betrag','m_datum','m_aktenzeichen','m_contactRepresentative','m_contactAddress','m_contactEmail','m_contactPhone','m_firstNote'].forEach(id=>{const el=$(id);if(el)el.value='';});if($('m_category'))$('m_category').value='Sonstiges';try{if(typeof setNewDebtStatus==='function')setNewDebtStatus('offen');if(typeof setStatusV13==='function')setStatusV13('offen');}catch(e){} pendingFiles=[];renderFileList();}
-  function saveDebt(){const name=$('m_name')?.value.trim()||'';const grund=$('m_grund')?.value.trim()||'';const betrag=parseAmount($('m_betrag')?.value);const datum=$('m_datum')?.value||'';const aktenzeichen=$('m_aktenzeichen')?.value.trim()||'';const status=$('m_status')?.value||'offen';const category=$('m_category')?.value||'Sonstiges';if(!name){toastMsg('Bitte Name / Gläubiger eintragen.');$('m_name')?.focus();return false;}if(!grund){toastMsg('Bitte Grund eintragen.');$('m_grund')?.focus();return false;}if(!Number.isFinite(betrag)||betrag<=0){toastMsg('Bitte Betrag korrekt eintragen.');$('m_betrag')?.focus();return false;}const contact={representative:$('m_contactRepresentative')?.value.trim()||'',address:$('m_contactAddress')?.value.trim()||'',email:$('m_contactEmail')?.value.trim()||'',phone:$('m_contactPhone')?.value.trim()||''};const note=$('m_firstNote')?.value.trim()||'';const files=pendingFiles.map(f=>({...f}));const debt={name,grund,betrag,datum,aktenzeichen,status,category,contactDetails:contact,contactPerson:[contact.representative,contact.address,contact.email,contact.phone].filter(Boolean).join(' | '),notes:'',notesHistory:note?[{at:new Date().toISOString(),text:note}]:[],history:files.length?[{at:new Date().toISOString(),text:files.length+' Datei(en) beim Anlegen hinzugefügt'}]:[],documents:[],correspondence:files};try{debt.notes=typeof notesText==='function'?notesText(debt):note;}catch(e){debt.notes=note;}const arr=readArr();if(!arr){toastMsg('Schulden-Liste nicht gefunden.');return false;}arr.push(debt);try{if(typeof save==='function')save();else localStorage.setItem('godmode_debts',JSON.stringify(arr));}catch(e){console.error(e);}try{if(typeof render==='function')render();}catch(e){console.error(e);}toastMsg('Schulden gespeichert ✅');clearForm();closeModal();return true;}
+  function saveDebt(){const name=$('m_name')?.value.trim()||'';const grund=$('m_grund')?.value.trim()||'';const betrag=parseAmount($('m_betrag')?.value);const datum=$('m_datum')?.value||'';const aktenzeichen=$('m_aktenzeichen')?.value.trim()||'';const status=$('m_status')?.value||'offen';const category=$('m_category')?.value||'Sonstiges';if(!name){toastMsg('Bitte Name / Gläubiger eintragen.');$('m_name')?.focus();return false;}if(!grund){toastMsg('Bitte Grund eintragen.');$('m_grund')?.focus();return false;}if(!Number.isFinite(betrag)||betrag<=0){toastMsg('Bitte Betrag korrekt eintragen.');$('m_betrag')?.focus();return false;}const contact={representative:$('m_contactRepresentative')?.value.trim()||'',address:$('m_contactAddress')?.value.trim()||'',email:$('m_contactEmail')?.value.trim()||'',phone:$('m_contactPhone')?.value.trim()||''};const note=$('m_firstNote')?.value.trim()||'';const files=pendingFiles.map(f=>({...f}));const debt={name,grund,betrag,datum,aktenzeichen,status,category,kategorie:category,contactDetails:contact,contactPerson:[contact.representative,contact.address,contact.email,contact.phone].filter(Boolean).join(' | '),notes:'',notesHistory:note?[{at:new Date().toISOString(),text:note}]:[],history:files.length?[{at:new Date().toISOString(),text:files.length+' Datei(en) beim Anlegen hinzugefügt'}]:[],documents:[],correspondence:files};try{debt.notes=typeof notesText==='function'?notesText(debt):note;}catch(e){debt.notes=note;}const arr=readArr();if(!arr){toastMsg('Schulden-Liste nicht gefunden.');return false;}arr.push(debt);try{if(typeof save==='function')save();else localStorage.setItem('godmode_debts',JSON.stringify(arr));}catch(e){console.error(e);}try{if(typeof render==='function')render();}catch(e){console.error(e);}toastMsg('Schulden gespeichert ✅');clearForm();closeModal();return true;}
   function bindForm(){const paste=$('m_paste'), add=$('m_add'); if(paste && paste.dataset.v76!=='1'){paste.dataset.v76='1';paste.innerHTML='📎 Dateien einfügen';paste.addEventListener('click',e=>{e.preventDefault();e.stopImmediatePropagation();openFilePicker();},true);} if(add && add.dataset.v76!=='1'){add.dataset.v76='1';add.addEventListener('click',e=>{e.preventDefault();e.stopImmediatePropagation();saveDebt();},true);}}
   function init(){removeOldVersions();ensureViewButtons();bindAddButtons();ensureAkteTab();ensureFileInput();bindForm();}
   document.addEventListener('DOMContentLoaded',()=>{init();setTimeout(init,300);setTimeout(init,1000);});
@@ -8468,7 +8468,7 @@ body.force-mobile-view #fabAdd{display:flex !important;}
 </style>
 <script id="v79-menu-stability-js">
 (function(){
-  const VERSION='v97';
+  const VERSION='v99';
   function setText(el,txt){ if(el && el.textContent!==txt) el.textContent=txt; }
   function cleanup(){
     document.querySelectorAll('.v59MenuVersion,.v67CurrentVersion,.v70OnlyVersion,[id$="OnlyVersion"],[id$="CurrentVersion"]').forEach(el=>{ if(el.id!=='stableVersionV78') el.style.display='none'; });
@@ -8656,7 +8656,7 @@ body.force-mobile-view #fabAdd{display:flex !important;}
   function ensureModal(){
     let overlay=$('paperlessOverlay'); if(overlay) return overlay;
     overlay=document.createElement('div'); overlay.id='paperlessOverlay'; overlay.className='paperlessOverlay';
-    overlay.innerHTML='<div class="paperlessModal" role="dialog" aria-modal="true"><div class="paperlessHead"><div><h3 id="paperlessTitle">Paperless-Dokumente</h3><p id="paperlessSub">Verknüpfte Dokumente sehen, neue Dokumente suchen und mit dieser Schuld verknüpfen.</p></div><button id="paperlessClose" class="paperlessClose" type="button">×</button></div><div class="paperlessGrid"><div class="paperlessBox"><h4>Verbindung</h4><div class="paperlessForm"><label>Paperless URL<input id="paperlessUrl" placeholder="https://paperless.example.de"></label><label>API Token<input id="paperlessToken" type="password" placeholder="Token aus Paperless"></label><label>Paperless-Tag für Schulden-Briefe<input id="paperlessTagInput" placeholder="App"></label><label style="display:flex;align-items:center;gap:9px;grid-template-columns:auto 1fr;"><input id="paperlessInsecureTls" type="checkbox" style="width:18px;height:18px;"><span>Selbstsigniertes/privates HTTPS-Zertifikat erlauben</span></label><div class="paperlessBtnRow"><button id="paperlessSaveSettings" type="button">Speichern</button><button id="paperlessTest" class="secondary" type="button">Testen</button><button id="paperlessLoadTags" class="secondary" type="button">Tags laden</button><button id="paperlessDebug" class="secondary" type="button">Diagnose</button><button id="paperlessRawDebug" class="secondary" type="button">Roh-Test</button></div><div id="paperlessConnectionHint" class="paperlessHint"></div></div></div><div class="paperlessBox"><h4>Aktuelle Akte</h4><div id="paperlessDebtInfo" class="paperlessHint">–</div><div class="paperlessHint">Filter: Es werden nur Paperless-Dokumente mit dem eingestellten Tag angezeigt. v97: Handy-Seite aus der funktionierenden v95-Basis wiederhergestellt.</div></div></div><div class="paperlessBox paperlessModalLinkedBox"><h4>📎 Verknüpfte Paperless-Dokumente dieser Schuld</h4><div class="paperlessLinkedHint">Hier erscheinen die Dokumente, nachdem du bei einem Suchtreffer auf „Verknüpfen“ geklickt hast.</div><div id="paperlessLinkedDocs" class="desktopCorrList paperlessLinkedList"></div></div><div class="paperlessBox"><h4>Dokumente suchen</h4><div class="paperlessSearchLine"><input id="paperlessQuery" placeholder="Suchbegriff, Gläubiger, Aktenzeichen"><button id="paperlessSearch" type="button">Suchen</button><button id="paperlessAutoSearch" class="secondary" type="button">Automatisch zuordnen</button><button id="paperlessAutoQuery" class="secondary" type="button">Akte übernehmen</button><button id="paperlessOnlyTag" class="secondary" type="button">Nur eingestellter Tag</button><button id="paperlessAllDocs" class="secondary" type="button">Alle testen</button><button id="paperlessTextApp" class="secondary" type="button">Volltext App</button></div><div id="paperlessResults" class="paperlessResultList"><div class="desktopEmptyState">Noch keine Suche gestartet.</div></div></div></div>';
+    overlay.innerHTML='<div class="paperlessModal" role="dialog" aria-modal="true"><div class="paperlessHead"><div><h3 id="paperlessTitle">Paperless-Dokumente</h3><p id="paperlessSub">Verknüpfte Dokumente sehen, neue Dokumente suchen und mit dieser Schuld verknüpfen.</p></div><button id="paperlessClose" class="paperlessClose" type="button">×</button></div><div class="paperlessGrid"><div class="paperlessBox"><h4>Verbindung</h4><div class="paperlessForm"><label>Paperless URL<input id="paperlessUrl" placeholder="https://paperless.example.de"></label><label>API Token<input id="paperlessToken" type="password" placeholder="Token aus Paperless"></label><label>Paperless-Tag für Schulden-Briefe<input id="paperlessTagInput" placeholder="App"></label><label style="display:flex;align-items:center;gap:9px;grid-template-columns:auto 1fr;"><input id="paperlessInsecureTls" type="checkbox" style="width:18px;height:18px;"><span>Selbstsigniertes/privates HTTPS-Zertifikat erlauben</span></label><div class="paperlessBtnRow"><button id="paperlessSaveSettings" type="button">Speichern</button><button id="paperlessTest" class="secondary" type="button">Testen</button><button id="paperlessLoadTags" class="secondary" type="button">Tags laden</button><button id="paperlessDebug" class="secondary" type="button">Diagnose</button><button id="paperlessRawDebug" class="secondary" type="button">Roh-Test</button></div><div id="paperlessConnectionHint" class="paperlessHint"></div></div></div><div class="paperlessBox"><h4>Aktuelle Akte</h4><div id="paperlessDebtInfo" class="paperlessHint">–</div><div class="paperlessHint">Filter: Es werden nur Paperless-Dokumente mit dem eingestellten Tag angezeigt. v99: Handy-Seite bleibt ohne Paperless; Plus zum Hinzufügen ist wieder aktiv.</div></div></div><div class="paperlessBox paperlessModalLinkedBox"><h4>📎 Verknüpfte Paperless-Dokumente dieser Schuld</h4><div class="paperlessLinkedHint">Hier erscheinen die Dokumente, nachdem du bei einem Suchtreffer auf „Verknüpfen“ geklickt hast.</div><div id="paperlessLinkedDocs" class="desktopCorrList paperlessLinkedList"></div></div><div class="paperlessBox"><h4>Dokumente suchen</h4><div class="paperlessSearchLine"><input id="paperlessQuery" placeholder="Suchbegriff, Gläubiger, Aktenzeichen"><button id="paperlessSearch" type="button">Suchen</button><button id="paperlessAutoSearch" class="secondary" type="button">Automatisch zuordnen</button><button id="paperlessAutoQuery" class="secondary" type="button">Akte übernehmen</button><button id="paperlessOnlyTag" class="secondary" type="button">Nur eingestellter Tag</button><button id="paperlessAllDocs" class="secondary" type="button">Alle testen</button><button id="paperlessTextApp" class="secondary" type="button">Volltext App</button></div><div id="paperlessResults" class="paperlessResultList"><div class="desktopEmptyState">Noch keine Suche gestartet.</div></div></div></div>';
     document.body.appendChild(overlay);
     overlay.addEventListener('click', e=>{ if(e.target===overlay) closeModal(); });
     $('paperlessClose').addEventListener('click', closeModal);
@@ -8681,7 +8681,7 @@ body.force-mobile-view #fabAdd{display:flex !important;}
     $('paperlessToken').disabled=Boolean(serverConfig.paperlessConfigured);
     if($('paperlessInsecureTls')) $('paperlessInsecureTls').disabled=false;
     $('paperlessConnectionHint').innerHTML=serverConfig.paperlessConfigured ? 'Railway-Variablen erkannt: <b>PAPERLESS_URL</b> und <b>PAPERLESS_TOKEN</b>. Token wird nicht im Browser angezeigt. Für private Zertifikate kannst du jetzt auch hier den Haken aktivieren; alternativ <b>PAPERLESS_ALLOW_SELF_SIGNED=true</b> in Railway setzen.' : 'Ohne Railway-Variablen werden URL und Token nur in diesem Browser gespeichert.';
-    $('paperlessDebtInfo').innerHTML=d ? '<b>'+esc(d.name||'Ohne Name')+'</b><br>Grund: '+esc(d.grund||'–')+'<br>Aktenzeichen: '+esc(d.aktenzeichen||d.caseNumber||'–')+'<br>Kundennummer: '+esc(d.customerNumber||d.kundennummer||d.customerId||'–')+'<br>Paperless-Tag: <b>'+esc(activeTag())+'</b><br><br><b>v97:</b> Handy-Seite wurde auf die funktionierende v95-Basis zurückgesetzt.' : 'Keine Akte ausgewählt.';
+    $('paperlessDebtInfo').innerHTML=d ? '<b>'+esc(d.name||'Ohne Name')+'</b><br>Grund: '+esc(d.grund||'–')+'<br>Aktenzeichen: '+esc(d.aktenzeichen||d.caseNumber||'–')+'<br>Kundennummer: '+esc(d.customerNumber||d.kundennummer||d.customerId||'–')+'<br>Paperless-Tag: <b>'+esc(activeTag())+'</b><br><br><b>v99:</b> Handy-Seite bleibt ohne Paperless; Plus zum Hinzufügen wurde wiederhergestellt.' : 'Keine Akte ausgewählt.';
     $('paperlessQuery').value=d ? buildQuery(d) : '';
     $('paperlessResults').innerHTML='<div class="desktopEmptyState">Noch keine Suche gestartet.</div>';
     renderModalLinked();
@@ -8700,7 +8700,7 @@ body.force-mobile-view #fabAdd{display:flex !important;}
     try{
       const data=await apiJson('/api/paperless/tags');
       const tags=((data.data&&data.data.results)||[]);
-      if(!tags.length){ if(box) box.innerHTML='<div class="desktopEmptyState">Paperless hat keine Tags über die API geliefert. v97 prüft zusätzlich den Dokumentzugriff und Volltext App.</div>'; return; }
+      if(!tags.length){ if(box) box.innerHTML='<div class="desktopEmptyState">Paperless hat keine Tags über die API geliefert. v99 prüft zusätzlich den Dokumentzugriff und Volltext App.</div>'; return; }
       if(box) box.innerHTML='<div class="paperlessHint"><b>Gefundene Paperless-Tags:</b> Klicke auf den richtigen Tag für deine Schulden-Briefe. Aktuell eingestellt: <b>'+esc(activeTag())+'</b></div>' + tags.map(t=>'<div class="paperlessResultItem"><div><strong>'+esc(t.name||('Tag #'+t.id))+'</strong><span>ID '+esc(t.id)+' · Dokumente: '+esc(t.document_count ?? '–')+'</span></div><div class="paperlessResultActions"><button type="button" data-pl-settag="'+esc(t.name||'')+'">Diesen Tag nutzen</button></div></div>').join('');
       box.querySelectorAll('[data-pl-settag]').forEach(btn=>btn.addEventListener('click',()=>{ const name=btn.getAttribute('data-pl-settag')||''; if($('paperlessTagInput')) $('paperlessTagInput').value=name; const st=settings(); saveSettings({...st, tag:name}); updateStatus('ok','Paperless: Tag-Filter gesetzt auf '+name); toast('Tag gesetzt: '+name); openModal(); }));
     }catch(err){ if(box) box.innerHTML='<div class="desktopEmptyState">Tags laden fehlgeschlagen: '+esc(err.message||String(err))+'</div>'; }
@@ -8744,7 +8744,7 @@ body.force-mobile-view #fabAdd{display:flex !important;}
         const raw = obj.rawPreview ? '<div class="paperlessHint" style="white-space:pre-wrap;max-height:160px;overflow:auto"><b>Roh-Antwort:</b> '+esc(obj.rawPreview)+'</div>' : '';
         return '<h4 style="margin-top:12px">'+esc(title)+'</h4><div class="paperlessHint">HTTP '+esc(obj.httpStatus)+' · '+esc(obj.contentType||'kein content-type')+flag(obj)+'<br>count: '+esc(obj.count ?? '–')+' · results: '+esc(obj.resultsLength ?? '–')+' · Keys: '+esc((obj.jsonTopKeys||[]).join(', ')||'–')+(obj.finalUrl?'<br>URL: '+esc(obj.finalUrl):'')+(obj.hint?'<br><b>Hinweis:</b> '+esc(obj.hint):'')+'</div>'+samples+raw;
       }
-      if(box) box.innerHTML='<div class="paperlessHint"><b>v97 Roh-Test:</b><br>'+esc(data.hint||'Der Test zeigt jetzt auch, ob Paperless JSON oder nur eine HTML/Login-Seite zurückgibt.')+'</div>'+ 
+      if(box) box.innerHTML='<div class="paperlessHint"><b>v99 Roh-Test:</b><br>'+esc(data.hint||'Der Test zeigt jetzt auch, ob Paperless JSON oder nur eine HTML/Login-Seite zurückgibt.')+'</div>'+ 
         block('Dokumente /api/documents/', t.documents)+
         block('Dokumente ohne Sortierung', t.documentsNoOrdering)+
         block('Volltextsuche App', t.documentsSearchApp)+
@@ -8773,7 +8773,7 @@ body.force-mobile-view #fabAdd{display:flex !important;}
         if(tagName==='*' || String(tagName).toLowerCase()==='all'){
           hint='Paperless hat auch ohne Tag-Filter keine Dokumente geliefert. Prüfe den API-Token: Er muss Dokumente lesen dürfen.';
         }else{
-          hint=data.paperlessTagMissing ? ('Der Paperless-Tag <b>'+esc(tagName)+'</b> wurde über die API nicht gefunden. v97 testet danach ohne Tag-Filter. Drücke zusätzlich „Roh-Test“, um Dokument-/Tag-Rechte zu prüfen.') : ('Keine passenden Paperless-Dokumente mit Tag <b>'+esc(tagName)+'</b> gefunden.');
+          hint=data.paperlessTagMissing ? ('Der Paperless-Tag <b>'+esc(tagName)+'</b> wurde über die API nicht gefunden. v99 testet danach ohne Tag-Filter. Drücke zusätzlich „Roh-Test“, um Dokument-/Tag-Rechte zu prüfen.') : ('Keine passenden Paperless-Dokumente mit Tag <b>'+esc(tagName)+'</b> gefunden.');
         }
         if(data.availableTags && data.availableTags.length){ hint += '<br><br>Gefundene Tags: '+data.availableTags.map(t=>esc(t.name)+' ('+esc(t.document_count||0)+')').join(', '); }
         if(data.hint){ hint += '<br><br>'+esc(data.hint); }
@@ -8832,6 +8832,210 @@ body.force-mobile-view #fabAdd{display:flex !important;}
   }
   document.addEventListener('DOMContentLoaded',()=>{ loadConfig().then(()=>{hook(); setTimeout(hook,500); setTimeout(hook,1500);}); });
   setTimeout(()=>{loadConfig(); hook();},1800);
+})();
+</script>
+
+
+
+<style id="v98-mobile-plus-fix-style">
+/* v99 – Handy-Plus zurück, ohne Paperless auf Handy einzubauen */
+@media (max-width:1120px){
+  body.force-mobile-view .mobileBottomNav,
+  body:not(.force-desktop-view) .mobileBottomNav{
+    display:flex !important;
+    visibility:visible !important;
+    opacity:1 !important;
+    pointer-events:auto !important;
+    position:fixed !important;
+    left:12px !important;
+    right:12px !important;
+    bottom:12px !important;
+    z-index:9998 !important;
+  }
+  body.force-mobile-view #navAdd,
+  body:not(.force-desktop-view) #navAdd{
+    display:flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    visibility:visible !important;
+    opacity:1 !important;
+    pointer-events:auto !important;
+  }
+  body.force-mobile-view #fabAdd,
+  body:not(.force-desktop-view) #fabAdd{
+    display:flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    visibility:visible !important;
+    opacity:1 !important;
+    pointer-events:auto !important;
+  }
+  body.force-desktop-view .mobileBottomNav,
+  body.force-desktop-view #fabAdd{
+    display:none !important;
+  }
+}
+</style>
+<script id="v98-mobile-plus-fix-js">
+(function(){
+  const VERSION='v99';
+  function $(id){return document.getElementById(id);}
+  function isMobileView(){
+    try{
+      return document.body.classList.contains('force-mobile-view') || localStorage.getItem('schulden-view-mode')==='mobile' || localStorage.getItem('godmode_view')==='mobile' || window.innerWidth<=1120;
+    }catch(e){return window.innerWidth<=1120;}
+  }
+  function callOpenAdd(){
+    try{
+      if(typeof window.openAddModal==='function') return window.openAddModal();
+      const btn=$('btnOpenAdd'); if(btn) return btn.click();
+    }catch(e){ console.error(e); }
+  }
+  function ensureNav(){
+    let nav=document.querySelector('.mobileBottomNav');
+    if(!nav){
+      nav=document.createElement('nav');
+      nav.className='mobileBottomNav';
+      nav.setAttribute('aria-label','Navigation');
+      nav.innerHTML='<button id="navHome" class="navBtn" type="button" data-action="home" aria-label="Übersicht" title="Übersicht">🏠<span>Home</span></button><button id="navStats" class="navBtn" type="button" data-action="stats" aria-label="Statistik" title="Statistik">📊<span>Stats</span></button><button id="navAdd" class="navBtn navPlus" type="button" data-action="add" aria-label="Neue Schuld" title="Neue Schuld">＋</button><button id="navBackup" class="navBtn" type="button" data-action="backup" aria-label="Backup" title="Backup">💾<span>Backup</span></button><button id="navRestore" class="navBtn" type="button" data-action="restore" aria-label="Restore" title="Restore">📂<span>Restore</span></button>';
+      document.body.appendChild(nav);
+    }
+    if(!$('navAdd')){
+      const add=document.createElement('button');
+      add.id='navAdd'; add.className='navBtn navPlus'; add.type='button'; add.dataset.action='add'; add.title='Neue Schuld'; add.setAttribute('aria-label','Neue Schuld'); add.textContent='＋';
+      const kids=[...nav.children];
+      if(kids.length>=2) nav.insertBefore(add,kids[2]); else nav.appendChild(add);
+    }
+    return nav;
+  }
+  function bind(btn){
+    if(!btn || btn.dataset.v98Plus==='1') return;
+    btn.dataset.v98Plus='1';
+    ['click','touchend','pointerup'].forEach(type=>{
+      btn.addEventListener(type,(e)=>{e.preventDefault();e.stopPropagation();callOpenAdd();},true);
+    });
+  }
+  function fix(){
+    try{
+      const nav=ensureNav();
+      const mobile=isMobileView();
+      if(nav){
+        nav.style.setProperty('visibility','visible','important');
+        nav.style.setProperty('opacity','1','important');
+        nav.style.setProperty('pointer-events','auto','important');
+        nav.style.setProperty('display', mobile ? 'flex':'none', 'important');
+      }
+      const add=$('navAdd');
+      if(add){
+        add.textContent='＋'; add.title='Neue Schuld'; add.setAttribute('aria-label','Neue Schuld');
+        add.style.setProperty('display','flex','important');
+        add.style.setProperty('visibility','visible','important');
+        add.style.setProperty('opacity','1','important');
+        add.style.setProperty('pointer-events','auto','important');
+        bind(add);
+      }
+      const fab=$('fabAdd');
+      if(fab){
+        fab.textContent='＋'; fab.title='Neue Schuld'; fab.setAttribute('aria-label','Neue Schuld');
+        fab.style.setProperty('display', mobile ? 'flex':'none', 'important');
+        fab.style.setProperty('visibility','visible','important');
+        fab.style.setProperty('opacity','1','important');
+        fab.style.setProperty('pointer-events','auto','important');
+        bind(fab);
+      }
+      bind($('btnOpenAdd'));
+      const bottom=document.querySelector('.sidebarBottom');
+      if(bottom){
+        let box=$('v98OnlyVersion');
+        if(!box){ box=document.createElement('div'); box.id='v98OnlyVersion'; bottom.appendChild(box); }
+        box.textContent=VERSION;
+        document.querySelectorAll('#v76OnlyVersion').forEach(el=>{ if(el!==box) el.remove(); });
+      }
+    }catch(e){console.error('v99 mobile plus fix', e);}
+  }
+  const prevRender=window.render;
+  if(typeof prevRender==='function' && !prevRender.__v98PlusFix){
+    const wrapped=function(){ const r=prevRender.apply(this,arguments); setTimeout(fix,0); setTimeout(fix,80); return r; };
+    wrapped.__v98PlusFix=true; window.render=wrapped;
+  }
+  window.addEventListener('load',()=>{fix(); setTimeout(fix,250);});
+  window.addEventListener('resize',()=>setTimeout(fix,50));
+  document.addEventListener('DOMContentLoaded',fix);
+  setInterval(fix,1500);
+  fix();
+})();
+</script>
+
+
+
+<style id="v99-category-fix-style">
+/* v99: Kategorie beim Desktop-Neuanlegen stabil anzeigen. Handy-Seite bleibt ohne Paperless und ohne Umbau. */
+</style>
+<script id="v99-category-fix-js">
+(function(){
+  const VERSION='v99';
+  const DEBT_KEY='godmode_debts';
+  const CRED_KEY='schulden_creditors_v37';
+  function readDebts(){ try{ if(typeof debts!=='undefined' && Array.isArray(debts)) return debts; }catch(e){} return Array.isArray(window.debts)?window.debts:[]; }
+  function readJson(k,f){ try{ const v=JSON.parse(localStorage.getItem(k)||'null'); return v??f; }catch(e){ return f; } }
+  function writeJson(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+  function norm(s){ return String(s||'').trim().toLowerCase(); }
+  function normalizeCategories(){
+    const arr=readDebts();
+    if(!Array.isArray(arr)) return false;
+    let changed=false;
+    arr.forEach(d=>{
+      if(!d) return;
+      const cat=String(d.category||d.kategorie||'').trim();
+      if(cat){
+        if(d.category!==cat){ d.category=cat; changed=true; }
+        if(d.kategorie!==cat){ d.kategorie=cat; changed=true; }
+      }
+    });
+    // Gläubiger-Kategorie nur ergänzen, wenn sie leer/Sonstiges ist. So wird beim neuen Anlegen die Auswahl auch in Filtern korrekt sichtbar.
+    let creds=readJson(CRED_KEY, []); if(!Array.isArray(creds)) creds=[];
+    arr.forEach(d=>{
+      const cat=String(d?.category||d?.kategorie||'').trim();
+      const name=String(d?.name||'').trim();
+      if(!cat || !name) return;
+      const c=creds.find(x=> (d.creditorId && x.id===d.creditorId) || norm(x.name)===norm(name) || (x.aktenzeichen && d.aktenzeichen && norm(x.aktenzeichen)===norm(d.aktenzeichen)) );
+      if(c && (!String(c.category||'').trim() || String(c.category||'').trim()==='Sonstiges')){ c.category=cat; c.updatedAt=new Date().toISOString(); changed=true; }
+    });
+    if(changed){
+      try{ localStorage.setItem(DEBT_KEY, JSON.stringify(arr)); }catch(e){}
+      writeJson(CRED_KEY, creds);
+    }
+    return changed;
+  }
+  function patchCategoryCells(){
+    const arr=readDebts();
+    document.querySelectorAll('#tbody tr.v58DesktopRow').forEach(tr=>{
+      const idx=Number(tr.dataset.index); const d=arr[idx]; if(!d) return;
+      const cat=String(d.category||d.kategorie||'Sonstiges').trim()||'Sonstiges';
+      const tag=tr.querySelector('.v63Tag');
+      if(tag) tag.textContent=cat;
+      const small=tr.querySelector('.v58NameCell small');
+      if(small && (!small.textContent || small.textContent==='Schulden-Akte' || small.textContent==='Sonstiges')) small.textContent=cat;
+    });
+    const catFilter=document.getElementById('v58CategoryFilter');
+    if(catFilter){
+      const have=new Set([...catFilter.options].map(o=>o.value));
+      arr.forEach(d=>{ const cat=String(d.category||d.kategorie||'').trim(); if(cat && !have.has(cat)){ const opt=document.createElement('option'); opt.value=cat; opt.textContent=cat; catFilter.appendChild(opt); have.add(cat); } });
+    }
+  }
+  function run(){ try{ normalizeCategories(); patchCategoryCells(); document.querySelectorAll('.v59MenuVersion').forEach(el=>el.textContent=VERSION); const b=document.getElementById('v98OnlyVersion'); if(b) b.textContent='v99'; }catch(e){ console.error('v99 category fix',e); } }
+  const oldSave=window.save;
+  if(typeof oldSave==='function' && !oldSave.__v99CategoryFix){
+    const wrapped=function(){ normalizeCategories(); const r=oldSave.apply(this,arguments); setTimeout(run,60); return r; };
+    wrapped.__v99CategoryFix=true; window.save=wrapped; try{ save=wrapped; }catch(e){}
+  }
+  const oldRender=window.render;
+  if(typeof oldRender==='function' && !oldRender.__v99CategoryFix){
+    const wrappedRender=function(){ const r=oldRender.apply(this,arguments); setTimeout(run,80); return r; };
+    wrappedRender.__v99CategoryFix=true; window.render=wrappedRender; try{ render=wrappedRender; }catch(e){}
+  }
+  document.addEventListener('DOMContentLoaded',()=>{ setTimeout(run,250); setTimeout(run,900); });
+  setTimeout(run,1500); setInterval(run,2500);
 })();
 </script>
 

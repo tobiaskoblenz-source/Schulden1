@@ -1,1 +1,1 @@
-Schulden v97 - Rollback auf funktionierende Handy-Seite aus v95. Paperless-Anbindung bleibt erhalten.
+Schulden v99 - Kategorie beim Desktop-Neuanlegen korrigiert. Paperless bleibt Desktop, Handy-Seite bleibt ohne Paperless.
