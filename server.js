@@ -14,6 +14,11 @@ function cleanPaperlessBase(value){
   return String(value || "").trim().replace(/\/+$/, "");
 }
 
+function paperlessJsonAccept(){
+  const v = String(process.env.PAPERLESS_API_VERSION || "9").trim();
+  return v ? ("application/json; version=" + v) : "application/json";
+}
+
 function paperlessConfig(req){
   const envUrl = cleanPaperlessBase(process.env.PAPERLESS_URL || process.env.PAPERLESS_BASE_URL || "");
   const envToken = String(process.env.PAPERLESS_TOKEN || process.env.PAPERLESS_API_TOKEN || "").trim();
@@ -64,7 +69,7 @@ async function paperlessFetch(req, res, targetPath, options = {}){
   const url = cfg.baseUrl + targetPath;
   const headers = {
     "Authorization": "Token " + cfg.token,
-    "Accept": options.accept || "application/json"
+    "Accept": options.accept || paperlessJsonAccept()
   };
 
   const controller = new AbortController();
@@ -150,7 +155,7 @@ async function paperlessRawJson(req, targetPath, options = {}){
   try{
     const fetchOptions = {
       method: options.method || "GET",
-      headers: {"Authorization":"Token " + cfg.token, "Accept": options.accept || "application/json"},
+      headers: {"Authorization":"Token " + cfg.token, "Accept": options.accept || paperlessJsonAccept()},
       redirect:"follow",
       signal:controller.signal
     };
@@ -202,13 +207,25 @@ function paperlessResultArray(data){
 
 async function listPaperlessTags(req){
   const collected = [];
-  let page = 1;
-  for(let guard = 0; guard < 10; guard++){
-    const result = await paperlessRawJson(req, "/api/tags/?page_size=200&ordering=name&page=" + page);
-    const arr = paperlessResultArray(result.data);
-    collected.push(...arr);
-    if(!result.data || !result.data.next || !arr.length) break;
-    page += 1;
+  const seen = new Set();
+  const variants = [
+    page => "/api/tags/?page_size=200&ordering=name&page=" + page,
+    page => "/api/tags/?page_size=200&page=" + page,
+    page => "/api/tags/?format=json&page_size=200&page=" + page
+  ];
+  for(const makePath of variants){
+    let page = 1;
+    for(let guard = 0; guard < 10; guard++){
+      const result = await paperlessRawJson(req, makePath(page));
+      const arr = paperlessResultArray(result.data);
+      for(const t of arr){
+        const key = String(t && (t.id ?? t.name ?? JSON.stringify(t)));
+        if(!seen.has(key)){ seen.add(key); collected.push(t); }
+      }
+      if(!result.data || !result.data.next || !arr.length) break;
+      page += 1;
+    }
+    if(collected.length) break;
   }
   return collected;
 }
@@ -244,6 +261,48 @@ async function resolvePaperlessTag(req, tagName){
 
 async function paperlessDocumentQuery(req, params){
   return await paperlessRawJson(req, "/api/documents/?" + params.toString());
+}
+
+function uniquePaperlessDocs(list){
+  const seen = new Set();
+  const out = [];
+  for(const d of list || []){
+    const id = String(d && d.id);
+    if(id && !seen.has(id)){ seen.add(id); out.push(d); }
+  }
+  return out;
+}
+
+async function paperlessSearchByTagText(req, tagName, query, pageSize){
+  const tag = String(tagName || "").trim();
+  const q = String(query || "").trim();
+  const searches = [];
+  if(tag){
+    searches.push((q ? q + " " : "") + "tag:" + tag);
+    searches.push((q ? q + " " : "") + 'tag:"' + tag + '"');
+    searches.push((q ? q + " " : "") + "tags:" + tag);
+    searches.push((q ? q + " " : "") + tag);
+  }else if(q){
+    searches.push(q);
+  }
+  const results = [];
+  const modes = [];
+  let last = null;
+  for(const search of searches){
+    const params = new URLSearchParams();
+    params.set("page_size", String(pageSize));
+    params.set("ordering", "-created");
+    params.set("query", search);
+    try{
+      const r = await paperlessDocumentQuery(req, params);
+      last = r;
+      const arr = paperlessResultArray(r.data);
+      if(arr.length){ results.push(...arr); modes.push(search); }
+    }catch(e){ /* try next syntax */ }
+    if(results.length >= pageSize) break;
+  }
+  const merged = uniquePaperlessDocs(results).slice(0, pageSize);
+  return {ok:true, data:{count:merged.length,next:null,previous:null,results:merged}, usingEnv:last?.usingEnv, baseUrl:last?.baseUrl, insecureTls:last?.insecureTls, modes};
 }
 
 
@@ -435,7 +494,7 @@ const server = http.createServer(async (req, res)=>{
     const url = new URL(req.url, `http://${req.headers.host || "localhost"}`);
 
     if(url.pathname === "/api/health"){
-      return sendJson(res, 200, {ok:true, service:"schulden-manager", version:"v86", paperless:Boolean(process.env.PAPERLESS_URL || process.env.PAPERLESS_BASE_URL)});
+      return sendJson(res, 200, {ok:true, service:"schulden-manager", version:"v87", paperless:Boolean(process.env.PAPERLESS_URL || process.env.PAPERLESS_BASE_URL)});
     }
 
     if(url.pathname === "/api/config"){
@@ -444,7 +503,8 @@ const server = http.createServer(async (req, res)=>{
         paperlessConfigured: Boolean((process.env.PAPERLESS_URL || process.env.PAPERLESS_BASE_URL) && (process.env.PAPERLESS_TOKEN || process.env.PAPERLESS_API_TOKEN)),
         paperlessUrl: cleanPaperlessBase(process.env.PAPERLESS_URL || process.env.PAPERLESS_BASE_URL || ""),
         paperlessInsecureTls: /^(1|true|yes|ja)$/i.test(String(process.env.PAPERLESS_ALLOW_SELF_SIGNED || process.env.PAPERLESS_INSECURE_TLS || "")),
-        paperlessTag: String(process.env.PAPERLESS_TAG || process.env.PAPERLESS_REQUIRED_TAG || "App").trim() || "App"
+        paperlessTag: String(process.env.PAPERLESS_TAG || process.env.PAPERLESS_REQUIRED_TAG || "App").trim() || "App",
+        paperlessApiVersion: String(process.env.PAPERLESS_API_VERSION || "9")
       });
     }
 
@@ -470,13 +530,27 @@ const server = http.createServer(async (req, res)=>{
         try{
           tag = await resolvePaperlessTag(req, requiredTag);
           if(!tag){
+            // Manche Paperless-/Proxy-Setups liefern /api/tags/ leer oder ohne Rechte,
+            // obwohl die Dokument-Suche funktioniert. Dann nutzen wir Paperless' Volltext-Suche
+            // mit tag:Name als Fallback.
+            const byText = await paperlessSearchByTagText(req, requiredTag, query, pageSize);
+            const arr = paperlessResultArray(byText.data);
+            if(arr.length){
+              return sendJson(res, 200, {
+                ok:true, usingEnv:byText.usingEnv, baseUrl:byText.baseUrl, insecureTls:byText.insecureTls,
+                paperlessTag: requiredTag, paperlessTagId:null, paperlessTagDocumentCount:null,
+                paperlessTagMissing:true, searchMode:"query_tag_text_fallback", tagQueryModes:byText.modes,
+                hint:'Paperless hat keine Tag-Liste geliefert. v87 nutzt deshalb die Paperless-Suche mit tag:' + requiredTag + '.',
+                data:byText.data
+              });
+            }
             const availableTags = await listPaperlessTags(req).catch(()=>[]);
             return sendJson(res, 200, {
               ok:true,
               paperlessTag: requiredTag,
               paperlessTagMissing: true,
               availableTags: availableTags.slice(0,80).map(t=>({id:t.id,name:t.name,document_count:t.document_count})),
-              hint: 'In Paperless wurde kein Tag mit dem Namen "' + requiredTag + '" gefunden. Bitte Schreibweise prüfen. Gefundene Tags werden zur Diagnose mitgeliefert.',
+              hint: 'Paperless hat keinen Tag mit dem Namen "' + requiredTag + '" geliefert. v87 hat zusätzlich tag:' + requiredTag + ' versucht, aber auch darüber nichts gefunden. Prüfe bitte, ob wirklich ein Dokument diesen Tag hat und ob dein API-Benutzer Tag-/Dokument-Rechte hat.',
               data:{count:0,next:null,previous:null,results:[]}
             });
           }
@@ -521,6 +595,14 @@ const server = http.createServer(async (req, res)=>{
           localScan = await localPaperlessTagScan(req, tag, query, pageSize);
           merged = paperlessResultArray(localScan.data);
           used = {...localScan, _mode:"local_scan_tag_ids", _relaxed:true};
+        }
+        if(requiredTag && merged.length === 0){
+          const byText = await paperlessSearchByTagText(req, requiredTag, query, pageSize);
+          const arr = paperlessResultArray(byText.data);
+          if(arr.length){
+            merged = arr;
+            used = {...byText, _mode:"query_tag_text_fallback", _relaxed:true};
+          }
         }
         const relaxed = Boolean(used._relaxed) && merged.length > 0;
         return sendJson(res, 200, {
