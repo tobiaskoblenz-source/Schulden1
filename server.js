@@ -246,6 +246,71 @@ async function paperlessDocumentQuery(req, params){
   return await paperlessRawJson(req, "/api/documents/?" + params.toString());
 }
 
+
+function paperlessDocTagIds(doc){
+  const out = [];
+  const tags = doc && doc.tags;
+  if(Array.isArray(tags)){
+    for(const t of tags){
+      if(t == null) continue;
+      if(typeof t === "number" || typeof t === "string") out.push(String(t));
+      else if(typeof t === "object" && t.id != null) out.push(String(t.id));
+    }
+  }
+  return out;
+}
+
+function paperlessDocHasTag(doc, tag){
+  if(!tag || tag.id == null) return true;
+  const wanted = String(tag.id);
+  return paperlessDocTagIds(doc).includes(wanted);
+}
+
+function textFromPaperlessValue(value){
+  if(value == null) return "";
+  if(typeof value === "string" || typeof value === "number") return String(value);
+  if(typeof value === "object") return [value.name, value.title, value.slug, value.id].filter(Boolean).join(" ");
+  return "";
+}
+
+function paperlessDocMatchesQuery(doc, query){
+  const q = String(query || "").trim().toLowerCase();
+  if(!q) return true;
+  const hay = [
+    doc.title, doc.archive_filename, doc.original_filename, doc.content,
+    textFromPaperlessValue(doc.correspondent), textFromPaperlessValue(doc.document_type),
+    textFromPaperlessValue(doc.storage_path), doc.created, doc.added, doc.asn
+  ].filter(Boolean).join(" ").toLowerCase();
+  return q.split(/\s+/).filter(Boolean).every(part => hay.includes(part));
+}
+
+async function localPaperlessTagScan(req, tag, query, pageSize){
+  const maxPages = Math.min(Math.max(parseInt(process.env.PAPERLESS_LOCAL_SCAN_PAGES || "20", 10) || 20, 1), 100);
+  const perPage = Math.min(Math.max(parseInt(process.env.PAPERLESS_LOCAL_SCAN_PAGE_SIZE || "100", 10) || 100, 20), 200);
+  const found = [];
+  let scanned = 0;
+  let lastResult = null;
+  for(let page = 1; page <= maxPages; page++){
+    const params = new URLSearchParams();
+    params.set("page_size", String(perPage));
+    params.set("ordering", "-created");
+    params.set("page", String(page));
+    const r = await paperlessDocumentQuery(req, params);
+    lastResult = r;
+    const arr = paperlessResultArray(r.data);
+    scanned += arr.length;
+    for(const d of arr){
+      if(paperlessDocHasTag(d, tag) && paperlessDocMatchesQuery(d, query)){
+        found.push(d);
+        if(found.length >= pageSize) break;
+      }
+    }
+    if(found.length >= pageSize) break;
+    if(!r.data || !r.data.next || !arr.length) break;
+  }
+  return {ok:true, data:{count:found.length,next:null,previous:null,results:found}, scanned, pages:maxPages, usingEnv:lastResult?.usingEnv, baseUrl:lastResult?.baseUrl, insecureTls:lastResult?.insecureTls};
+}
+
 function dedupePaperlessDocuments(results){
   const seen = new Set();
   const out = [];
@@ -370,7 +435,7 @@ const server = http.createServer(async (req, res)=>{
     const url = new URL(req.url, `http://${req.headers.host || "localhost"}`);
 
     if(url.pathname === "/api/health"){
-      return sendJson(res, 200, {ok:true, service:"schulden-manager", version:"v84", paperless:Boolean(process.env.PAPERLESS_URL || process.env.PAPERLESS_BASE_URL)});
+      return sendJson(res, 200, {ok:true, service:"schulden-manager", version:"v85", paperless:Boolean(process.env.PAPERLESS_URL || process.env.PAPERLESS_BASE_URL)});
     }
 
     if(url.pathname === "/api/config"){
@@ -410,7 +475,7 @@ const server = http.createServer(async (req, res)=>{
               ok:true,
               paperlessTag: requiredTag,
               paperlessTagMissing: true,
-              availableTags: availableTags.slice(0,50).map(t=>({id:t.id,name:t.name,document_count:t.document_count})),
+              availableTags: availableTags.slice(0,80).map(t=>({id:t.id,name:t.name,document_count:t.document_count})),
               hint: 'In Paperless wurde kein Tag mit dem Namen "' + requiredTag + '" gefunden. Bitte Schreibweise prüfen. Gefundene Tags werden zur Diagnose mitgeliefert.',
               data:{count:0,next:null,previous:null,results:[]}
             });
@@ -423,13 +488,11 @@ const server = http.createServer(async (req, res)=>{
         const attempts = [];
         const base = () => { const p = new URLSearchParams(); p.set("page_size", String(pageSize)); p.set("ordering", "-created"); return p; };
         if(tag){
-          // Paperless-Versionen unterscheiden sich bei den Filter-Parametern. Darum testen wir mehrere sichere Varianten.
-          const p1 = base(); if(query.trim()) p1.set("query", query.trim()); p1.set("tags__id__all", String(tag.id)); attempts.push({mode:"tags__id__all", params:p1});
-          const p2 = base(); if(query.trim()) p2.set("query", query.trim()); p2.set("tags__id__in", String(tag.id)); attempts.push({mode:"tags__id__in", params:p2});
-          const p3 = base(); p3.set("query", (query.trim() ? query.trim() + " " : "") + 'tag:"' + String(tag.name).replace(/"/g,'') + '"'); attempts.push({mode:"query_tag_quoted", params:p3});
-          const p4 = base(); p4.set("query", (query.trim() ? query.trim() + " " : "") + 'tag:' + String(tag.name).replace(/\s+/g,'\ ')); attempts.push({mode:"query_tag", params:p4});
-          // Wenn die Akten-Suche zu eng ist, wenigstens alle App-Dokumente zeigen.
-          const p5 = base(); p5.set("tags__id__all", String(tag.id)); attempts.push({mode:"tag_only", params:p5, relaxed:true});
+          const p1 = base(); if(query.trim()) p1.set("query", query.trim()); p1.set("tags__id__all", String(tag.id)); attempts.push({mode:"server_tags__id__all", params:p1});
+          const p2 = base(); if(query.trim()) p2.set("query", query.trim()); p2.set("tags__id__in", String(tag.id)); attempts.push({mode:"server_tags__id__in", params:p2});
+          const p3 = base(); if(query.trim()) p3.set("query", query.trim()); p3.set("tags", String(tag.id)); attempts.push({mode:"server_tags", params:p3});
+          const p4 = base(); if(query.trim()) p4.set("query", query.trim()); attempts.push({mode:"server_query_then_local_tag", params:p4, localFilter:true});
+          const p5 = base(); p5.set("tags__id__all", String(tag.id)); attempts.push({mode:"server_tag_only", params:p5, relaxed:true});
         }else{
           const p = base(); if(query.trim()) p.set("query", query.trim()); attempts.push({mode:"no_tag", params:p});
         }
@@ -438,16 +501,27 @@ const server = http.createServer(async (req, res)=>{
         for(const attempt of attempts){
           try{
             const r = await paperlessDocumentQuery(req, attempt.params);
+            let arr = paperlessResultArray(r.data);
+            if(attempt.localFilter && tag){
+              arr = arr.filter(d => paperlessDocHasTag(d, tag));
+              r.data = {...(r.data||{}), count:arr.length, results:arr};
+            }
             r._mode = attempt.mode; r._relaxed = Boolean(attempt.relaxed);
             successful.push(r);
-            const arr = paperlessResultArray(r.data);
-            if(arr.length && !attempt.relaxed) break;
-            if(arr.length && attempt.relaxed) break;
+            if(arr.length) break;
           }catch(e){ if(!firstError) firstError = e; }
         }
         if(!successful.length && firstError) throw firstError;
-        const merged = dedupePaperlessDocuments(successful);
-        const used = successful[successful.length-1] || {data:{}};
+        let merged = dedupePaperlessDocuments(successful);
+        let used = successful[successful.length-1] || {data:{}};
+        let localScan = null;
+        if(tag && merged.length === 0){
+          // Wichtigster Fallback: Paperless-Filter können je nach Version abweichen.
+          // Darum lesen wir die neuesten Dokumente und filtern den Tag lokal über die Dokument-Metadaten.
+          localScan = await localPaperlessTagScan(req, tag, query, pageSize);
+          merged = paperlessResultArray(localScan.data);
+          used = {...localScan, _mode:"local_scan_tag_ids", _relaxed:true};
+        }
         const relaxed = Boolean(used._relaxed) && merged.length > 0;
         return sendJson(res, 200, {
           ok:true,
@@ -458,12 +532,38 @@ const server = http.createServer(async (req, res)=>{
           paperlessTagId: tag ? tag.id : null,
           paperlessTagDocumentCount: tag ? tag.document_count : null,
           searchMode: used._mode || "unknown",
+          localScan: localScan ? {scanned:localScan.scanned, maxPages:localScan.pages} : null,
           relaxedSearch: relaxed,
-          hint: relaxed ? 'Mit dem Akten-Suchbegriff wurde nichts gefunden. Es werden deshalb alle Dokumente mit dem Tag "' + requiredTag + '" angezeigt.' : '',
+          hint: used._mode === "local_scan_tag_ids" ? 'Server-Tagfilter lieferte nichts. v85 hat deshalb lokal nach Dokumenten mit Tag "' + requiredTag + '" gesucht.' : (relaxed ? 'Mit dem Akten-Suchbegriff wurde nichts gefunden. Es werden deshalb alle Dokumente mit dem Tag "' + requiredTag + '" angezeigt.' : ''),
           data:{count: merged.length, next:null, previous:null, results: merged}
         });
       }catch(err){
         return sendJson(res, err.status || 500, err.payload || {ok:false, error:err.message || "Paperless Suche Fehler"});
+      }
+    }
+
+    if(url.pathname === "/api/paperless/debug" && req.method === "GET"){
+      const requiredTag = String(url.searchParams.get("tag") || paperlessTagName(req) || "App").trim();
+      try{
+        const tags = await listPaperlessTags(req);
+        const tag = requiredTag ? (tags.find(t => String(t.name||"").trim().toLowerCase() === requiredTag.toLowerCase()) || null) : null;
+        const params = new URLSearchParams();
+        params.set("page_size", "10");
+        params.set("ordering", "-created");
+        const docsResult = await paperlessDocumentQuery(req, params);
+        const docs = paperlessResultArray(docsResult.data);
+        const matching = tag ? docs.filter(d => paperlessDocHasTag(d, tag)) : docs;
+        return sendJson(res, 200, {
+          ok:true,
+          paperlessTag:requiredTag,
+          matchedTag: tag ? {id:tag.id,name:tag.name,document_count:tag.document_count} : null,
+          tags:tags.slice(0,80).map(t=>({id:t.id,name:t.name,document_count:t.document_count})),
+          latestDocuments:docs.map(d=>({id:d.id,title:d.title,created:d.created,tagIds:paperlessDocTagIds(d),tags:d.tags})),
+          latestMatchingTag:matching.map(d=>({id:d.id,title:d.title,created:d.created,tagIds:paperlessDocTagIds(d)})),
+          hint: tag ? 'Tag wurde gefunden. Wenn latestMatchingTag leer ist, haben die neuesten Dokumente diesen Tag nicht oder Paperless liefert Tag-Metadaten anders.' : 'Tag wurde nicht gefunden.'
+        });
+      }catch(err){
+        return sendJson(res, err.status || 500, err.payload || {ok:false, error:err.message || "Paperless Diagnose Fehler"});
       }
     }
 

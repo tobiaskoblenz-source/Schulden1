@@ -1,4 +1,4 @@
-const VERSION = 'dark-v57-delete-without-browser-confirm';
+const VERSION = 'dark-v85-paperless-local-tag-filter';
 const CACHE_STATIC = `schulden-manager-static-${VERSION}`;
 const CACHE_RUNTIME = `schulden-manager-runtime-${VERSION}`;
 const APP_SHELL = [

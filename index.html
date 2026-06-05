@@ -2808,7 +2808,7 @@ body.force-mobile-view .dashboardShell{
     <section class="hero heroDashboard">
       <div class="heroMain dashboardHeader">
         <div class="dashboardGreetingWrap">
-          <div class="eyebrow">Ruhiges Dashboard · v84</div>
+          <div class="eyebrow">Ruhiges Dashboard · v85</div>
           <h1 id="greetingTitle">Guten Abend!</h1>
           <p id="greetingText">Hier ist die Übersicht deiner Schulden.</p>
         </div>
@@ -8450,7 +8450,7 @@ body.force-mobile-view #fabAdd{display:flex !important;}
 
 
 <style id="v79-menu-stability-style">
-/* v84: Paperless-Tag-Filter App robuster: ID-Filter, Fallback, Diagnose */
+/* v85: Paperless-Tag-Filter mit lokalem Fallback + Diagnose */
 @media (min-width:1121px){
   .v59MenuVersion,.v67CurrentVersion,.v70OnlyVersion,[id$="OnlyVersion"],[id$="CurrentVersion"]{display:none!important;visibility:hidden!important;height:0!important;min-height:0!important;margin:0!important;padding:0!important;overflow:hidden!important;}
   #stableVersionV79{display:block!important;visibility:visible!important;height:auto!important;margin:10px 8px 0!important;padding:6px 0 0!important;text-align:center!important;color:#eaf2ff!important;font-size:12px!important;font-weight:900!important;letter-spacing:.05em;}
@@ -8468,7 +8468,7 @@ body.force-mobile-view #fabAdd{display:flex !important;}
 </style>
 <script id="v79-menu-stability-js">
 (function(){
-  const VERSION='v84';
+  const VERSION='v85';
   function setText(el,txt){ if(el && el.textContent!==txt) el.textContent=txt; }
   function cleanup(){
     document.querySelectorAll('.v59MenuVersion,.v67CurrentVersion,.v70OnlyVersion,[id$="OnlyVersion"],[id$="CurrentVersion"]').forEach(el=>{ if(el.id!=='stableVersionV78') el.style.display='none'; });
@@ -8599,7 +8599,7 @@ body.force-mobile-view #fabAdd{display:flex !important;}
   function ensureModal(){
     let overlay=$('paperlessOverlay'); if(overlay) return overlay;
     overlay=document.createElement('div'); overlay.id='paperlessOverlay'; overlay.className='paperlessOverlay';
-    overlay.innerHTML='<div class="paperlessModal" role="dialog" aria-modal="true"><div class="paperlessHead"><div><h3 id="paperlessTitle">Paperless-Anbindung</h3><p id="paperlessSub">Dokumente suchen und mit dieser Schulden-Akte verknüpfen.</p></div><button id="paperlessClose" class="paperlessClose" type="button">×</button></div><div class="paperlessGrid"><div class="paperlessBox"><h4>Verbindung</h4><div class="paperlessForm"><label>Paperless URL<input id="paperlessUrl" placeholder="https://paperless.example.de"></label><label>API Token<input id="paperlessToken" type="password" placeholder="Token aus Paperless"></label><label style="display:flex;align-items:center;gap:9px;grid-template-columns:auto 1fr;"><input id="paperlessInsecureTls" type="checkbox" style="width:18px;height:18px;"><span>Selbstsigniertes/privates HTTPS-Zertifikat erlauben</span></label><div class="paperlessBtnRow"><button id="paperlessSaveSettings" type="button">Speichern</button><button id="paperlessTest" class="secondary" type="button">Testen</button></div><div id="paperlessConnectionHint" class="paperlessHint"></div></div></div><div class="paperlessBox"><h4>Aktuelle Akte</h4><div id="paperlessDebtInfo" class="paperlessHint">–</div><div class="paperlessHint">Fester Filter: Es werden nur Paperless-Dokumente mit dem Tag <b>App</b> angezeigt. Du kannst den Tag per Railway-Variable <b>PAPERLESS_TAG</b> ändern.</div></div></div><div class="paperlessBox"><h4>Dokumente suchen</h4><div class="paperlessSearchLine"><input id="paperlessQuery" placeholder="Suchbegriff, Gläubiger, Aktenzeichen"><button id="paperlessSearch" type="button">Suchen</button><button id="paperlessAutoQuery" class="secondary" type="button">Akte übernehmen</button><button id="paperlessOnlyTag" class="secondary" type="button">Nur Tag App</button></div><div id="paperlessResults" class="paperlessResultList"><div class="desktopEmptyState">Noch keine Suche gestartet.</div></div></div></div>';
+    overlay.innerHTML='<div class="paperlessModal" role="dialog" aria-modal="true"><div class="paperlessHead"><div><h3 id="paperlessTitle">Paperless-Anbindung</h3><p id="paperlessSub">Dokumente suchen und mit dieser Schulden-Akte verknüpfen.</p></div><button id="paperlessClose" class="paperlessClose" type="button">×</button></div><div class="paperlessGrid"><div class="paperlessBox"><h4>Verbindung</h4><div class="paperlessForm"><label>Paperless URL<input id="paperlessUrl" placeholder="https://paperless.example.de"></label><label>API Token<input id="paperlessToken" type="password" placeholder="Token aus Paperless"></label><label style="display:flex;align-items:center;gap:9px;grid-template-columns:auto 1fr;"><input id="paperlessInsecureTls" type="checkbox" style="width:18px;height:18px;"><span>Selbstsigniertes/privates HTTPS-Zertifikat erlauben</span></label><div class="paperlessBtnRow"><button id="paperlessSaveSettings" type="button">Speichern</button><button id="paperlessTest" class="secondary" type="button">Testen</button><button id="paperlessDebug" class="secondary" type="button">Diagnose</button></div><div id="paperlessConnectionHint" class="paperlessHint"></div></div></div><div class="paperlessBox"><h4>Aktuelle Akte</h4><div id="paperlessDebtInfo" class="paperlessHint">–</div><div class="paperlessHint">Fester Filter: Es werden nur Paperless-Dokumente mit dem Tag <b>App</b> angezeigt. Du kannst den Tag per Railway-Variable <b>PAPERLESS_TAG</b> ändern.</div></div></div><div class="paperlessBox"><h4>Dokumente suchen</h4><div class="paperlessSearchLine"><input id="paperlessQuery" placeholder="Suchbegriff, Gläubiger, Aktenzeichen"><button id="paperlessSearch" type="button">Suchen</button><button id="paperlessAutoQuery" class="secondary" type="button">Akte übernehmen</button><button id="paperlessOnlyTag" class="secondary" type="button">Nur Tag App</button></div><div id="paperlessResults" class="paperlessResultList"><div class="desktopEmptyState">Noch keine Suche gestartet.</div></div></div></div>';
     document.body.appendChild(overlay);
     overlay.addEventListener('click', e=>{ if(e.target===overlay) closeModal(); });
     $('paperlessClose').addEventListener('click', closeModal);
@@ -8608,6 +8608,7 @@ body.force-mobile-view #fabAdd{display:flex !important;}
       updateStatus('ok','Paperless: Einstellungen gespeichert'); toast('Paperless-Einstellungen gespeichert ✅');
     });
     $('paperlessTest').addEventListener('click', testConnection);
+    const dbg=$('paperlessDebug'); if(dbg) dbg.addEventListener('click', debugPaperless);
     $('paperlessSearch').addEventListener('click', searchDocs);
     $('paperlessAutoQuery').addEventListener('click', ()=>{ const d=currentDebts()[selectedIndex]; $('paperlessQuery').value=buildQuery(d); });
     $('paperlessOnlyTag').addEventListener('click', ()=>{ $('paperlessQuery').value=''; searchDocs(); });
@@ -8633,6 +8634,20 @@ body.force-mobile-view #fabAdd{display:flex !important;}
     saveSettings({url: serverConfig.paperlessConfigured ? (settings().url||'') : cleanBase($('paperlessUrl').value), token: serverConfig.paperlessConfigured ? (settings().token||'') : $('paperlessToken').value.trim(), insecureTls:Boolean($('paperlessInsecureTls')?.checked)});
     try{ await apiJson('/api/paperless/status'); updateStatus('ok','Paperless: Verbindung funktioniert ✓'); toast('Paperless-Verbindung funktioniert ✅'); }
     catch(err){ updateStatus('err','Paperless: Verbindung fehlgeschlagen'); alert('Paperless-Verbindung fehlgeschlagen:\n\n'+err.message); }
+  }
+  async function debugPaperless(){
+    const box=$('paperlessResults');
+    if(box) box.innerHTML='<div class="desktopEmptyState">Paperless-Diagnose läuft…</div>';
+    try{
+      const data=await apiJson('/api/paperless/debug?tag='+encodeURIComponent(serverConfig.paperlessTag||'App'));
+      const tag=data.matchedTag;
+      const tagHtml=tag ? ('<b>Tag gefunden:</b> '+esc(tag.name)+' · ID '+esc(tag.id)+' · Dokumente laut Paperless: '+esc(tag.document_count ?? '–')) : ('<b>Tag nicht gefunden:</b> '+esc(data.paperlessTag||'App'));
+      const latest=(data.latestDocuments||[]).map(d=>'<div class="desktopCorrItem"><div class="desktopCorrMeta"><strong>'+esc(d.title||('Dokument #'+d.id))+'</strong><span>ID '+esc(d.id)+' · Tags: '+esc((d.tagIds||[]).join(', ')||'keine')+'</span></div></div>').join('');
+      const matching=(data.latestMatchingTag||[]).map(d=>'<div class="desktopCorrItem"><div class="desktopCorrMeta"><strong>'+esc(d.title||('Dokument #'+d.id))+'</strong><span>ID '+esc(d.id)+' · Tags: '+esc((d.tagIds||[]).join(', ')||'keine')+'</span></div></div>').join('') || '<div class="desktopEmptyState">Unter den neuesten 10 Dokumenten ist kein Dokument mit diesem Tag.</div>';
+      if(box) box.innerHTML='<div class="paperlessHint">'+tagHtml+'<br>'+esc(data.hint||'')+'</div><h4>Neueste Dokumente mit Tag '+esc(data.paperlessTag||'App')+'</h4>'+matching+'<h4 style="margin-top:12px">Neueste Dokumente allgemein</h4>'+latest;
+    }catch(err){
+      if(box) box.innerHTML='<div class="desktopEmptyState">Diagnose fehlgeschlagen: '+esc(err.message||String(err))+'</div>';
+    }
   }
   async function searchDocs(){
     const box=$('paperlessResults'); if(!box) return;
