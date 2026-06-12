@@ -9111,5 +9111,222 @@ body.force-mobile-view #fabAdd{display:flex !important;}
 })();
 </script>
 
+
+
+<style id="v101-mobile-new-button-style">
+/* v101: „Neu“ auf Handy-/Tablet-Seite dauerhaft sichtbar */
+#v101MobileNewWrap{
+  display:none;
+}
+#v101MobileNewBtn{
+  width:100%;
+  min-height:52px;
+  border-radius:18px;
+  margin:12px 0 14px;
+  padding:0 18px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  font-size:17px;
+  font-weight:900;
+  letter-spacing:-.01em;
+  background:linear-gradient(135deg,#1d56df,#377eff)!important;
+  color:#fff!important;
+  border:1px solid rgba(255,255,255,.13)!important;
+  box-shadow:0 16px 34px rgba(29,86,223,.28)!important;
+}
+#v101MobileNewBtn .v101Plus{
+  width:28px;
+  height:28px;
+  border-radius:10px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  background:rgba(255,255,255,.16);
+  font-size:21px;
+  line-height:1;
+}
+#navAdd span.v101NavLabel{
+  display:block!important;
+  font-size:11px!important;
+  font-weight:900!important;
+  line-height:1!important;
+  margin-top:2px!important;
+}
+body.force-mobile-view #v101MobileNewWrap{
+  display:block!important;
+}
+@media (max-width:1180px){
+  #v101MobileNewWrap{
+    display:block!important;
+  }
+  .mobileBottomNav{
+    display:flex!important;
+    visibility:visible!important;
+    opacity:1!important;
+    pointer-events:auto!important;
+  }
+  #navAdd{
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:center!important;
+    justify-content:center!important;
+    visibility:visible!important;
+    opacity:1!important;
+    pointer-events:auto!important;
+    gap:2px!important;
+  }
+  #fabAdd{
+    display:none!important;
+  }
+  body{
+    padding-bottom:92px!important;
+  }
+  body.dark .container{
+    padding-bottom:112px!important;
+  }
+}
+@media (min-width:1181px){
+  body:not(.force-mobile-view) #v101MobileNewWrap{
+    display:none!important;
+  }
+  body.force-desktop-view #v101MobileNewWrap{
+    display:none!important;
+  }
+}
+</style>
+<script id="v101-mobile-new-button-js">
+(function(){
+  const VERSION='v101';
+  function $(id){ return document.getElementById(id); }
+  function isMobileLike(){
+    try{
+      return document.body.classList.contains('force-mobile-view') ||
+             localStorage.getItem('schulden-view-mode')==='mobile' ||
+             localStorage.getItem('godmode_view')==='mobile' ||
+             window.innerWidth <= 1180;
+    }catch(e){ return window.innerWidth <= 1180; }
+  }
+  function openNewDebt(){
+    try{
+      if(typeof window.openAddModal === 'function'){
+        window.openAddModal();
+        return;
+      }
+      const b=$('btnOpenAdd');
+      if(b) b.click();
+    }catch(e){
+      const b=$('btnOpenAdd');
+      if(b) b.click();
+    }
+  }
+  function bindOpen(btn){
+    if(!btn || btn.dataset.v101NewBound==='1') return;
+    btn.dataset.v101NewBound='1';
+    let last=0;
+    const handler=function(e){
+      const now=Date.now();
+      if(now-last<350){ e.preventDefault(); e.stopPropagation(); return; }
+      last=now;
+      e.preventDefault();
+      e.stopPropagation();
+      openNewDebt();
+    };
+    btn.addEventListener('click', handler, true);
+    btn.addEventListener('touchend', handler, {capture:true, passive:false});
+    btn.addEventListener('pointerup', handler, true);
+  }
+  function ensureMobileNewButton(){
+    const board=$('debtListSection');
+    if(!board) return;
+    let wrap=$('v101MobileNewWrap');
+    if(!wrap){
+      wrap=document.createElement('div');
+      wrap.id='v101MobileNewWrap';
+      wrap.innerHTML='<button id="v101MobileNewBtn" type="button" aria-label="Neue Schulden"><span class="v101Plus">＋</span><span>Neu</span></button>';
+      const toolbar=board.querySelector('.boardToolbar');
+      if(toolbar && toolbar.parentNode){
+        toolbar.insertAdjacentElement('afterend', wrap);
+      }else{
+        board.insertBefore(wrap, board.firstChild);
+      }
+    }
+    bindOpen($('v101MobileNewBtn'));
+    wrap.style.setProperty('display', isMobileLike() ? 'block' : 'none', 'important');
+  }
+  function ensureBottomNavNew(){
+    let nav=document.querySelector('.mobileBottomNav');
+    if(!nav){
+      nav=document.createElement('nav');
+      nav.className='mobileBottomNav';
+      nav.setAttribute('aria-label','Navigation');
+      nav.innerHTML='<button id="navHome" class="navBtn" type="button" data-action="home">🏠<span>Home</span></button><button id="navStats" class="navBtn" type="button" data-action="stats">📊<span>Stats</span></button><button id="navAdd" class="navBtn navPlus" type="button" data-action="add" aria-label="Neue Schulden" title="Neue Schulden">＋<span class="v101NavLabel">Neu</span></button>';
+      document.body.appendChild(nav);
+    }
+    let add=$('navAdd');
+    if(!add){
+      add=document.createElement('button');
+      add.id='navAdd';
+      add.className='navBtn navPlus';
+      add.type='button';
+      add.dataset.action='add';
+      add.setAttribute('aria-label','Neue Schulden');
+      add.title='Neue Schulden';
+      add.innerHTML='＋<span class="v101NavLabel">Neu</span>';
+      const kids=[...nav.children];
+      if(kids.length>=2) nav.insertBefore(add,kids[2]); else nav.appendChild(add);
+    }else if(!add.querySelector('.v101NavLabel')){
+      add.innerHTML='＋<span class="v101NavLabel">Neu</span>';
+      add.setAttribute('aria-label','Neue Schulden');
+      add.title='Neue Schulden';
+    }
+    bindOpen(add);
+    nav.style.setProperty('display', isMobileLike() ? 'flex' : 'none', 'important');
+    nav.style.setProperty('visibility','visible','important');
+    nav.style.setProperty('opacity','1','important');
+    nav.style.setProperty('pointer-events','auto','important');
+    add.style.setProperty('display','flex','important');
+    add.style.setProperty('visibility','visible','important');
+    add.style.setProperty('opacity','1','important');
+    add.style.setProperty('pointer-events','auto','important');
+  }
+  function setVersion(){
+    try{
+      document.querySelectorAll('.v59MenuVersion').forEach(el=>el.textContent=VERSION);
+      ['v98OnlyVersion','v76OnlyVersion'].forEach(id=>{ const el=$(id); if(el) el.textContent=VERSION; });
+      const bottom=document.querySelector('.sidebarBottom');
+      if(bottom && !$('v101OnlyVersion')){
+        const box=document.createElement('div');
+        box.id='v101OnlyVersion';
+        box.textContent=VERSION;
+        box.style.cssText='margin:10px 8px 0;padding:6px 0 0;text-align:center;color:#eaf2ff;font-size:12px;font-weight:900;letter-spacing:.05em;';
+        bottom.appendChild(box);
+      }
+      const box=$('v101OnlyVersion'); if(box) box.textContent=VERSION;
+    }catch(e){}
+  }
+  function fix(){
+    ensureMobileNewButton();
+    ensureBottomNavNew();
+    bindOpen($('btnOpenAdd'));
+    bindOpen($('fabAdd'));
+    setVersion();
+  }
+  const oldRender=window.render;
+  if(typeof oldRender==='function' && !oldRender.__v101MobileNew){
+    const wrapped=function(){ const r=oldRender.apply(this,arguments); setTimeout(fix,0); setTimeout(fix,100); return r; };
+    wrapped.__v101MobileNew=true;
+    window.render=wrapped;
+    try{ render=wrapped; }catch(e){}
+  }
+  document.addEventListener('DOMContentLoaded',()=>{ fix(); setTimeout(fix,250); setTimeout(fix,1000); });
+  window.addEventListener('load',()=>{ fix(); setTimeout(fix,500); });
+  window.addEventListener('resize',()=>setTimeout(fix,80));
+  setInterval(fix,1500);
+  fix();
+})();
+</script>
+
 </body>
 </html>

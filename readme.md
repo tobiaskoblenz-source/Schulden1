@@ -1,1 +1,1 @@
-Schulden v100 - Kategorie-Dropdown in der Desktop-Neu-Schulden-Maske repariert. Paperless bleibt Desktop, Handy-Seite nicht umgebaut.
+Schulden v101 - Neu-Button auf Handy-/Tablet-Seite wieder sichtbar und stabil klickbar. Basis: v100.
