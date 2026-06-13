@@ -1,3 +1,3 @@
-Schulden Manager v103
+Schulden Manager v104
 
-Fix: Handy-/Tablet-Menü ohne Flackern. Alte konkurrierende Plus-/Menü-Fixes wurden deaktiviert.
+Fix: Auf Handy/Tablet ist der Button "Schulden speichern" im Neu-Formular wieder erreichbar. Die untere Leiste wird beim geöffneten Modal ausgeblendet.
