@@ -9328,5 +9328,149 @@ body.force-mobile-view #v101MobileNewWrap{
 })();
 </script>
 
+
+<style id="v102-mobile-bottom-nav-fit-style">
+/* v102: Mobile/Tablet-Untermenü passend machen – kein doppeltes Plus, kompakte Leiste */
+@media (max-width:1180px){
+  #fabAdd,
+  body.force-mobile-view #fabAdd,
+  body:not(.force-desktop-view) #fabAdd{
+    display:none !important;
+    visibility:hidden !important;
+    opacity:0 !important;
+    pointer-events:none !important;
+  }
+  .mobileBottomNav,
+  body.force-mobile-view .mobileBottomNav,
+  body:not(.force-desktop-view) .mobileBottomNav{
+    display:grid !important;
+    grid-template-columns:repeat(3, minmax(0,1fr)) !important;
+    align-items:center !important;
+    gap:8px !important;
+    left:12px !important;
+    right:12px !important;
+    width:auto !important;
+    min-height:72px !important;
+    padding:10px !important;
+    border-radius:24px !important;
+    transform:none !important;
+    bottom:12px !important;
+    z-index:2147483000 !important;
+  }
+  .mobileBottomNav #navBackup,
+  .mobileBottomNav #navRestore{
+    display:none !important;
+  }
+  .mobileBottomNav .navBtn{
+    width:100% !important;
+    min-width:0 !important;
+    height:52px !important;
+    padding:0 6px !important;
+    border-radius:18px !important;
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:center !important;
+    justify-content:center !important;
+    gap:2px !important;
+    font-size:18px !important;
+    box-shadow:none !important;
+  }
+  .mobileBottomNav .navBtn span{
+    font-size:11px !important;
+    line-height:1.05 !important;
+    white-space:nowrap !important;
+  }
+  .mobileBottomNav #navAdd{
+    background:linear-gradient(135deg,#4f8cff,#7c71ff) !important;
+    color:#fff !important;
+  }
+  body{ padding-bottom:96px !important; }
+  body.dark .container{ padding-bottom:116px !important; }
+}
+@media (max-width:430px){
+  .mobileBottomNav,
+  body.force-mobile-view .mobileBottomNav,
+  body:not(.force-desktop-view) .mobileBottomNav{
+    left:10px !important;
+    right:10px !important;
+    bottom:10px !important;
+    gap:6px !important;
+    padding:8px !important;
+  }
+  .mobileBottomNav .navBtn{
+    height:50px !important;
+    border-radius:16px !important;
+    font-size:17px !important;
+  }
+  .mobileBottomNav .navBtn span{font-size:10px !important;}
+}
+</style>
+<script id="v102-mobile-bottom-nav-fit-js">
+(function(){
+  const VERSION='v102';
+  function $(id){ return document.getElementById(id); }
+  function isMobileLike(){
+    try{
+      return document.body.classList.contains('force-mobile-view') ||
+        localStorage.getItem('schulden-view-mode')==='mobile' ||
+        localStorage.getItem('godmode_view')==='mobile' ||
+        window.innerWidth <= 1180;
+    }catch(e){ return window.innerWidth <= 1180; }
+  }
+  function openAdd(){
+    if(typeof window.openAddModal==='function') return window.openAddModal();
+    $('btnOpenAdd')?.click();
+  }
+  function scrollStats(){ $('statsCard')?.scrollIntoView({behavior:'smooth', block:'start'}); }
+  function scrollHome(){ window.scrollTo({top:0, behavior:'smooth'}); }
+  function ensureCompactNav(){
+    let nav=document.querySelector('.mobileBottomNav');
+    if(!nav){
+      nav=document.createElement('nav');
+      nav.className='mobileBottomNav';
+      nav.setAttribute('aria-label','Navigation');
+      document.body.appendChild(nav);
+    }
+    nav.innerHTML=''
+      + '<button id="navHome" class="navBtn" type="button" aria-label="Übersicht" title="Übersicht">🏠<span>Home</span></button>'
+      + '<button id="navStats" class="navBtn" type="button" aria-label="Statistik" title="Statistik">📊<span>Stats</span></button>'
+      + '<button id="navAdd" class="navBtn navPlus" type="button" aria-label="Neue Schulden" title="Neue Schulden">＋<span>Neu</span></button>';
+    $('navHome')?.addEventListener('click', scrollHome, {passive:true});
+    $('navStats')?.addEventListener('click', scrollStats, {passive:true});
+    ['click','touchend','pointerup'].forEach(ev=> $('navAdd')?.addEventListener(ev, function(e){ e.preventDefault(); e.stopPropagation(); openAdd(); }, {capture:true, passive:false}));
+    nav.style.setProperty('display', isMobileLike() ? 'grid' : 'none', 'important');
+  }
+  function hideFab(){
+    const fab=$('fabAdd');
+    if(!fab) return;
+    fab.style.setProperty('display','none','important');
+    fab.style.setProperty('visibility','hidden','important');
+    fab.style.setProperty('opacity','0','important');
+    fab.style.setProperty('pointer-events','none','important');
+  }
+  function setVersion(){
+    document.querySelectorAll('.v59MenuVersion').forEach(el=>el.textContent=VERSION);
+    ['v98OnlyVersion','v76OnlyVersion','v101OnlyVersion'].forEach(id=>{ const el=$(id); if(el) el.textContent=VERSION; });
+  }
+  function fix(){
+    ensureCompactNav();
+    hideFab();
+    setVersion();
+  }
+  const oldRender=window.render;
+  if(typeof oldRender==='function' && !oldRender.__v102CompactNav){
+    const wrapped=function(){ const r=oldRender.apply(this,arguments); setTimeout(fix,0); setTimeout(fix,120); return r; };
+    wrapped.__v102CompactNav=true;
+    window.render=wrapped;
+    try{ render=wrapped; }catch(e){}
+  }
+  document.addEventListener('DOMContentLoaded', ()=>{ fix(); setTimeout(fix,250); setTimeout(fix,800); });
+  window.addEventListener('load', ()=>{ fix(); setTimeout(fix,500); });
+  window.addEventListener('resize', ()=>setTimeout(fix,80));
+  setInterval(fix, 1500);
+  fix();
+})();
+</script>
+
 </body>
 </html>
