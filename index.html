@@ -8876,98 +8876,7 @@ body.force-mobile-view #fabAdd{display:flex !important;}
   }
 }
 </style>
-<script id="v98-mobile-plus-fix-js">
-(function(){
-  const VERSION='v99';
-  function $(id){return document.getElementById(id);}
-  function isMobileView(){
-    try{
-      return document.body.classList.contains('force-mobile-view') || localStorage.getItem('schulden-view-mode')==='mobile' || localStorage.getItem('godmode_view')==='mobile' || window.innerWidth<=1120;
-    }catch(e){return window.innerWidth<=1120;}
-  }
-  function callOpenAdd(){
-    try{
-      if(typeof window.openAddModal==='function') return window.openAddModal();
-      const btn=$('btnOpenAdd'); if(btn) return btn.click();
-    }catch(e){ console.error(e); }
-  }
-  function ensureNav(){
-    let nav=document.querySelector('.mobileBottomNav');
-    if(!nav){
-      nav=document.createElement('nav');
-      nav.className='mobileBottomNav';
-      nav.setAttribute('aria-label','Navigation');
-      nav.innerHTML='<button id="navHome" class="navBtn" type="button" data-action="home" aria-label="Übersicht" title="Übersicht">🏠<span>Home</span></button><button id="navStats" class="navBtn" type="button" data-action="stats" aria-label="Statistik" title="Statistik">📊<span>Stats</span></button><button id="navAdd" class="navBtn navPlus" type="button" data-action="add" aria-label="Neue Schuld" title="Neue Schuld">＋</button><button id="navBackup" class="navBtn" type="button" data-action="backup" aria-label="Backup" title="Backup">💾<span>Backup</span></button><button id="navRestore" class="navBtn" type="button" data-action="restore" aria-label="Restore" title="Restore">📂<span>Restore</span></button>';
-      document.body.appendChild(nav);
-    }
-    if(!$('navAdd')){
-      const add=document.createElement('button');
-      add.id='navAdd'; add.className='navBtn navPlus'; add.type='button'; add.dataset.action='add'; add.title='Neue Schuld'; add.setAttribute('aria-label','Neue Schuld'); add.textContent='＋';
-      const kids=[...nav.children];
-      if(kids.length>=2) nav.insertBefore(add,kids[2]); else nav.appendChild(add);
-    }
-    return nav;
-  }
-  function bind(btn){
-    if(!btn || btn.dataset.v98Plus==='1') return;
-    btn.dataset.v98Plus='1';
-    ['click','touchend','pointerup'].forEach(type=>{
-      btn.addEventListener(type,(e)=>{e.preventDefault();e.stopPropagation();callOpenAdd();},true);
-    });
-  }
-  function fix(){
-    try{
-      const nav=ensureNav();
-      const mobile=isMobileView();
-      if(nav){
-        nav.style.setProperty('visibility','visible','important');
-        nav.style.setProperty('opacity','1','important');
-        nav.style.setProperty('pointer-events','auto','important');
-        nav.style.setProperty('display', mobile ? 'flex':'none', 'important');
-      }
-      const add=$('navAdd');
-      if(add){
-        add.textContent='＋'; add.title='Neue Schuld'; add.setAttribute('aria-label','Neue Schuld');
-        add.style.setProperty('display','flex','important');
-        add.style.setProperty('visibility','visible','important');
-        add.style.setProperty('opacity','1','important');
-        add.style.setProperty('pointer-events','auto','important');
-        bind(add);
-      }
-      const fab=$('fabAdd');
-      if(fab){
-        fab.textContent='＋'; fab.title='Neue Schuld'; fab.setAttribute('aria-label','Neue Schuld');
-        fab.style.setProperty('display', mobile ? 'flex':'none', 'important');
-        fab.style.setProperty('visibility','visible','important');
-        fab.style.setProperty('opacity','1','important');
-        fab.style.setProperty('pointer-events','auto','important');
-        bind(fab);
-      }
-      bind($('btnOpenAdd'));
-      const bottom=document.querySelector('.sidebarBottom');
-      if(bottom){
-        let box=$('v98OnlyVersion');
-        if(!box){ box=document.createElement('div'); box.id='v98OnlyVersion'; bottom.appendChild(box); }
-        box.textContent=VERSION;
-        document.querySelectorAll('#v76OnlyVersion').forEach(el=>{ if(el!==box) el.remove(); });
-      }
-    }catch(e){console.error('v99 mobile plus fix', e);}
-  }
-  const prevRender=window.render;
-  if(typeof prevRender==='function' && !prevRender.__v98PlusFix){
-    const wrapped=function(){ const r=prevRender.apply(this,arguments); setTimeout(fix,0); setTimeout(fix,80); return r; };
-    wrapped.__v98PlusFix=true; window.render=wrapped;
-  }
-  window.addEventListener('load',()=>{fix(); setTimeout(fix,250);});
-  window.addEventListener('resize',()=>setTimeout(fix,50));
-  document.addEventListener('DOMContentLoaded',fix);
-  setInterval(fix,1500);
-  fix();
-})();
-</script>
-
-
-
+<script id="v98-mobile-plus-fix-js-disabled">/* disabled in v103: conflicting mobile plus interval removed */</script>
 <style id="v99-category-fix-style">
 /* v99: Kategorie beim Desktop-Neuanlegen stabil anzeigen. Handy-Seite bleibt ohne Paperless und ohne Umbau. */
 </style>
@@ -9048,7 +8957,7 @@ body.force-mobile-view #fabAdd{display:flex !important;}
 </style>
 <script id="v100-category-dropdown-fix-js">
 (function(){
-  const VERSION='v100';
+  const VERSION='v103';
   const CAT_KEY='schulden_creditor_categories_v56';
   const CRED_KEY='schulden_creditors_v37';
   const DEFAULT_CATS=['Krankenkasse','Amt / Behörde','Gericht','Inkasso','Versicherung','Privatperson','Sonstiges'];
@@ -9196,139 +9105,7 @@ body.force-mobile-view #v101MobileNewWrap{
   }
 }
 </style>
-<script id="v101-mobile-new-button-js">
-(function(){
-  const VERSION='v101';
-  function $(id){ return document.getElementById(id); }
-  function isMobileLike(){
-    try{
-      return document.body.classList.contains('force-mobile-view') ||
-             localStorage.getItem('schulden-view-mode')==='mobile' ||
-             localStorage.getItem('godmode_view')==='mobile' ||
-             window.innerWidth <= 1180;
-    }catch(e){ return window.innerWidth <= 1180; }
-  }
-  function openNewDebt(){
-    try{
-      if(typeof window.openAddModal === 'function'){
-        window.openAddModal();
-        return;
-      }
-      const b=$('btnOpenAdd');
-      if(b) b.click();
-    }catch(e){
-      const b=$('btnOpenAdd');
-      if(b) b.click();
-    }
-  }
-  function bindOpen(btn){
-    if(!btn || btn.dataset.v101NewBound==='1') return;
-    btn.dataset.v101NewBound='1';
-    let last=0;
-    const handler=function(e){
-      const now=Date.now();
-      if(now-last<350){ e.preventDefault(); e.stopPropagation(); return; }
-      last=now;
-      e.preventDefault();
-      e.stopPropagation();
-      openNewDebt();
-    };
-    btn.addEventListener('click', handler, true);
-    btn.addEventListener('touchend', handler, {capture:true, passive:false});
-    btn.addEventListener('pointerup', handler, true);
-  }
-  function ensureMobileNewButton(){
-    const board=$('debtListSection');
-    if(!board) return;
-    let wrap=$('v101MobileNewWrap');
-    if(!wrap){
-      wrap=document.createElement('div');
-      wrap.id='v101MobileNewWrap';
-      wrap.innerHTML='<button id="v101MobileNewBtn" type="button" aria-label="Neue Schulden"><span class="v101Plus">＋</span><span>Neu</span></button>';
-      const toolbar=board.querySelector('.boardToolbar');
-      if(toolbar && toolbar.parentNode){
-        toolbar.insertAdjacentElement('afterend', wrap);
-      }else{
-        board.insertBefore(wrap, board.firstChild);
-      }
-    }
-    bindOpen($('v101MobileNewBtn'));
-    wrap.style.setProperty('display', isMobileLike() ? 'block' : 'none', 'important');
-  }
-  function ensureBottomNavNew(){
-    let nav=document.querySelector('.mobileBottomNav');
-    if(!nav){
-      nav=document.createElement('nav');
-      nav.className='mobileBottomNav';
-      nav.setAttribute('aria-label','Navigation');
-      nav.innerHTML='<button id="navHome" class="navBtn" type="button" data-action="home">🏠<span>Home</span></button><button id="navStats" class="navBtn" type="button" data-action="stats">📊<span>Stats</span></button><button id="navAdd" class="navBtn navPlus" type="button" data-action="add" aria-label="Neue Schulden" title="Neue Schulden">＋<span class="v101NavLabel">Neu</span></button>';
-      document.body.appendChild(nav);
-    }
-    let add=$('navAdd');
-    if(!add){
-      add=document.createElement('button');
-      add.id='navAdd';
-      add.className='navBtn navPlus';
-      add.type='button';
-      add.dataset.action='add';
-      add.setAttribute('aria-label','Neue Schulden');
-      add.title='Neue Schulden';
-      add.innerHTML='＋<span class="v101NavLabel">Neu</span>';
-      const kids=[...nav.children];
-      if(kids.length>=2) nav.insertBefore(add,kids[2]); else nav.appendChild(add);
-    }else if(!add.querySelector('.v101NavLabel')){
-      add.innerHTML='＋<span class="v101NavLabel">Neu</span>';
-      add.setAttribute('aria-label','Neue Schulden');
-      add.title='Neue Schulden';
-    }
-    bindOpen(add);
-    nav.style.setProperty('display', isMobileLike() ? 'flex' : 'none', 'important');
-    nav.style.setProperty('visibility','visible','important');
-    nav.style.setProperty('opacity','1','important');
-    nav.style.setProperty('pointer-events','auto','important');
-    add.style.setProperty('display','flex','important');
-    add.style.setProperty('visibility','visible','important');
-    add.style.setProperty('opacity','1','important');
-    add.style.setProperty('pointer-events','auto','important');
-  }
-  function setVersion(){
-    try{
-      document.querySelectorAll('.v59MenuVersion').forEach(el=>el.textContent=VERSION);
-      ['v98OnlyVersion','v76OnlyVersion'].forEach(id=>{ const el=$(id); if(el) el.textContent=VERSION; });
-      const bottom=document.querySelector('.sidebarBottom');
-      if(bottom && !$('v101OnlyVersion')){
-        const box=document.createElement('div');
-        box.id='v101OnlyVersion';
-        box.textContent=VERSION;
-        box.style.cssText='margin:10px 8px 0;padding:6px 0 0;text-align:center;color:#eaf2ff;font-size:12px;font-weight:900;letter-spacing:.05em;';
-        bottom.appendChild(box);
-      }
-      const box=$('v101OnlyVersion'); if(box) box.textContent=VERSION;
-    }catch(e){}
-  }
-  function fix(){
-    ensureMobileNewButton();
-    ensureBottomNavNew();
-    bindOpen($('btnOpenAdd'));
-    bindOpen($('fabAdd'));
-    setVersion();
-  }
-  const oldRender=window.render;
-  if(typeof oldRender==='function' && !oldRender.__v101MobileNew){
-    const wrapped=function(){ const r=oldRender.apply(this,arguments); setTimeout(fix,0); setTimeout(fix,100); return r; };
-    wrapped.__v101MobileNew=true;
-    window.render=wrapped;
-    try{ render=wrapped; }catch(e){}
-  }
-  document.addEventListener('DOMContentLoaded',()=>{ fix(); setTimeout(fix,250); setTimeout(fix,1000); });
-  window.addEventListener('load',()=>{ fix(); setTimeout(fix,500); });
-  window.addEventListener('resize',()=>setTimeout(fix,80));
-  setInterval(fix,1500);
-  fix();
-})();
-</script>
-
-
+<script id="v101-mobile-new-button-js-disabled">/* disabled in v103: replaced by stable mobile nav */</script>
 <style id="v102-mobile-bottom-nav-fit-style">
 /* v102: Mobile/Tablet-Untermenü passend machen – kein doppeltes Plus, kompakte Leiste */
 @media (max-width:1180px){
@@ -9405,70 +9182,243 @@ body.force-mobile-view #v101MobileNewWrap{
   .mobileBottomNav .navBtn span{font-size:10px !important;}
 }
 </style>
-<script id="v102-mobile-bottom-nav-fit-js">
+<script id="v102-mobile-bottom-nav-fit-js-disabled">/* disabled in v103: replaced by non-flicker stable nav */</script>
+
+<style id="v103-mobile-nav-no-flicker-style">
+/* v103: Handy-/Tablet-Menü stabil ohne Flackern */
+@media (max-width:1180px){
+  #fabAdd,
+  body.force-mobile-view #fabAdd,
+  body:not(.force-desktop-view) #fabAdd{
+    display:none !important;
+    visibility:hidden !important;
+    opacity:0 !important;
+    pointer-events:none !important;
+  }
+
+  .mobileBottomNav,
+  body.force-mobile-view .mobileBottomNav,
+  body:not(.force-desktop-view) .mobileBottomNav{
+    display:grid !important;
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+    align-items:center !important;
+    gap:8px !important;
+    position:fixed !important;
+    left:12px !important;
+    right:12px !important;
+    bottom:12px !important;
+    width:auto !important;
+    min-width:0 !important;
+    max-width:none !important;
+    min-height:70px !important;
+    padding:9px 10px !important;
+    border-radius:24px !important;
+    transform:none !important;
+    z-index:2147483000 !important;
+    overflow:hidden !important;
+    contain:layout paint !important;
+    will-change:auto !important;
+  }
+
+  .mobileBottomNav #navBackup,
+  .mobileBottomNav #navRestore,
+  .mobileBottomNav [data-action="backup"],
+  .mobileBottomNav [data-action="restore"]{
+    display:none !important;
+  }
+
+  .mobileBottomNav .navBtn{
+    width:100% !important;
+    min-width:0 !important;
+    max-width:100% !important;
+    height:52px !important;
+    min-height:52px !important;
+    padding:0 6px !important;
+    border-radius:18px !important;
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:center !important;
+    justify-content:center !important;
+    gap:2px !important;
+    font-size:18px !important;
+    line-height:1 !important;
+    box-shadow:none !important;
+    transform:none !important;
+  }
+
+  .mobileBottomNav .navBtn:hover,
+  .mobileBottomNav .navBtn:active{
+    transform:none !important;
+  }
+
+  .mobileBottomNav .navBtn span{
+    display:block !important;
+    font-size:11px !important;
+    font-weight:800 !important;
+    line-height:1.05 !important;
+    white-space:nowrap !important;
+  }
+
+  .mobileBottomNav #navAdd{
+    background:linear-gradient(135deg,#4f8cff,#7c71ff) !important;
+    color:#fff !important;
+  }
+
+  body{padding-bottom:96px !important;}
+  body.dark .container{padding-bottom:116px !important;}
+}
+
+@media (min-width:1181px){
+  body:not(.force-mobile-view) .mobileBottomNav,
+  body.force-desktop-view .mobileBottomNav,
+  body.force-desktop-view #fabAdd{
+    display:none !important;
+  }
+}
+
+@media (max-width:430px){
+  .mobileBottomNav,
+  body.force-mobile-view .mobileBottomNav,
+  body:not(.force-desktop-view) .mobileBottomNav{
+    left:10px !important;
+    right:10px !important;
+    bottom:10px !important;
+    gap:6px !important;
+    padding:8px !important;
+    min-height:66px !important;
+    border-radius:22px !important;
+  }
+  .mobileBottomNav .navBtn{
+    height:50px !important;
+    min-height:50px !important;
+    border-radius:16px !important;
+    font-size:17px !important;
+  }
+  .mobileBottomNav .navBtn span{font-size:10px !important;}
+}
+</style>
+
+<script id="v103-mobile-nav-no-flicker-js">
 (function(){
-  const VERSION='v102';
+  const VERSION = 'v103';
+  let navReady = false;
+
   function $(id){ return document.getElementById(id); }
+
   function isMobileLike(){
     try{
       return document.body.classList.contains('force-mobile-view') ||
-        localStorage.getItem('schulden-view-mode')==='mobile' ||
-        localStorage.getItem('godmode_view')==='mobile' ||
+        localStorage.getItem('schulden-view-mode') === 'mobile' ||
+        localStorage.getItem('godmode_view') === 'mobile' ||
         window.innerWidth <= 1180;
-    }catch(e){ return window.innerWidth <= 1180; }
+    }catch(e){
+      return window.innerWidth <= 1180;
+    }
   }
+
   function openAdd(){
-    if(typeof window.openAddModal==='function') return window.openAddModal();
-    $('btnOpenAdd')?.click();
+    try{
+      if(typeof window.openAddModal === 'function'){
+        window.openAddModal();
+        return;
+      }
+    }catch(e){}
+    try{ $('btnOpenAdd')?.click(); }catch(e){}
   }
-  function scrollStats(){ $('statsCard')?.scrollIntoView({behavior:'smooth', block:'start'}); }
-  function scrollHome(){ window.scrollTo({top:0, behavior:'smooth'}); }
-  function ensureCompactNav(){
-    let nav=document.querySelector('.mobileBottomNav');
+
+  function scrollHome(){
+    try{ window.scrollTo({top:0, behavior:'smooth'}); }
+    catch(e){ window.scrollTo(0,0); }
+  }
+
+  function scrollStats(){
+    try{ $('statsCard')?.scrollIntoView({behavior:'smooth', block:'start'}); }
+    catch(e){ $('statsCard')?.scrollIntoView(); }
+  }
+
+  function makeButton(id, icon, label, title){
+    const b = document.createElement('button');
+    b.id = id;
+    b.className = 'navBtn' + (id === 'navAdd' ? ' navPlus' : '');
+    b.type = 'button';
+    b.setAttribute('aria-label', title);
+    b.title = title;
+    b.innerHTML = icon + '<span>' + label + '</span>';
+    return b;
+  }
+
+  function buildNavOnce(){
+    let nav = document.querySelector('.mobileBottomNav');
     if(!nav){
-      nav=document.createElement('nav');
-      nav.className='mobileBottomNav';
+      nav = document.createElement('nav');
+      nav.className = 'mobileBottomNav';
       nav.setAttribute('aria-label','Navigation');
       document.body.appendChild(nav);
     }
-    nav.innerHTML=''
-      + '<button id="navHome" class="navBtn" type="button" aria-label="Übersicht" title="Übersicht">🏠<span>Home</span></button>'
-      + '<button id="navStats" class="navBtn" type="button" aria-label="Statistik" title="Statistik">📊<span>Stats</span></button>'
-      + '<button id="navAdd" class="navBtn navPlus" type="button" aria-label="Neue Schulden" title="Neue Schulden">＋<span>Neu</span></button>';
-    $('navHome')?.addEventListener('click', scrollHome, {passive:true});
-    $('navStats')?.addEventListener('click', scrollStats, {passive:true});
-    ['click','touchend','pointerup'].forEach(ev=> $('navAdd')?.addEventListener(ev, function(e){ e.preventDefault(); e.stopPropagation(); openAdd(); }, {capture:true, passive:false}));
-    nav.style.setProperty('display', isMobileLike() ? 'grid' : 'none', 'important');
+
+    if(nav.dataset.v103Stable !== '1'){
+      nav.innerHTML = '';
+      nav.appendChild(makeButton('navHome','⌂','Start','Übersicht'));
+      nav.appendChild(makeButton('navStats','◔','Stats','Statistiken'));
+      nav.appendChild(makeButton('navAdd','＋','Neu','Neue Schulden'));
+      nav.dataset.v103Stable = '1';
+      navReady = true;
+
+      $('navHome')?.addEventListener('click', scrollHome);
+      $('navStats')?.addEventListener('click', scrollStats);
+      const add = $('navAdd');
+      if(add){
+        const handler = function(e){
+          e.preventDefault();
+          e.stopPropagation();
+          openAdd();
+        };
+        add.addEventListener('click', handler, true);
+        add.addEventListener('touchend', handler, {capture:true, passive:false});
+      }
+    }
+
+    return nav;
   }
-  function hideFab(){
-    const fab=$('fabAdd');
-    if(!fab) return;
-    fab.style.setProperty('display','none','important');
-    fab.style.setProperty('visibility','hidden','important');
-    fab.style.setProperty('opacity','0','important');
-    fab.style.setProperty('pointer-events','none','important');
+
+  function applyDisplayOnly(){
+    const nav = buildNavOnce();
+    if(nav){
+      nav.style.setProperty('display', isMobileLike() ? 'grid' : 'none', 'important');
+    }
+
+    const fab = $('fabAdd');
+    if(fab){
+      fab.style.setProperty('display','none','important');
+      fab.style.setProperty('visibility','hidden','important');
+      fab.style.setProperty('opacity','0','important');
+      fab.style.setProperty('pointer-events','none','important');
+    }
+
+    document.querySelectorAll('.v59MenuVersion').forEach(el => el.textContent = VERSION);
+    ['v98OnlyVersion','v76OnlyVersion','v101OnlyVersion'].forEach(id => {
+      const el = $(id);
+      if(el) el.textContent = VERSION;
+    });
   }
-  function setVersion(){
-    document.querySelectorAll('.v59MenuVersion').forEach(el=>el.textContent=VERSION);
-    ['v98OnlyVersion','v76OnlyVersion','v101OnlyVersion'].forEach(id=>{ const el=$(id); if(el) el.textContent=VERSION; });
+
+  // Never rebuild on render. Only re-apply display state.
+  const oldRender = window.render;
+  if(typeof oldRender === 'function' && !oldRender.__v103NoFlickerNav){
+    const wrapped = function(){
+      const r = oldRender.apply(this, arguments);
+      requestAnimationFrame(applyDisplayOnly);
+      return r;
+    };
+    wrapped.__v103NoFlickerNav = true;
+    window.render = wrapped;
+    try{ render = wrapped; }catch(e){}
   }
-  function fix(){
-    ensureCompactNav();
-    hideFab();
-    setVersion();
-  }
-  const oldRender=window.render;
-  if(typeof oldRender==='function' && !oldRender.__v102CompactNav){
-    const wrapped=function(){ const r=oldRender.apply(this,arguments); setTimeout(fix,0); setTimeout(fix,120); return r; };
-    wrapped.__v102CompactNav=true;
-    window.render=wrapped;
-    try{ render=wrapped; }catch(e){}
-  }
-  document.addEventListener('DOMContentLoaded', ()=>{ fix(); setTimeout(fix,250); setTimeout(fix,800); });
-  window.addEventListener('load', ()=>{ fix(); setTimeout(fix,500); });
-  window.addEventListener('resize', ()=>setTimeout(fix,80));
-  setInterval(fix, 1500);
-  fix();
+
+  document.addEventListener('DOMContentLoaded', applyDisplayOnly);
+  window.addEventListener('load', applyDisplayOnly);
+  window.addEventListener('resize', function(){ requestAnimationFrame(applyDisplayOnly); });
+  applyDisplayOnly();
 })();
 </script>
 
