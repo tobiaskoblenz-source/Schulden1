@@ -9977,5 +9977,191 @@ body.v105EditOpen #fabAdd{display:none!important}
 })();
 </script>
 
+
+<style id="v106-mobile-edit-button-style">
+/* v106: Bearbeiten-Button auf Handy/Tablet sicher sichtbar */
+#mobileList .mobileCard{
+  position:relative !important;
+}
+.v106MobileEditTop{
+  width:100% !important;
+  min-height:44px !important;
+  margin:12px 0 0 !important;
+  border-radius:14px !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:8px !important;
+  background:linear-gradient(135deg,#2563eb,#7c71ff) !important;
+  color:#fff !important;
+  border:1px solid rgba(255,255,255,.12) !important;
+  box-shadow:none !important;
+  font-size:14px !important;
+  font-weight:900 !important;
+}
+.v106MobileEditTop:active,
+.v106MobileEditTop:hover{
+  transform:none !important;
+}
+@media (max-width:1180px){
+  #mobileList .mobileCard .v106MobileEditTop{
+    display:flex !important;
+    visibility:visible !important;
+    opacity:1 !important;
+    pointer-events:auto !important;
+  }
+}
+@media (min-width:1181px){
+  body:not(.force-mobile-view) #mobileList .mobileCard .v106MobileEditTop{
+    display:none !important;
+  }
+}
+</style>
+
+<script id="v106-mobile-edit-button-js">
+(function(){
+  const VERSION = 'v106';
+
+  function $(id){ return document.getElementById(id); }
+
+  function getDebts(){
+    try{ if(Array.isArray(debts)) return debts; }catch(e){}
+    try{ if(Array.isArray(window.debts)) return window.debts; }catch(e){}
+    return [];
+  }
+
+  function visibleIndices(){
+    const list = getDebts();
+    const s = String($('search')?.value || '').toLowerCase();
+    const out = [];
+    list.forEach((d,i)=>{
+      try{
+        if(s && !JSON.stringify(d || {}).toLowerCase().includes(s)) return;
+      }catch(e){}
+      out.push(i);
+    });
+    return out;
+  }
+
+  function openEdit(i){
+    const old = document.querySelector('[data-v105-edit][data-index="'+i+'"]');
+    if(old){
+      old.click();
+      return;
+    }
+
+    // Fallback: öffnet das v105-Bearbeitungsfenster direkt, falls der alte Button noch nicht injiziert wurde.
+    try{
+      const overlay = $('v105EditOverlay');
+      const list = getDebts();
+      const d = list[i];
+      if(!overlay || !d) return;
+
+      function val(id, v){ const el=$(id); if(el) el.value = v == null ? '' : String(v); }
+      const c = (d.contactDetails && typeof d.contactDetails === 'object') ? d.contactDetails : {};
+      val('v105Name', d.name || '');
+      val('v105Reason', d.grund || d.reason || '');
+      val('v105Amount', String(Math.round((Number(d.betrag || d.amount || 0))*100)/100));
+      val('v105Date', d.datum || d.date || '');
+      val('v105Case', d.aktenzeichen || d.caseNumber || '');
+      val('v105Category', d.category || d.kategorie || 'Sonstiges');
+      val('v105Status', d.status || 'offen');
+      val('v105ContactName', c.representative || d.contactPerson || '');
+      val('v105ContactPhone', c.phone || '');
+      val('v105ContactEmail', c.email || '');
+      val('v105ContactAddress', c.address || '');
+
+      overlay.classList.add('show');
+      overlay.setAttribute('aria-hidden','false');
+      document.body.classList.add('modalOpen','v105EditOpen');
+    }catch(e){
+      console.error('v106 open edit fallback', e);
+    }
+  }
+
+  function makeMobileEditButton(i){
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'v106MobileEditTop';
+    b.setAttribute('data-v106-mobile-edit','1');
+    b.setAttribute('data-index', String(i));
+    b.innerHTML = '<span>✎</span><span>Bearbeiten</span>';
+    b.addEventListener('click', function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      openEdit(i);
+    }, true);
+    b.addEventListener('touchend', function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      openEdit(i);
+    }, {capture:true, passive:false});
+    return b;
+  }
+
+  function injectMobileEditButtons(){
+    const cards = document.querySelectorAll('#mobileList .mobileCard');
+    if(!cards.length) return;
+
+    const vis = visibleIndices();
+    cards.forEach((card, pos)=>{
+      const i = vis[pos];
+      if(i == null) return;
+
+      let btn = card.querySelector('[data-v106-mobile-edit]');
+      if(!btn){
+        btn = makeMobileEditButton(i);
+
+        // Direkt nach Betrag/Meta einfügen, damit er auf Handy und Tablet sofort sichtbar ist.
+        const meta = card.querySelector('.mobileMeta');
+        const row = card.querySelector('.mobileRow,.mobileActionMain,.mobileTinyActions');
+        if(meta && meta.parentNode){
+          meta.insertAdjacentElement('afterend', btn);
+        }else if(row && row.parentNode){
+          row.parentNode.insertBefore(btn, row);
+        }else{
+          card.appendChild(btn);
+        }
+      }else{
+        btn.setAttribute('data-index', String(i));
+      }
+    });
+
+    document.querySelectorAll('.v59MenuVersion').forEach(el=>el.textContent=VERSION);
+    ['v98OnlyVersion','v76OnlyVersion','v101OnlyVersion'].forEach(id=>{
+      const el=$(id);
+      if(el) el.textContent=VERSION;
+    });
+  }
+
+  const oldRender = window.render;
+  if(typeof oldRender === 'function' && !oldRender.__v106MobileEdit){
+    const wrapped = function(){
+      const r = oldRender.apply(this, arguments);
+      setTimeout(injectMobileEditButtons, 0);
+      setTimeout(injectMobileEditButtons, 120);
+      setTimeout(injectMobileEditButtons, 400);
+      return r;
+    };
+    wrapped.__v106MobileEdit = true;
+    window.render = wrapped;
+    try{ render = wrapped; }catch(e){}
+  }
+
+  document.addEventListener('DOMContentLoaded', ()=>{
+    setTimeout(injectMobileEditButtons, 100);
+    setTimeout(injectMobileEditButtons, 600);
+    setTimeout(injectMobileEditButtons, 1400);
+  });
+  window.addEventListener('load', ()=>{
+    setTimeout(injectMobileEditButtons, 150);
+    setTimeout(injectMobileEditButtons, 800);
+  });
+  $('search')?.addEventListener('input', ()=>setTimeout(injectMobileEditButtons, 120));
+  setInterval(injectMobileEditButtons, 1200);
+  setTimeout(injectMobileEditButtons, 100);
+})();
+</script>
+
 </body>
 </html>

@@ -1,3 +1,3 @@
-Schulden Manager v105
+Schulden Manager v106
 
-Neu: Bestehende Schulden können nachträglich bearbeitet werden. Betrag, Grund, Datum, Aktenzeichen, Kategorie, Status und Ansprechpartner lassen sich auf Desktop, Tablet und Handy ändern.
+Fix: Der Bearbeiten-Button wird auf Handy-/Tablet-Karten sichtbar direkt in jede Karte eingefügt.
