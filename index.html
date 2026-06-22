@@ -10587,5 +10587,243 @@ body.v105EditOpen #fabAdd{display:none!important}
 })();
 </script>
 
+
+<style id="v109-edit-every-actionbar-style">
+/* v109: Bearbeiten direkt in jede Aktionsleiste – Desktop, Tablet, Handy */
+.v109EditActionBtn{
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:6px !important;
+  visibility:visible !important;
+  opacity:1 !important;
+  pointer-events:auto !important;
+  background:linear-gradient(135deg,#2563eb,#7c71ff) !important;
+  color:#fff !important;
+  border:1px solid rgba(255,255,255,.14) !important;
+  box-shadow:none !important;
+  font-weight:900 !important;
+}
+.actionRow .v109EditActionBtn,
+.tableActions .v109EditActionBtn{
+  min-height:40px !important;
+  padding:0 12px !important;
+  border-radius:12px !important;
+  font-size:13px !important;
+}
+.mobileRow .v109EditActionBtn,
+.mobileActionMain .v109EditActionBtn{
+  min-height:42px !important;
+  width:100% !important;
+  border-radius:12px !important;
+  font-size:13px !important;
+}
+#mobileList .mobileCard .v107EditLine,
+#mobileList .mobileCard .v106MobileEditTop{
+  display:none !important;
+}
+@media (max-width:1180px){
+  #mobileList .mobileRow{
+    display:grid !important;
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+    gap:8px !important;
+  }
+}
+@media (min-width:769px) and (max-width:1180px){
+  #mobileList .mobileRow{
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  }
+}
+</style>
+
+<script id="v109-edit-every-actionbar-js">
+(function(){
+  const VERSION='v109';
+
+  function $(id){ return document.getElementById(id); }
+
+  function getDebts(){
+    try{ if(Array.isArray(debts)) return debts; }catch(e){}
+    try{ if(Array.isArray(window.debts)) return window.debts; }catch(e){}
+    try{
+      const raw=localStorage.getItem('godmode_debts');
+      const parsed=raw ? JSON.parse(raw) : [];
+      return Array.isArray(parsed) ? parsed : [];
+    }catch(e){ return []; }
+  }
+
+  function visibleIndices(){
+    const list=getDebts();
+    const s=String($('search')?.value||'').toLowerCase();
+    const out=[];
+    list.forEach((d,i)=>{
+      try{
+        if(s && !JSON.stringify(d||{}).toLowerCase().includes(s)) return;
+      }catch(e){}
+      out.push(i);
+    });
+    return out;
+  }
+
+  function setVal(id,v){
+    const el=$(id);
+    if(el) el.value = v == null ? '' : String(v);
+  }
+
+  function openEditorDirect(i){
+    const overlay=$('v105EditOverlay');
+    const list=getDebts();
+    const d=list[i];
+
+    if(!overlay || !d){
+      if(typeof showToast==='function') showToast('Bearbeiten-Fenster nicht gefunden.');
+      return;
+    }
+
+    const c=(d.contactDetails && typeof d.contactDetails==='object') ? d.contactDetails : {};
+    setVal('v105Name', d.name || '');
+    setVal('v105Reason', d.grund || d.reason || '');
+    setVal('v105Amount', String(Math.round((Number(d.betrag ?? d.amount ?? 0))*100)/100));
+    setVal('v105Date', d.datum || d.date || '');
+    setVal('v105Case', d.aktenzeichen || d.caseNumber || '');
+    setVal('v105Category', d.category || d.kategorie || 'Sonstiges');
+    setVal('v105Status', d.status || 'offen');
+    setVal('v105ContactName', c.representative || d.contactPerson || '');
+    setVal('v105ContactPhone', c.phone || '');
+    setVal('v105ContactEmail', c.email || '');
+    setVal('v105ContactAddress', c.address || '');
+
+    overlay.classList.add('show');
+    overlay.setAttribute('aria-hidden','false');
+    document.body.classList.add('modalOpen','v105EditOpen');
+  }
+
+  function makeBtn(i, mobile){
+    const btn=document.createElement('button');
+    btn.type='button';
+    btn.className=(mobile ? 'actionBtn ' : 'miniBtn ') + 'v109EditActionBtn';
+    btn.setAttribute('data-v109-edit','1');
+    btn.setAttribute('data-index',String(i));
+    btn.innerHTML=mobile
+      ? '<span class="ico">✎</span><span class="lbl">Bearbeiten</span>'
+      : '✎ Bearbeiten';
+
+    const handler=function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      openEditorDirect(Number(btn.getAttribute('data-index')));
+    };
+    btn.addEventListener('click',handler,true);
+    btn.addEventListener('touchend',handler,{capture:true,passive:false});
+    return btn;
+  }
+
+  function injectIntoDesktopTable(){
+    const rows=[...document.querySelectorAll('#tbody tr')];
+    if(!rows.length) return;
+    const vis=visibleIndices();
+
+    rows.forEach((row,pos)=>{
+      const i=vis[pos];
+      if(i==null) return;
+
+      const actionBox=row.querySelector('.actionRow,.tableActions') || row.querySelector('td:last-child');
+      if(!actionBox) return;
+
+      let btn=actionBox.querySelector('[data-v109-edit]');
+      if(!btn){
+        btn=makeBtn(i,false);
+        actionBox.insertBefore(btn, actionBox.firstChild || null);
+      }
+      btn.setAttribute('data-index',String(i));
+      btn.style.setProperty('display','inline-flex','important');
+      btn.style.setProperty('visibility','visible','important');
+      btn.style.setProperty('opacity','1','important');
+      btn.style.setProperty('pointer-events','auto','important');
+    });
+  }
+
+  function injectIntoMobileCards(){
+    document.querySelectorAll('#mobileList .mobileCard .v107EditLine,#mobileList .mobileCard .v106MobileEditTop').forEach(el=>el.remove());
+
+    const cards=[...document.querySelectorAll('#mobileList .mobileCard')];
+    if(!cards.length) return;
+    const vis=visibleIndices();
+
+    cards.forEach((card,pos)=>{
+      const i=vis[pos];
+      if(i==null) return;
+
+      const actionBox=card.querySelector('.mobileRow,.mobileActionMain,.mobileTinyActions');
+      if(!actionBox) return;
+
+      let btn=actionBox.querySelector('[data-v109-edit]');
+      if(!btn){
+        btn=makeBtn(i,true);
+        actionBox.insertBefore(btn, actionBox.firstChild || null);
+      }
+      btn.setAttribute('data-index',String(i));
+      btn.style.setProperty('display','flex','important');
+      btn.style.setProperty('visibility','visible','important');
+      btn.style.setProperty('opacity','1','important');
+      btn.style.setProperty('pointer-events','auto','important');
+    });
+  }
+
+  function apply(){
+    injectIntoDesktopTable();
+    injectIntoMobileCards();
+
+    document.querySelectorAll('.v59MenuVersion').forEach(el=>el.textContent=VERSION);
+    ['v98OnlyVersion','v76OnlyVersion','v101OnlyVersion'].forEach(id=>{
+      const el=$(id);
+      if(el) el.textContent=VERSION;
+    });
+  }
+
+  const oldRender=window.render;
+  if(typeof oldRender==='function' && !oldRender.__v109EditEverywhere){
+    const wrapped=function(){
+      const r=oldRender.apply(this,arguments);
+      requestAnimationFrame(apply);
+      setTimeout(apply,80);
+      setTimeout(apply,300);
+      setTimeout(apply,800);
+      return r;
+    };
+    wrapped.__v109EditEverywhere=true;
+    window.render=wrapped;
+    try{ render=wrapped; }catch(e){}
+  }
+
+  function observe(){
+    ['tbody','mobileList'].forEach(id=>{
+      const el=$(id);
+      if(!el || el.dataset.v109Observer==='1') return;
+      el.dataset.v109Observer='1';
+      new MutationObserver(()=>setTimeout(apply,40)).observe(el,{childList:true,subtree:true});
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded',()=>{
+    observe();
+    apply();
+    setTimeout(apply,300);
+    setTimeout(apply,1200);
+  });
+  window.addEventListener('load',()=>{
+    observe();
+    apply();
+    setTimeout(apply,600);
+    setTimeout(apply,1500);
+  });
+  window.addEventListener('resize',()=>setTimeout(apply,120));
+  $('search')?.addEventListener('input',()=>setTimeout(apply,120));
+
+  setInterval(()=>{observe();apply();},1000);
+  setTimeout(apply,100);
+})();
+</script>
+
 </body>
 </html>

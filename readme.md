@@ -1,3 +1,3 @@
-Schulden Manager v108
+Schulden Manager v109
 
-Fix: Der Bearbeiten-Button sitzt auf Handy/Tablet jetzt direkt neben den anderen Aktionsbuttons in der Karte.
+Fix: Bearbeiten wird jetzt direkt in jede Aktionsleiste eingefügt – auch in der Tablet-/Querformat-Tabellenansicht.

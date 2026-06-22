@@ -1,4 +1,4 @@
-const VERSION = 'v108-mobile-new-button';
+const VERSION = 'v109-mobile-new-button';
 const CACHE_STATIC = `schulden-manager-static-${VERSION}`;
 const CACHE_RUNTIME = `schulden-manager-runtime-${VERSION}`;
 const APP_SHELL = [
