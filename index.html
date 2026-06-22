@@ -10163,5 +10163,429 @@ body.v105EditOpen #fabAdd{display:none!important}
 })();
 </script>
 
+
+<style id="v107-mobile-edit-force-style">
+/* v107: Bearbeiten auf Handy/Tablet wirklich erzwingen */
+@media (max-width:1180px){
+  #mobileList .mobileCard .v107EditLine,
+  body.force-mobile-view #mobileList .mobileCard .v107EditLine{
+    display:flex !important;
+    width:100% !important;
+    min-height:46px !important;
+    margin:12px 0 10px !important;
+    border-radius:15px !important;
+    align-items:center !important;
+    justify-content:center !important;
+    gap:8px !important;
+    background:linear-gradient(135deg,#2563eb,#7c71ff) !important;
+    color:#fff !important;
+    border:1px solid rgba(255,255,255,.14) !important;
+    box-shadow:none !important;
+    font-size:14px !important;
+    font-weight:900 !important;
+    opacity:1 !important;
+    visibility:visible !important;
+    pointer-events:auto !important;
+    position:relative !important;
+    z-index:5 !important;
+  }
+
+  #mobileList .mobileCard .mobileRow,
+  #mobileList .mobileCard .mobileActionMain{
+    margin-top:8px !important;
+  }
+}
+
+@media (min-width:1181px){
+  body:not(.force-mobile-view) #mobileList .mobileCard .v107EditLine{
+    display:none !important;
+  }
+}
+</style>
+
+<script id="v107-mobile-edit-force-js">
+(function(){
+  const VERSION='v107';
+
+  function $(id){ return document.getElementById(id); }
+
+  function getDebts(){
+    try{ if(Array.isArray(debts)) return debts; }catch(e){}
+    try{ if(Array.isArray(window.debts)) return window.debts; }catch(e){}
+    try{
+      const raw=localStorage.getItem('godmode_debts');
+      const parsed=raw ? JSON.parse(raw) : [];
+      return Array.isArray(parsed) ? parsed : [];
+    }catch(e){ return []; }
+  }
+
+  function visibleIndices(){
+    const list=getDebts();
+    const s=String($('search')?.value||'').toLowerCase();
+    const out=[];
+    list.forEach((d,i)=>{
+      try{
+        if(s && !JSON.stringify(d||{}).toLowerCase().includes(s)) return;
+      }catch(e){}
+      out.push(i);
+    });
+    return out;
+  }
+
+  function clickExistingEdit(i){
+    const selectors=[
+      '[data-v105-edit][data-index="'+i+'"]',
+      '[data-v106-mobile-edit][data-index="'+i+'"]'
+    ];
+    for(const sel of selectors){
+      const el=document.querySelector(sel);
+      if(el){
+        el.dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true}));
+        return true;
+      }
+    }
+    return false;
+  }
+
+  function fallbackOpenEdit(i){
+    if(clickExistingEdit(i)) return;
+
+    try{
+      const overlay=$('v105EditOverlay');
+      const list=getDebts();
+      const d=list[i];
+      if(!overlay || !d){
+        if(typeof showToast==='function') showToast('Bearbeiten-Fenster nicht gefunden.');
+        return;
+      }
+
+      function set(id,v){ const el=$(id); if(el) el.value = v == null ? '' : String(v); }
+      const c=(d.contactDetails && typeof d.contactDetails==='object') ? d.contactDetails : {};
+      set('v105Name', d.name || '');
+      set('v105Reason', d.grund || d.reason || '');
+      set('v105Amount', String(Math.round((Number(d.betrag ?? d.amount ?? 0))*100)/100));
+      set('v105Date', d.datum || d.date || '');
+      set('v105Case', d.aktenzeichen || d.caseNumber || '');
+      set('v105Category', d.category || d.kategorie || 'Sonstiges');
+      set('v105Status', d.status || 'offen');
+      set('v105ContactName', c.representative || d.contactPerson || '');
+      set('v105ContactPhone', c.phone || '');
+      set('v105ContactEmail', c.email || '');
+      set('v105ContactAddress', c.address || '');
+
+      overlay.classList.add('show');
+      overlay.setAttribute('aria-hidden','false');
+      document.body.classList.add('modalOpen','v105EditOpen');
+    }catch(e){
+      console.error('v107 edit fallback failed', e);
+    }
+  }
+
+  function makeBtn(i){
+    const btn=document.createElement('button');
+    btn.type='button';
+    btn.className='v107EditLine';
+    btn.setAttribute('data-v107-edit','1');
+    btn.setAttribute('data-index',String(i));
+    btn.innerHTML='<span>✎</span><span>Bearbeiten</span>';
+    const handler=function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      fallbackOpenEdit(Number(btn.getAttribute('data-index')));
+    };
+    btn.addEventListener('click',handler,true);
+    btn.addEventListener('touchend',handler,{capture:true,passive:false});
+    return btn;
+  }
+
+  function ensureButtons(){
+    const cards=[...document.querySelectorAll('#mobileList .mobileCard')];
+    if(!cards.length) return;
+
+    const vis=visibleIndices();
+
+    cards.forEach((card,pos)=>{
+      const i=vis[pos];
+      if(i==null) return;
+
+      let btn=card.querySelector('.v107EditLine');
+      if(!btn){
+        btn=makeBtn(i);
+
+        // Ganz oben sichtbar, direkt nach dem Kopf der Karte.
+        const top=card.querySelector('.mobileTop');
+        if(top && top.parentNode){
+          top.insertAdjacentElement('afterend',btn);
+        }else{
+          card.insertBefore(btn,card.firstChild);
+        }
+      }
+      btn.setAttribute('data-index',String(i));
+      btn.style.setProperty('display','flex','important');
+      btn.style.setProperty('visibility','visible','important');
+      btn.style.setProperty('opacity','1','important');
+      btn.style.setProperty('pointer-events','auto','important');
+    });
+
+    document.querySelectorAll('.v59MenuVersion').forEach(el=>el.textContent=VERSION);
+    ['v98OnlyVersion','v76OnlyVersion','v101OnlyVersion'].forEach(id=>{
+      const el=$(id);
+      if(el) el.textContent=VERSION;
+    });
+  }
+
+  const oldRender=window.render;
+  if(typeof oldRender==='function' && !oldRender.__v107MobileEditForce){
+    const wrapped=function(){
+      const r=oldRender.apply(this,arguments);
+      requestAnimationFrame(ensureButtons);
+      setTimeout(ensureButtons,80);
+      setTimeout(ensureButtons,300);
+      return r;
+    };
+    wrapped.__v107MobileEditForce=true;
+    window.render=wrapped;
+    try{ render=wrapped; }catch(e){}
+  }
+
+  function startObserver(){
+    const list=$('mobileList');
+    if(!list || list.dataset.v107Observer==='1') return;
+    list.dataset.v107Observer='1';
+    const obs=new MutationObserver(()=>setTimeout(ensureButtons,40));
+    obs.observe(list,{childList:true,subtree:true});
+  }
+
+  document.addEventListener('DOMContentLoaded',()=>{
+    startObserver();
+    ensureButtons();
+    setTimeout(ensureButtons,300);
+    setTimeout(ensureButtons,1000);
+    setTimeout(ensureButtons,2000);
+  });
+  window.addEventListener('load',()=>{
+    startObserver();
+    ensureButtons();
+    setTimeout(ensureButtons,500);
+    setTimeout(ensureButtons,1500);
+  });
+  window.addEventListener('resize',()=>setTimeout(ensureButtons,120));
+  $('search')?.addEventListener('input',()=>setTimeout(ensureButtons,120));
+
+  setInterval(()=>{
+    startObserver();
+    ensureButtons();
+  },1000);
+
+  setTimeout(ensureButtons,100);
+})();
+</script>
+
+
+<style id="v108-mobile-edit-inline-style">
+/* v108: Bearbeiten direkt neben die anderen Handy-/Tablet-Buttons */
+#mobileList .mobileCard .v107EditLine{
+  display:none !important;
+}
+
+#mobileList .mobileRow .v108EditInline,
+#mobileList .mobileActionMain .v108EditInline{
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:6px !important;
+  visibility:visible !important;
+  opacity:1 !important;
+  pointer-events:auto !important;
+  background:linear-gradient(135deg,#2563eb,#7c71ff) !important;
+  color:#fff !important;
+  border:1px solid rgba(255,255,255,.12) !important;
+  box-shadow:none !important;
+}
+
+@media (max-width:1180px){
+  #mobileList .mobileRow{
+    display:grid !important;
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+    gap:8px !important;
+  }
+  #mobileList .mobileRow .actionBtn{
+    min-width:0 !important;
+    width:100% !important;
+  }
+}
+
+@media (min-width:769px) and (max-width:1180px){
+  #mobileList .mobileRow{
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  }
+}
+</style>
+
+<script id="v108-mobile-edit-inline-js">
+(function(){
+  const VERSION='v108';
+
+  function $(id){ return document.getElementById(id); }
+
+  function getDebts(){
+    try{ if(Array.isArray(debts)) return debts; }catch(e){}
+    try{ if(Array.isArray(window.debts)) return window.debts; }catch(e){}
+    try{
+      const raw=localStorage.getItem('godmode_debts');
+      const parsed=raw ? JSON.parse(raw) : [];
+      return Array.isArray(parsed) ? parsed : [];
+    }catch(e){ return []; }
+  }
+
+  function visibleIndices(){
+    const list=getDebts();
+    const s=String($('search')?.value||'').toLowerCase();
+    const out=[];
+    list.forEach((d,i)=>{
+      try{
+        if(s && !JSON.stringify(d||{}).toLowerCase().includes(s)) return;
+      }catch(e){}
+      out.push(i);
+    });
+    return out;
+  }
+
+  function openEditByExisting(i){
+    const el =
+      document.querySelector('[data-v105-edit][data-index="'+i+'"]') ||
+      document.querySelector('[data-v106-mobile-edit][data-index="'+i+'"]');
+    if(el){
+      el.dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true}));
+      return true;
+    }
+    return false;
+  }
+
+  function openEditFallback(i){
+    if(openEditByExisting(i)) return;
+
+    try{
+      const overlay=$('v105EditOverlay');
+      const list=getDebts();
+      const d=list[i];
+      if(!overlay || !d){
+        if(typeof showToast==='function') showToast('Bearbeiten-Fenster nicht gefunden.');
+        return;
+      }
+
+      function set(id,v){ const el=$(id); if(el) el.value = v == null ? '' : String(v); }
+      const c=(d.contactDetails && typeof d.contactDetails==='object') ? d.contactDetails : {};
+      set('v105Name', d.name || '');
+      set('v105Reason', d.grund || d.reason || '');
+      set('v105Amount', String(Math.round((Number(d.betrag ?? d.amount ?? 0))*100)/100));
+      set('v105Date', d.datum || d.date || '');
+      set('v105Case', d.aktenzeichen || d.caseNumber || '');
+      set('v105Category', d.category || d.kategorie || 'Sonstiges');
+      set('v105Status', d.status || 'offen');
+      set('v105ContactName', c.representative || d.contactPerson || '');
+      set('v105ContactPhone', c.phone || '');
+      set('v105ContactEmail', c.email || '');
+      set('v105ContactAddress', c.address || '');
+
+      overlay.classList.add('show');
+      overlay.setAttribute('aria-hidden','false');
+      document.body.classList.add('modalOpen','v105EditOpen');
+    }catch(e){
+      console.error('v108 edit fallback failed', e);
+    }
+  }
+
+  function makeBtn(i){
+    const btn=document.createElement('button');
+    btn.type='button';
+    btn.className='actionBtn v108EditInline';
+    btn.setAttribute('data-v108-edit','1');
+    btn.setAttribute('data-index',String(i));
+    btn.innerHTML='<span class="ico">✎</span><span class="lbl">Bearbeiten</span>';
+    const handler=function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      openEditFallback(Number(btn.getAttribute('data-index')));
+    };
+    btn.addEventListener('click',handler,true);
+    btn.addEventListener('touchend',handler,{capture:true,passive:false});
+    return btn;
+  }
+
+  function placeButtons(){
+    // Den alten oberen Button entfernen/ausblenden, damit nur der Button in der Buttonreihe bleibt.
+    document.querySelectorAll('#mobileList .mobileCard .v107EditLine').forEach(el=>el.remove());
+    document.querySelectorAll('#mobileList .mobileCard .v106MobileEditTop').forEach(el=>el.remove());
+
+    const cards=[...document.querySelectorAll('#mobileList .mobileCard')];
+    if(!cards.length) return;
+
+    const vis=visibleIndices();
+    cards.forEach((card,pos)=>{
+      const i=vis[pos];
+      if(i==null) return;
+
+      const row=card.querySelector('.mobileRow,.mobileActionMain');
+      if(!row) return;
+
+      let btn=row.querySelector('[data-v108-edit]');
+      if(!btn){
+        btn=makeBtn(i);
+        row.insertBefore(btn,row.firstChild);
+      }
+      btn.setAttribute('data-index',String(i));
+      btn.style.setProperty('display','flex','important');
+      btn.style.setProperty('visibility','visible','important');
+      btn.style.setProperty('opacity','1','important');
+      btn.style.setProperty('pointer-events','auto','important');
+    });
+
+    document.querySelectorAll('.v59MenuVersion').forEach(el=>el.textContent=VERSION);
+    ['v98OnlyVersion','v76OnlyVersion','v101OnlyVersion'].forEach(id=>{
+      const el=$(id);
+      if(el) el.textContent=VERSION;
+    });
+  }
+
+  const oldRender=window.render;
+  if(typeof oldRender==='function' && !oldRender.__v108MobileEditInline){
+    const wrapped=function(){
+      const r=oldRender.apply(this,arguments);
+      requestAnimationFrame(placeButtons);
+      setTimeout(placeButtons,100);
+      setTimeout(placeButtons,350);
+      return r;
+    };
+    wrapped.__v108MobileEditInline=true;
+    window.render=wrapped;
+    try{ render=wrapped; }catch(e){}
+  }
+
+  function observe(){
+    const list=$('mobileList');
+    if(!list || list.dataset.v108Observer==='1') return;
+    list.dataset.v108Observer='1';
+    new MutationObserver(()=>setTimeout(placeButtons,40)).observe(list,{childList:true,subtree:true});
+  }
+
+  document.addEventListener('DOMContentLoaded',()=>{
+    observe();
+    placeButtons();
+    setTimeout(placeButtons,300);
+    setTimeout(placeButtons,1000);
+  });
+  window.addEventListener('load',()=>{
+    observe();
+    placeButtons();
+    setTimeout(placeButtons,600);
+  });
+  window.addEventListener('resize',()=>setTimeout(placeButtons,100));
+  $('search')?.addEventListener('input',()=>setTimeout(placeButtons,120));
+  setInterval(()=>{observe();placeButtons();},1200);
+  setTimeout(placeButtons,100);
+})();
+</script>
+
 </body>
 </html>
