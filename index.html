@@ -9578,5 +9578,404 @@ body.modalOpen #fabAdd{
 })();
 </script>
 
+
+<style id="v105-edit-debt-style">
+/* v105: Bestehende Schulden nachträglich bearbeiten – Desktop, Tablet, Handy */
+.v105EditBtn{
+  background:linear-gradient(135deg,#2563eb,#7c71ff)!important;
+  color:#fff!important;
+  border:1px solid rgba(255,255,255,.12)!important;
+  box-shadow:none!important;
+}
+.v105EditBtn .ico{font-weight:900}
+#v105EditOverlay{
+  position:fixed;
+  inset:0;
+  z-index:2147483600;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:14px;
+  background:rgba(2,8,16,.68);
+  backdrop-filter:blur(12px);
+}
+#v105EditOverlay.show{display:flex!important}
+.v105EditBox{
+  width:min(920px,100%);
+  max-height:calc(100dvh - 28px);
+  overflow:auto;
+  border-radius:26px;
+  padding:18px;
+  background:linear-gradient(180deg,rgba(11,20,34,.99),rgba(8,16,29,.99));
+  border:1px solid rgba(255,255,255,.10);
+  box-shadow:0 24px 80px rgba(0,0,0,.42);
+  color:#eaf2ff;
+}
+.v105EditHead{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+  position:sticky;
+  top:-18px;
+  z-index:5;
+  margin:-18px -18px 14px;
+  padding:18px;
+  background:linear-gradient(180deg,rgba(11,20,34,1),rgba(11,20,34,.94));
+  border-bottom:1px solid rgba(255,255,255,.07);
+}
+.v105EditHead h3{margin:0;font-size:24px;color:#fff}
+.v105EditHead p{margin:6px 0 0;color:#9fb2cf;font-size:13px;line-height:1.4}
+.v105EditClose{
+  min-width:42px!important;
+  min-height:42px!important;
+  border-radius:14px!important;
+  padding:0!important;
+  background:#13233a!important;
+  color:#eaf2ff!important;
+  box-shadow:none!important;
+}
+.v105EditGrid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
+}
+.v105EditFull{grid-column:1/-1}
+.v105EditField label{
+  display:block;
+  font-size:12px;
+  color:#dbe7ff;
+  margin:0 0 6px;
+  font-weight:800;
+}
+.v105EditField input,
+.v105EditField select,
+.v105EditField textarea{
+  width:100%;
+  min-height:42px;
+  border-radius:13px;
+  background:#132238!important;
+  border:1px solid rgba(255,255,255,.09)!important;
+  color:#eaf2ff!important;
+  box-shadow:none!important;
+}
+.v105EditField textarea{min-height:70px;padding:10px 12px;resize:vertical}
+.v105EditActions{
+  position:sticky;
+  bottom:-18px;
+  z-index:5;
+  display:grid;
+  grid-template-columns:1fr 1.3fr;
+  gap:10px;
+  margin:16px -18px -18px;
+  padding:14px 18px calc(14px + env(safe-area-inset-bottom,0px));
+  background:linear-gradient(180deg,rgba(8,16,29,0),rgba(8,16,29,.94) 24%,rgba(8,16,29,.99));
+  border-top:1px solid rgba(255,255,255,.07);
+}
+.v105EditActions button{min-height:54px!important}
+#v105EditSave{background:linear-gradient(135deg,#1d56df,#377eff)!important}
+#v105EditCancel{background:#13233a!important;color:#eaf2ff!important;border:1px solid rgba(255,255,255,.08)!important;box-shadow:none!important}
+body.v105EditOpen .mobileBottomNav,
+body.v105EditOpen #fabAdd{display:none!important}
+
+@media (max-width:768px){
+  #v105EditOverlay{align-items:flex-start;padding:8px}
+  .v105EditBox{
+    width:100%;
+    max-height:calc(100dvh - 16px);
+    border-radius:22px;
+    padding:14px;
+  }
+  .v105EditHead{
+    top:-14px;
+    margin:-14px -14px 12px;
+    padding:14px;
+  }
+  .v105EditHead h3{font-size:20px}
+  .v105EditGrid{grid-template-columns:1fr;gap:10px}
+  .v105EditActions{
+    grid-template-columns:1fr;
+    margin:14px -14px -14px;
+    padding:12px 14px calc(12px + env(safe-area-inset-bottom,0px));
+  }
+  #v105EditSave{order:-1}
+}
+</style>
+
+<div id="v105EditOverlay" aria-hidden="true">
+  <div class="v105EditBox" role="dialog" aria-modal="true" aria-labelledby="v105EditTitle">
+    <div class="v105EditHead">
+      <div>
+        <h3 id="v105EditTitle">Schulden bearbeiten</h3>
+        <p>Betrag, Status, Aktenzeichen, Ansprechpartner und weitere Daten nachträglich ändern.</p>
+      </div>
+      <button id="v105EditClose" class="v105EditClose" type="button" aria-label="Schließen">✕</button>
+    </div>
+
+    <div class="v105EditGrid">
+      <div class="v105EditField">
+        <label for="v105Name">Name / Gläubiger *</label>
+        <input id="v105Name" autocomplete="name">
+      </div>
+      <div class="v105EditField">
+        <label for="v105Amount">Betrag / Restbetrag *</label>
+        <input id="v105Amount" type="number" step="0.01" inputmode="decimal">
+      </div>
+      <div class="v105EditField">
+        <label for="v105Reason">Grund *</label>
+        <input id="v105Reason">
+      </div>
+      <div class="v105EditField">
+        <label for="v105Date">Fällig am</label>
+        <input id="v105Date" type="date">
+      </div>
+      <div class="v105EditField">
+        <label for="v105Case">Aktenzeichen</label>
+        <input id="v105Case">
+      </div>
+      <div class="v105EditField">
+        <label for="v105Category">Kategorie</label>
+        <input id="v105Category" placeholder="z. B. Bank, Inkasso, Rechnung">
+      </div>
+      <div class="v105EditField">
+        <label for="v105Status">Status</label>
+        <select id="v105Status">
+          <option value="offen">Offen</option>
+          <option value="teilzahlung">Teilzahlung</option>
+          <option value="klaerung">In Klärung</option>
+          <option value="bezahlt">Bezahlt</option>
+        </select>
+      </div>
+      <div class="v105EditField">
+        <label for="v105ContactName">Ansprechpartner / Vertreter</label>
+        <input id="v105ContactName">
+      </div>
+      <div class="v105EditField">
+        <label for="v105ContactPhone">Telefon</label>
+        <input id="v105ContactPhone" type="tel">
+      </div>
+      <div class="v105EditField">
+        <label for="v105ContactEmail">E-Mail</label>
+        <input id="v105ContactEmail" type="email">
+      </div>
+      <div class="v105EditField v105EditFull">
+        <label for="v105ContactAddress">Anschrift</label>
+        <textarea id="v105ContactAddress"></textarea>
+      </div>
+    </div>
+
+    <div class="v105EditActions">
+      <button id="v105EditCancel" type="button">Abbrechen</button>
+      <button id="v105EditSave" type="button">Änderungen speichern</button>
+    </div>
+  </div>
+</div>
+
+<script id="v105-edit-debt-js">
+(function(){
+  const VERSION='v105';
+  let editIndex = -1;
+
+  function $(id){ return document.getElementById(id); }
+  function arr(){
+    try{
+      if(Array.isArray(debts)) return debts;
+    }catch(e){}
+    if(Array.isArray(window.debts)) return window.debts;
+    try{
+      const raw = localStorage.getItem('godmode_debts');
+      const parsed = raw ? JSON.parse(raw) : [];
+      return Array.isArray(parsed) ? parsed : [];
+    }catch(e){ return []; }
+  }
+  function saveAll(){
+    try{
+      if(typeof save === 'function') save();
+      else localStorage.setItem('godmode_debts', JSON.stringify(arr()));
+    }catch(e){
+      localStorage.setItem('godmode_debts', JSON.stringify(arr()));
+    }
+  }
+  function toast(msg){
+    try{ if(typeof showToast === 'function') return showToast(msg); }catch(e){}
+    try{ alert(msg); }catch(e){}
+  }
+  function parseAmount(v){
+    const n = parseFloat(String(v||'').replace(/\./g,'').replace(',','.'));
+    return Number.isFinite(n) ? n : NaN;
+  }
+  function fmtAmount(n){
+    const x = Number(n)||0;
+    return String(Math.round(x*100)/100);
+  }
+  function contactOf(d){
+    const c = (d && typeof d.contactDetails==='object' && d.contactDetails) ? d.contactDetails : {};
+    const legacy = String((d && (d.contactPerson || d.ansprechpartner || d.kontakt)) || '').trim();
+    return {
+      representative: c.representative || c.name || legacy.split('|')[0]?.trim() || '',
+      address: c.address || '',
+      email: c.email || '',
+      phone: c.phone || ''
+    };
+  }
+  function visibleIndices(){
+    const list = arr();
+    const s = String($('search')?.value || '').toLowerCase();
+    const out = [];
+    list.forEach((d,i)=>{
+      if(s && !JSON.stringify(d||{}).toLowerCase().includes(s)) return;
+      out.push(i);
+    });
+    return out;
+  }
+  function setVal(id,v){ const el=$(id); if(el) el.value = v == null ? '' : String(v); }
+
+  function openEdit(i){
+    const list = arr();
+    const d = list[i];
+    if(!d) return;
+    editIndex = i;
+    const c = contactOf(d);
+
+    setVal('v105Name', d.name || '');
+    setVal('v105Reason', d.grund || d.reason || '');
+    setVal('v105Amount', fmtAmount(d.betrag ?? d.amount ?? 0));
+    setVal('v105Date', d.datum || d.date || '');
+    setVal('v105Case', d.aktenzeichen || d.caseNumber || '');
+    setVal('v105Category', d.category || d.kategorie || 'Sonstiges');
+    setVal('v105Status', d.status || 'offen');
+    setVal('v105ContactName', c.representative || '');
+    setVal('v105ContactPhone', c.phone || '');
+    setVal('v105ContactEmail', c.email || '');
+    setVal('v105ContactAddress', c.address || '');
+
+    const overlay = $('v105EditOverlay');
+    if(overlay){
+      overlay.classList.add('show');
+      overlay.setAttribute('aria-hidden','false');
+      document.body.classList.add('modalOpen','v105EditOpen');
+      setTimeout(()=>$('v105Name')?.focus(), 60);
+    }
+  }
+
+  function closeEdit(){
+    editIndex = -1;
+    const overlay = $('v105EditOverlay');
+    if(overlay){
+      overlay.classList.remove('show');
+      overlay.setAttribute('aria-hidden','true');
+      document.body.classList.remove('v105EditOpen');
+      const addOpen = $('addModal') && ($('addModal').getAttribute('aria-hidden') === 'false' || $('addModal').style.display === 'flex' || $('addModal').style.display === 'block');
+      if(!addOpen) document.body.classList.remove('modalOpen');
+    }
+  }
+
+  function saveEdit(){
+    const list = arr();
+    const d = list[editIndex];
+    if(!d) return closeEdit();
+
+    const name = String($('v105Name')?.value || '').trim();
+    const grund = String($('v105Reason')?.value || '').trim();
+    const betrag = parseAmount($('v105Amount')?.value);
+    if(!name){ toast('Bitte Name / Gläubiger eintragen.'); $('v105Name')?.focus(); return; }
+    if(!grund){ toast('Bitte Grund eintragen.'); $('v105Reason')?.focus(); return; }
+    if(!Number.isFinite(betrag) || betrag <= 0){ toast('Bitte Betrag korrekt eintragen.'); $('v105Amount')?.focus(); return; }
+
+    const category = String($('v105Category')?.value || 'Sonstiges').trim() || 'Sonstiges';
+    const contact = {
+      representative: String($('v105ContactName')?.value || '').trim(),
+      address: String($('v105ContactAddress')?.value || '').trim(),
+      email: String($('v105ContactEmail')?.value || '').trim(),
+      phone: String($('v105ContactPhone')?.value || '').trim()
+    };
+
+    d.name = name;
+    d.grund = grund;
+    d.reason = grund;
+    d.betrag = betrag;
+    d.amount = betrag;
+    d.datum = $('v105Date')?.value || '';
+    d.date = d.datum;
+    d.aktenzeichen = String($('v105Case')?.value || '').trim();
+    d.caseNumber = d.aktenzeichen;
+    d.status = $('v105Status')?.value || 'offen';
+    d.category = category;
+    d.kategorie = category;
+    d.contactDetails = contact;
+    d.contactPerson = [contact.representative, contact.address, contact.email, contact.phone].filter(Boolean).join(' | ');
+
+    if(!Array.isArray(d.editHistory)) d.editHistory = [];
+    d.editHistory.push({at:new Date().toISOString(), text:'Schuldendaten bearbeitet'});
+
+    saveAll();
+    try{ if(typeof render === 'function') render(); }catch(e){}
+    setTimeout(injectEditButtons, 50);
+    closeEdit();
+    toast('Änderungen gespeichert ✅');
+  }
+
+  function makeEditButton(i, mobile){
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = mobile ? 'actionBtn v105EditBtn' : 'v105EditBtn miniBtn';
+    b.setAttribute('data-v105-edit','1');
+    b.setAttribute('data-index', String(i));
+    b.innerHTML = mobile ? "<span class='ico'>✎</span><span class='lbl'>Bearbeiten</span>" : "✎ Bearbeiten";
+    b.addEventListener('click', function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      openEdit(i);
+    });
+    return b;
+  }
+
+  function injectEditButtons(){
+    const vis = visibleIndices();
+
+    document.querySelectorAll('#tbody tr').forEach((row,pos)=>{
+      const i = vis[pos];
+      if(i == null || row.querySelector('[data-v105-edit]')) return;
+      const target = row.querySelector('.tableActions,.actionRow') || row.querySelector('td:last-child');
+      if(target) target.insertBefore(makeEditButton(i,false), target.firstChild || null);
+    });
+
+    document.querySelectorAll('#mobileList .mobileCard').forEach((card,pos)=>{
+      const i = vis[pos];
+      if(i == null || card.querySelector('[data-v105-edit]')) return;
+      const target = card.querySelector('.mobileRow,.mobileActionMain,.mobileTinyActions');
+      if(target) target.insertBefore(makeEditButton(i,true), target.firstChild || null);
+    });
+
+    document.querySelectorAll('.v59MenuVersion').forEach(el=>el.textContent=VERSION);
+    ['v98OnlyVersion','v76OnlyVersion','v101OnlyVersion'].forEach(id=>{ const el=$(id); if(el) el.textContent=VERSION; });
+  }
+
+  const oldRender = window.render;
+  if(typeof oldRender === 'function' && !oldRender.__v105EditDebt){
+    const wrapped = function(){
+      const r = oldRender.apply(this, arguments);
+      setTimeout(injectEditButtons, 0);
+      setTimeout(injectEditButtons, 120);
+      return r;
+    };
+    wrapped.__v105EditDebt = true;
+    window.render = wrapped;
+    try{ render = wrapped; }catch(e){}
+  }
+
+  $('v105EditClose')?.addEventListener('click', closeEdit);
+  $('v105EditCancel')?.addEventListener('click', closeEdit);
+  $('v105EditSave')?.addEventListener('click', function(e){ e.preventDefault(); saveEdit(); });
+  $('v105EditOverlay')?.addEventListener('click', function(e){ if(e.target === this) closeEdit(); });
+  document.addEventListener('keydown', function(e){ if(e.key === 'Escape' && $('v105EditOverlay')?.classList.contains('show')) closeEdit(); });
+  document.addEventListener('DOMContentLoaded', ()=>{ setTimeout(injectEditButtons, 100); setTimeout(injectEditButtons, 700); });
+  window.addEventListener('load', ()=>{ setTimeout(injectEditButtons, 150); });
+  document.getElementById('search')?.addEventListener('input', ()=>setTimeout(injectEditButtons, 100));
+  setInterval(injectEditButtons, 2000);
+  setTimeout(injectEditButtons, 100);
+})();
+</script>
+
 </body>
 </html>

@@ -1,3 +1,3 @@
-Schulden Manager v104
+Schulden Manager v105
 
-Fix: Auf Handy/Tablet ist der Button "Schulden speichern" im Neu-Formular wieder erreichbar. Die untere Leiste wird beim geöffneten Modal ausgeblendet.
+Neu: Bestehende Schulden können nachträglich bearbeitet werden. Betrag, Grund, Datum, Aktenzeichen, Kategorie, Status und Ansprechpartner lassen sich auf Desktop, Tablet und Handy ändern.
