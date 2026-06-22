@@ -1,3 +1,3 @@
-Schulden Manager v109
+Schulden Manager v110
 
-Fix: Bearbeiten wird jetzt direkt in jede Aktionsleiste eingefügt – auch in der Tablet-/Querformat-Tabellenansicht.
+Fix: Bearbeiten wird jetzt vor Status in alle Aktionsleisten eingefügt, auch in alternativen Handy-Seiten mit Daten/QR.

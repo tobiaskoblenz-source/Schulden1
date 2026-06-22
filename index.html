@@ -10825,5 +10825,278 @@ body.v105EditOpen #fabAdd{display:none!important}
 })();
 </script>
 
+
+<style id="v110-edit-before-status-style">
+/* v110: Bearbeiten auf der Handy-Seite vor Status erzwingen – auch bei alternativen Aktionsleisten mit Daten/QR */
+.v110EditBeforeStatus{
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:6px !important;
+  visibility:visible !important;
+  opacity:1 !important;
+  pointer-events:auto !important;
+  background:linear-gradient(135deg,#2563eb,#7c71ff) !important;
+  color:#fff !important;
+  border:1px solid rgba(255,255,255,.14) !important;
+  box-shadow:none !important;
+  font-weight:900 !important;
+}
+.actionRow .v110EditBeforeStatus,
+.tableActions .v110EditBeforeStatus,
+.mobileRow .v110EditBeforeStatus,
+.mobileActionMain .v110EditBeforeStatus,
+.mobileTinyActions .v110EditBeforeStatus,
+[data-actions] .v110EditBeforeStatus{
+  min-height:40px !important;
+  padding:0 12px !important;
+  border-radius:12px !important;
+  font-size:13px !important;
+}
+
+@media (max-width:1180px){
+  .mobileRow .v110EditBeforeStatus,
+  .mobileActionMain .v110EditBeforeStatus,
+  .mobileTinyActions .v110EditBeforeStatus,
+  #mobileList .v110EditBeforeStatus{
+    display:flex !important;
+    width:100% !important;
+    min-width:0 !important;
+  }
+}
+
+/* Alte extra Bearbeiten-Varianten ausblenden, damit nur eine Variante bleibt */
+#mobileList .v107EditLine,
+#mobileList .v106MobileEditTop{
+  display:none !important;
+}
+</style>
+
+<script id="v110-edit-before-status-js">
+(function(){
+  const VERSION='v110';
+
+  function $(id){ return document.getElementById(id); }
+
+  function getDebts(){
+    try{ if(Array.isArray(debts)) return debts; }catch(e){}
+    try{ if(Array.isArray(window.debts)) return window.debts; }catch(e){}
+    try{
+      const raw=localStorage.getItem('godmode_debts');
+      const parsed=raw ? JSON.parse(raw) : [];
+      return Array.isArray(parsed) ? parsed : [];
+    }catch(e){ return []; }
+  }
+
+  function visibleIndices(){
+    const list=getDebts();
+    const s=String($('search')?.value||'').toLowerCase();
+    const out=[];
+    list.forEach((d,i)=>{
+      try{
+        if(s && !JSON.stringify(d||{}).toLowerCase().includes(s)) return;
+      }catch(e){}
+      out.push(i);
+    });
+    return out;
+  }
+
+  function setVal(id,v){
+    const el=$(id);
+    if(el) el.value = v == null ? '' : String(v);
+  }
+
+  function openEditor(i){
+    const overlay=$('v105EditOverlay');
+    const list=getDebts();
+    const d=list[i];
+
+    if(!overlay || !d){
+      if(typeof showToast==='function') showToast('Bearbeiten-Fenster nicht gefunden.');
+      return;
+    }
+
+    const c=(d.contactDetails && typeof d.contactDetails==='object') ? d.contactDetails : {};
+    setVal('v105Name', d.name || '');
+    setVal('v105Reason', d.grund || d.reason || '');
+    setVal('v105Amount', String(Math.round((Number(d.betrag ?? d.amount ?? 0))*100)/100));
+    setVal('v105Date', d.datum || d.date || '');
+    setVal('v105Case', d.aktenzeichen || d.caseNumber || '');
+    setVal('v105Category', d.category || d.kategorie || 'Sonstiges');
+    setVal('v105Status', d.status || 'offen');
+    setVal('v105ContactName', c.representative || d.contactPerson || '');
+    setVal('v105ContactPhone', c.phone || '');
+    setVal('v105ContactEmail', c.email || '');
+    setVal('v105ContactAddress', c.address || '');
+
+    overlay.classList.add('show');
+    overlay.setAttribute('aria-hidden','false');
+    document.body.classList.add('modalOpen','v105EditOpen');
+  }
+
+  function makeBtn(i){
+    const btn=document.createElement('button');
+    btn.type='button';
+    btn.className='v110EditBeforeStatus actionBtn miniBtn';
+    btn.setAttribute('data-v110-edit','1');
+    btn.setAttribute('data-index',String(i));
+    btn.innerHTML='<span class="ico">✎</span><span class="lbl">Bearbeiten</span>';
+    const handler=function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      openEditor(Number(btn.getAttribute('data-index')));
+    };
+    btn.addEventListener('click',handler,true);
+    btn.addEventListener('touchend',handler,{capture:true,passive:false});
+    return btn;
+  }
+
+  function findDebtIndexForElement(el, fallbackPosition){
+    // 1. Falls irgendwo schon ein alter Bearbeiten-Button mit Index steckt, übernehmen.
+    const indexed=el.querySelector('[data-index]');
+    if(indexed && indexed.getAttribute('data-index') != null){
+      const n=Number(indexed.getAttribute('data-index'));
+      if(Number.isInteger(n) && n>=0) return n;
+    }
+
+    // 2. Position innerhalb der sichtbaren Karten/Zeilen verwenden.
+    const vis=visibleIndices();
+
+    const card=el.closest('.mobileCard,tr,.debtCard,.debtItem,.debtRow,[data-debt-index]');
+    if(card){
+      const dataIndex=card.getAttribute('data-debt-index') || card.getAttribute('data-index');
+      if(dataIndex != null){
+        const n=Number(dataIndex);
+        if(Number.isInteger(n) && n>=0) return n;
+      }
+
+      const allCards=[...document.querySelectorAll('#mobileList .mobileCard, tbody tr, .debtCard, .debtItem, .debtRow')];
+      const pos=allCards.indexOf(card);
+      if(pos>=0 && vis[pos]!=null) return vis[pos];
+    }
+
+    if(vis[fallbackPosition] != null) return vis[fallbackPosition];
+    return fallbackPosition;
+  }
+
+  function isActionContainer(el){
+    if(!el || el.nodeType!==1) return false;
+    if(el.classList.contains('actionRow') || el.classList.contains('tableActions') || el.classList.contains('mobileRow') || el.classList.contains('mobileActionMain') || el.classList.contains('mobileTinyActions')) return true;
+
+    // Alternative Handy-Seite: Container erkennen, wenn Status/Löschen/Abbau/Info/Daten/QR Buttons drin sind.
+    const text=String(el.textContent||'').toLowerCase();
+    const hasStatus=text.includes('status');
+    const hasActionWords=(text.includes('löschen') || text.includes('abbau') || text.includes('historie') || text.includes('info') || text.includes('daten') || text.includes('qr') || text.includes('ansprech'));
+    const buttons=el.querySelectorAll('button').length;
+    return buttons>=2 && hasStatus && hasActionWords;
+  }
+
+  function collectActionContainers(){
+    const set=new Set();
+
+    document.querySelectorAll('.actionRow,.tableActions,.mobileRow,.mobileActionMain,.mobileTinyActions').forEach(el=>set.add(el));
+
+    // Suche zusätzlich nach Button-Gruppen in der Handy-Seite, die nicht die Standard-Klassen haben.
+    document.querySelectorAll('#mobileList button, .contentArea button, main button').forEach(btn=>{
+      const label=String(btn.textContent||'').toLowerCase();
+      if(!label.includes('status')) return;
+
+      let p=btn.parentElement;
+      for(let depth=0; p && depth<4; depth++, p=p.parentElement){
+        if(isActionContainer(p)){
+          set.add(p);
+          break;
+        }
+      }
+    });
+
+    return [...set];
+  }
+
+  function insertBeforeStatus(container, pos){
+    if(!container || container.querySelector('[data-v110-edit]')) return;
+
+    const i=findDebtIndexForElement(container,pos);
+    if(i==null || i<0) return;
+
+    const btn=makeBtn(i);
+
+    const statusBtn=[...container.querySelectorAll('button')].find(b=>String(b.textContent||'').toLowerCase().includes('status'));
+    if(statusBtn && statusBtn.parentElement===container){
+      container.insertBefore(btn,statusBtn);
+    }else if(statusBtn){
+      statusBtn.insertAdjacentElement('beforebegin',btn);
+    }else{
+      container.insertBefore(btn,container.firstChild);
+    }
+  }
+
+  function apply(){
+    // Alte falsche Top-Buttons entfernen.
+    document.querySelectorAll('#mobileList .v107EditLine,#mobileList .v106MobileEditTop').forEach(el=>el.remove());
+
+    const containers=collectActionContainers();
+    containers.forEach((el,pos)=>insertBeforeStatus(el,pos));
+
+    // vorhandene v110 Buttons aktualisieren / sichtbar halten
+    document.querySelectorAll('[data-v110-edit]').forEach((btn)=>{
+      btn.style.setProperty('display','inline-flex','important');
+      btn.style.setProperty('visibility','visible','important');
+      btn.style.setProperty('opacity','1','important');
+      btn.style.setProperty('pointer-events','auto','important');
+    });
+
+    document.querySelectorAll('.v59MenuVersion').forEach(el=>el.textContent=VERSION);
+    ['v98OnlyVersion','v76OnlyVersion','v101OnlyVersion'].forEach(id=>{
+      const el=$(id);
+      if(el) el.textContent=VERSION;
+    });
+  }
+
+  const oldRender=window.render;
+  if(typeof oldRender==='function' && !oldRender.__v110EditBeforeStatus){
+    const wrapped=function(){
+      const r=oldRender.apply(this,arguments);
+      requestAnimationFrame(apply);
+      setTimeout(apply,80);
+      setTimeout(apply,300);
+      setTimeout(apply,900);
+      return r;
+    };
+    wrapped.__v110EditBeforeStatus=true;
+    window.render=wrapped;
+    try{ render=wrapped; }catch(e){}
+  }
+
+  function observe(){
+    ['tbody','mobileList','debtListSection','dashboardTop'].forEach(id=>{
+      const el=$(id);
+      if(!el || el.dataset.v110Observer==='1') return;
+      el.dataset.v110Observer='1';
+      new MutationObserver(()=>setTimeout(apply,50)).observe(el,{childList:true,subtree:true});
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded',()=>{
+    observe();
+    apply();
+    setTimeout(apply,300);
+    setTimeout(apply,1200);
+    setTimeout(apply,2500);
+  });
+  window.addEventListener('load',()=>{
+    observe();
+    apply();
+    setTimeout(apply,600);
+    setTimeout(apply,1600);
+  });
+  window.addEventListener('resize',()=>setTimeout(apply,120));
+  $('search')?.addEventListener('input',()=>setTimeout(apply,120));
+
+  setInterval(()=>{observe();apply();},1000);
+  setTimeout(apply,100);
+})();
+</script>
+
 </body>
 </html>
