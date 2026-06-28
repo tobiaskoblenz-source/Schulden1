@@ -11092,105 +11092,23 @@ body.v105EditOpen #fabAdd{display:none!important}
 </script>
 
 
-<style id="v120-akte-layout-fix-style">
-/* v120: Wenn die Akte rechts offen ist, darf links nichts abgeschnitten werden */
-@media (min-width:1121px){
-  .dashboardContentGrid{
-    grid-template-columns:minmax(0,1fr) clamp(340px, 23vw, 400px) !important;
-    gap:16px !important;
-    align-items:start !important;
+<script id="v121-revert-v120-js">
+(function(){
+  const VERSION='v121';
+  function setVersion(){
+    try{
+      document.querySelectorAll('.v59MenuVersion').forEach(el=>el.textContent=VERSION);
+      ['v98OnlyVersion','v76OnlyVersion','v101OnlyVersion'].forEach(id=>{
+        const el=document.getElementById(id);
+        if(el) el.textContent=VERSION;
+      });
+    }catch(e){}
   }
-
-  .dashboardContentGrid > :first-child,
-  .debtBoardCard,
-  #debtListSection,
-  #desktopTable,
-  .dashboardTableWrap,
-  #v112VergleichSection,
-  .v112VergleichPlaceholder,
-  .v113CompareWrap{
-    min-width:0 !important;
-  }
-
-  .desktopDetailPanel,
-  .desktopAktePanel{
-    width:clamp(340px, 23vw, 400px) !important;
-    min-width:clamp(340px, 23vw, 400px) !important;
-    max-width:clamp(340px, 23vw, 400px) !important;
-  }
-
-  #desktopTable,
-  .dashboardTableWrap{
-    overflow-x:auto !important;
-    overflow-y:visible !important;
-    padding-bottom:4px !important;
-    scrollbar-width:thin;
-  }
-
-  #desktopTable table{
-    min-width:920px !important;
-    width:100% !important;
-  }
-
-  .tableActions{
-    grid-template-columns:repeat(3,max-content) !important;
-    align-items:start !important;
-    justify-content:start !important;
-    gap:8px !important;
-  }
-
-  .tableUtilityActions{
-    grid-column:1 / -1 !important;
-    display:flex !important;
-    flex-wrap:wrap !important;
-    justify-content:flex-start !important;
-    gap:8px !important;
-  }
-
-  .tableActions > .miniBtn,
-  .tableActions .miniBtn,
-  .tableUtilityActions .tinyBtn,
-  .tableActions .debtQrBtn,
-  .tableActions .btn-correspondence,
-  .tableActions .v119EditBtn{
-    max-width:100% !important;
-    white-space:nowrap !important;
-  }
-
-  .v113CompareHead{
-    display:flex !important;
-    flex-wrap:wrap !important;
-    align-items:flex-start !important;
-    justify-content:space-between !important;
-    gap:12px !important;
-  }
-
-  #v112CloseVergleich,
-  .v113CompareHead button{
-    max-width:100% !important;
-    white-space:normal !important;
-  }
-}
-
-@media (min-width:1121px) and (max-width:1450px){
-  #desktopTable table{
-    min-width:980px !important;
-  }
-}
-
-@media (min-width:1121px) and (max-width:1280px){
-  .desktopDetailPanel,
-  .desktopAktePanel{
-    width:360px !important;
-    min-width:360px !important;
-    max-width:360px !important;
-  }
-
-  .dashboardContentGrid{
-    grid-template-columns:minmax(0,1fr) 360px !important;
-  }
-}
-</style>
+  document.addEventListener('DOMContentLoaded',setVersion);
+  window.addEventListener('load',setVersion);
+  setVersion();
+})();
+</script>
 
 </body>
 </html>

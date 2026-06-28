@@ -1,3 +1,3 @@
-Schulden Manager v120
+Schulden Manager v121
 
-Layout-Fix: Wenn die Schulden-Akte rechts geöffnet ist, wird links nichts mehr abgeschnitten. Die rechte Akte-Spalte ist schmaler, die linke Hauptfläche flexibler, und die Tabelle kann bei Bedarf horizontal scrollen.
+Rollback: Die Layout-Änderung aus v120 wurde rückgängig gemacht. Handy-/Tablet-Seite ist wieder wie in v119.
