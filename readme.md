@@ -1,3 +1,3 @@
-Schulden Manager v128
+Schulden Manager v130
 
-Fix: Papierkorb auf der Handy-/Tablet-Seite wieder sichtbar. Desktop bleibt wie v127.
+Fix: Papierkorb-Button auf Handy/Tablet nutzt jetzt denselben Desktop-Papierkorb-Workflow. Desktop-Bearbeiten aus v129 bleibt erhalten.
