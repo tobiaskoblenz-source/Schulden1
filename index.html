@@ -5257,12 +5257,14 @@ if ('serviceWorker' in navigator) {
         "<div class='v19Amount"+paidClass+"'><div><strong>"+formatEUR(Number(d.betrag)||0)+"</strong><span>Restbetrag</span></div></div>" +
         "<div class='v19Status'><span class='"+badgeClass+"'>"+statusText(d.status)+"</span></div>" +
         "<div class='v19Actions'>" +
+          "<button class='btn-edit' data-action='edit' type='button'>Bearbeiten</button>" +
           "<button class='btn-status' data-action='status' type='button'>Status</button>" +
           "<button class='btn-delete' data-action='delete' type='button'>Löschen</button>" +
           "<button class='btn-pay' data-action='pay' type='button'>Abbau</button>" +
           "<button class='btn-history' data-action='history' type='button'>Historie</button>" +
           "<button class='btn-info' data-action='info' type='button'>Info</button>" +
-          "<button class='btn-contact' data-action='contact' type='button'>Ansprech<br>partner</button><button class='btn-correspondence' data-action='corr' type='button'><span class='ico'>📎</span><span class='lbl'>Daten</span></button>" +
+          "<button class='btn-contact' data-action='contact' type='button'>Ansprech<br>partner</button>" +
+          "<button class='btn-correspondence' data-action='corr' type='button'><span class='ico'>📎</span><span class='lbl'>Daten</span></button>" +
         "</div>" +
       "</div>";
     }).join("");
@@ -5277,6 +5279,7 @@ if ('serviceWorker' in navigator) {
 
     target.querySelectorAll(".v19MobileRow").forEach(row=>{
       const i = Number(row.dataset.index);
+      row.querySelector("[data-action='edit']")?.addEventListener("click", ()=>window.v125OpenDebtEditor && window.v125OpenDebtEditor(i));
       row.querySelector("[data-action='status']")?.addEventListener("click", ()=>toggleStatus(i));
       row.querySelector("[data-action='delete']")?.addEventListener("click", ()=>removeDebt(i));
       row.querySelector("[data-action='pay']")?.addEventListener("click", ()=>paySingleDebt(i));
@@ -11254,6 +11257,188 @@ body.v105EditOpen #fabAdd{display:none!important}
   window.addEventListener('load',()=>{init();setTimeout(init,700);});
   $('search')?.addEventListener('input',()=>setTimeout(bindButtons,100));
   init();
+})();
+</script>
+
+
+<style id="v125-mobile-edit-style">
+/* v125: Bearbeiten direkt in der echten Handy-/Tablet-Aktionsleiste */
+.v19Actions .btn-edit{
+  background:linear-gradient(135deg,#c4b5fd,#93c5fd)!important;
+  color:#0b1530!important;
+  font-weight:900!important;
+}
+</style>
+
+<script id="v125-mobile-edit-js">
+(function(){
+  const VERSION='v125';
+  let currentEditIndex=-1;
+
+  function $(id){ return document.getElementById(id); }
+
+  function getDebts(){
+    try{ if(Array.isArray(debts)) return debts; }catch(e){}
+    try{ if(Array.isArray(window.debts)) return window.debts; }catch(e){}
+    try{
+      const raw = localStorage.getItem('godmode_debts');
+      const parsed = raw ? JSON.parse(raw) : [];
+      return Array.isArray(parsed) ? parsed : [];
+    }catch(e){ return []; }
+  }
+
+  function saveAll(list){
+    try{
+      if(typeof save === 'function') save();
+      else localStorage.setItem('godmode_debts', JSON.stringify(list));
+    }catch(e){
+      localStorage.setItem('godmode_debts', JSON.stringify(list));
+    }
+  }
+
+  function toast(msg){
+    try{ if(typeof showToast === 'function') return showToast(msg); }catch(e){}
+    alert(msg);
+  }
+
+  function setVal(id,v){
+    const el = $(id);
+    if(el) el.value = v == null ? '' : String(v);
+  }
+
+  function parseAmount(v){
+    const n = parseFloat(String(v||'').replace(/\./g,'').replace(',','.'));
+    return Number.isFinite(n) ? n : NaN;
+  }
+
+  window.v125OpenDebtEditor = function(i){
+    const list = getDebts();
+    const d = list[i];
+    const overlay = $('v105EditOverlay');
+    if(!d || !overlay){
+      toast('Bearbeiten-Fenster nicht gefunden.');
+      return;
+    }
+
+    currentEditIndex = i;
+    overlay.setAttribute('data-edit-index', String(i));
+
+    const c = (d.contactDetails && typeof d.contactDetails === 'object') ? d.contactDetails : {};
+    setVal('v105Name', d.name || '');
+    setVal('v105Reason', d.grund || d.reason || '');
+    setVal('v105Amount', String(Math.round((Number(d.betrag ?? d.amount ?? 0))*100)/100));
+    setVal('v105Date', d.datum || d.date || '');
+    setVal('v105Case', d.aktenzeichen || d.caseNumber || '');
+    setVal('v105Category', d.category || d.kategorie || 'Sonstiges');
+    setVal('v105Status', d.status || 'offen');
+    setVal('v105ContactName', c.representative || d.contactPerson || '');
+    setVal('v105ContactPhone', c.phone || '');
+    setVal('v105ContactEmail', c.email || '');
+    setVal('v105ContactAddress', c.address || '');
+
+    overlay.classList.add('show');
+    overlay.setAttribute('aria-hidden','false');
+    document.body.classList.add('modalOpen','v105EditOpen');
+  };
+
+  function closeEditor(){
+    const overlay = $('v105EditOverlay');
+    if(overlay){
+      overlay.classList.remove('show');
+      overlay.setAttribute('aria-hidden','true');
+      overlay.removeAttribute('data-edit-index');
+    }
+    currentEditIndex = -1;
+    document.body.classList.remove('v105EditOpen');
+    const addOpen = $('addModal') && ($('addModal').getAttribute('aria-hidden') === 'false' || $('addModal').style.display === 'flex' || $('addModal').style.display === 'block');
+    if(!addOpen) document.body.classList.remove('modalOpen');
+  }
+
+  function readIndex(){
+    const n = Number($('v105EditOverlay')?.getAttribute('data-edit-index'));
+    if(Number.isInteger(n) && n >= 0) return n;
+    if(Number.isInteger(currentEditIndex) && currentEditIndex >= 0) return currentEditIndex;
+    return -1;
+  }
+
+  function saveEditor(){
+    const list = getDebts();
+    const i = readIndex();
+    const d = list[i];
+
+    if(i < 0 || !d){
+      toast('Bearbeiten konnte nicht gespeichert werden: Eintrag nicht gefunden.');
+      return false;
+    }
+
+    const name = String($('v105Name')?.value || '').trim();
+    const grund = String($('v105Reason')?.value || '').trim();
+    const betrag = parseAmount($('v105Amount')?.value);
+
+    if(!name){ toast('Bitte Name / Gläubiger eintragen.'); $('v105Name')?.focus(); return false; }
+    if(!grund){ toast('Bitte Grund eintragen.'); $('v105Reason')?.focus(); return false; }
+    if(!Number.isFinite(betrag) || betrag <= 0){ toast('Bitte Betrag korrekt eintragen.'); $('v105Amount')?.focus(); return false; }
+
+    const category = String($('v105Category')?.value || 'Sonstiges').trim() || 'Sonstiges';
+    const contact = {
+      representative: String($('v105ContactName')?.value || '').trim(),
+      address: String($('v105ContactAddress')?.value || '').trim(),
+      email: String($('v105ContactEmail')?.value || '').trim(),
+      phone: String($('v105ContactPhone')?.value || '').trim()
+    };
+
+    d.name = name;
+    d.grund = grund;
+    d.reason = grund;
+    d.betrag = betrag;
+    d.amount = betrag;
+    d.datum = $('v105Date')?.value || '';
+    d.date = d.datum;
+    d.aktenzeichen = String($('v105Case')?.value || '').trim();
+    d.caseNumber = d.aktenzeichen;
+    d.status = $('v105Status')?.value || 'offen';
+    d.category = category;
+    d.kategorie = category;
+    d.contactDetails = contact;
+    d.contactPerson = [contact.representative, contact.address, contact.email, contact.phone].filter(Boolean).join(' | ');
+
+    if(!Array.isArray(d.editHistory)) d.editHistory = [];
+    d.editHistory.push({at:new Date().toISOString(), text:'Schuldendaten bearbeitet'});
+
+    saveAll(list);
+    try{ if(typeof render === 'function') render(); }catch(e){}
+    closeEditor();
+    toast('Änderungen gespeichert ✅');
+    return true;
+  }
+
+  function bindSave(){
+    const saveBtn = $('v105EditSave');
+    if(saveBtn && saveBtn.dataset.v125Save !== '1'){
+      saveBtn.dataset.v125Save = '1';
+      saveBtn.onclick = function(e){ e.preventDefault(); e.stopPropagation(); return saveEditor(); };
+    }
+    ['v105EditCancel','v105EditClose'].forEach(id=>{
+      const b = $(id);
+      if(b && b.dataset.v125Close !== '1'){
+        b.dataset.v125Close = '1';
+        b.onclick = function(e){ e.preventDefault(); e.stopPropagation(); closeEditor(); };
+      }
+    });
+  }
+
+  function setVersion(){
+    document.querySelectorAll('.v59MenuVersion').forEach(el=>el.textContent=VERSION);
+    ['v98OnlyVersion','v76OnlyVersion','v101OnlyVersion'].forEach(id=>{
+      const el=$(id);
+      if(el) el.textContent=VERSION;
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', ()=>{ bindSave(); setVersion(); });
+  window.addEventListener('load', ()=>{ bindSave(); setVersion(); });
+  bindSave();
+  setVersion();
 })();
 </script>
 
