@@ -1,3 +1,3 @@
-Schulden Manager v122
+Schulden Manager v123
 
-Fix: Bearbeiten-Button flackert beim Scrollen nicht mehr. Die alte Beobachter-Logik wurde deaktiviert; Bearbeiten wird nur nach normalem Rendern gesetzt.
+Fix: Bearbeiten wird fest in der Aktionsleiste gerendert, nicht mehr nachträglich per Beobachter eingefügt. Button-Flackern beim Scrollen wurde beruhigt.

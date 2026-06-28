@@ -3725,6 +3725,7 @@ function render(){
       "<td><span class='"+badgeClass+"'>"+badgeText+"</span></td>" +
       "<td>" +
         "<div class='actionRow'>" +
+          "<button class='btn-edit btn-edit-fixed' type='button'>✎ Bearbeiten</button>" +
           "<button class='btn-status' type='button'>Status</button>" +
           "<button class='btn-delete' type='button'>Löschen</button>" +
           "<button class='btn-pay' type='button'>Abbauen</button>" +
@@ -3760,6 +3761,7 @@ function render(){
         "<div class='metaItem'><span>Zahlungen</span><strong>"+((d.history && d.history.length) || 0)+" Einträge</strong></div>" +
       "</div>" +
       "<div class='mobileRow' style='margin-top:14px;'>" +
+        "<button class='actionBtn btn-edit btn-edit-fixed' type='button'><span class='ico'>✎</span><span class='lbl'>Bearbeiten</span></button>" +
         "<button class='actionBtn btn-status' type='button'><span class='ico'>↺</span><span class='lbl'>Status</span></button>" +
         "<button class='actionBtn btn-delete' type='button'><span class='ico'>✕</span><span class='lbl'>Löschen</span></button>" +
         "<button class='actionBtn btn-pay' type='button'><span class='ico'>€</span><span class='lbl'>Abbau</span></button>" +
@@ -4103,7 +4105,7 @@ if ('serviceWorker' in navigator) {
           '<button class="miniBtn primary" type="button">Info</button>' +
           '<button class="miniBtn" type="button">Abbau</button>' +
           '<button class="miniBtn" type="button">Ansprechpartner</button>' +
-          '<button class="miniBtn btn-correspondence" type="button">📎 Daten</button>' +
+          '<button class="miniBtn editBtn btn-edit-fixed" type="button">✎ Bearbeiten</button><button class="miniBtn btn-correspondence" type="button">📎 Daten</button>' +
           '<button class="miniBtn" type="button">Status</button>' +
           '<button class="miniBtn" type="button">Historie</button>' +
           '<button class="miniBtn" type="button">Löschen</button>' +
@@ -4128,7 +4130,7 @@ if ('serviceWorker' in navigator) {
           '<button class="miniBtn" type="button">Info</button>' +
           '<button class="miniBtn" type="button">Abbau</button>' +
           '<button class="miniBtn" type="button">Kontakt</button>' +
-          '<button class="miniBtn btn-correspondence" type="button">📎 Daten</button>' +
+          '<button class="miniBtn editBtn btn-edit-fixed" type="button">✎ Bearbeiten</button><button class="miniBtn btn-correspondence" type="button">📎 Daten</button>' +
           '<button class="miniBtn" type="button">Status</button>' +
           '<button class="miniBtn" type="button">Historie</button>' +
           '<button class="miniBtn" type="button">Löschen</button>' +
@@ -4406,7 +4408,7 @@ if ('serviceWorker' in navigator) {
         '<td><span class="statusBadge ' + statusCss(d.status) + '">' + escapeHTML2(prettyStatus(d.status)) + '</span></td>' +
         '<td><div class="tableActions">' +
           '<button class="miniBtn infoBtn" type="button">Info</button>' +
-          '<button class="miniBtn payBtn" type="button">Abbau</button>' +
+          '<button class="miniBtn editBtn btn-edit-fixed" type="button">✎ Bearbeiten</button><button class="miniBtn payBtn" type="button">Abbau</button>' +
           '<button class="miniBtn contactBtn" type="button">Ansprechpartner</button>' +
           '<div class="tableUtilityActions">' +
             '<button class="tinyBtn" type="button" title="Status">↺</button>' +
@@ -4769,7 +4771,8 @@ if ('serviceWorker' in navigator) {
           "<div class='metaItem'><span>Zahlungen</span><strong>"+(((d.history && d.history.length) || 0))+" Einträge</strong></div>" +
         "</div>" +
         "<div class='mobileRow'>" +
-          "<button class='actionBtn btn-status' type='button'><span class='ico'>↺</span><span class='lbl'>Status</span></button>" +
+          "<button class='actionBtn btn-edit btn-edit-fixed' type='button'><span class='ico'>✎</span><span class='lbl'>Bearbeiten</span></button>" +
+        "<button class='actionBtn btn-status' type='button'><span class='ico'>↺</span><span class='lbl'>Status</span></button>" +
           "<button class='actionBtn btn-delete' type='button'><span class='ico'>✕</span><span class='lbl'>Löschen</span></button>" +
           "<button class='actionBtn btn-pay' type='button'><span class='ico'>€</span><span class='lbl'>Abbau</span></button>" +
           "<button class='actionBtn btn-history' type='button'><span class='ico'>◷</span><span class='lbl'>Historie</span></button>" +
@@ -4963,7 +4966,8 @@ if ('serviceWorker' in navigator) {
           "<div class='metaItem'><span>Zahlungen</span><strong>"+(((d.history && d.history.length) || 0))+" Einträge</strong></div>" +
         "</div>" +
         "<div class='mobileRow'>" +
-          "<button class='actionBtn btn-status' type='button'><span class='ico'>↺</span><span class='lbl'>Status</span></button>" +
+          "<button class='actionBtn btn-edit btn-edit-fixed' type='button'><span class='ico'>✎</span><span class='lbl'>Bearbeiten</span></button>" +
+        "<button class='actionBtn btn-status' type='button'><span class='ico'>↺</span><span class='lbl'>Status</span></button>" +
           "<button class='actionBtn btn-delete' type='button'><span class='ico'>✕</span><span class='lbl'>Löschen</span></button>" +
           "<button class='actionBtn btn-pay' type='button'><span class='ico'>€</span><span class='lbl'>Abbau</span></button>" +
           "<button class='actionBtn btn-history' type='button'><span class='ico'>◷</span><span class='lbl'>Historie</span></button>" +
@@ -5102,7 +5106,8 @@ if ('serviceWorker' in navigator) {
           "<div class='metaItem'><span>Zahlungen</span><strong>"+(((d.history && d.history.length) || 0))+" Einträge</strong></div>" +
         "</div>" +
         "<div class='mobileRow'>" +
-          "<button class='actionBtn btn-status' type='button'><span class='ico'>↺</span><span class='lbl'>Status</span></button>" +
+          "<button class='actionBtn btn-edit btn-edit-fixed' type='button'><span class='ico'>✎</span><span class='lbl'>Bearbeiten</span></button>" +
+        "<button class='actionBtn btn-status' type='button'><span class='ico'>↺</span><span class='lbl'>Status</span></button>" +
           "<button class='actionBtn btn-delete' type='button'><span class='ico'>✕</span><span class='lbl'>Löschen</span></button>" +
           "<button class='actionBtn btn-pay' type='button'><span class='ico'>€</span><span class='lbl'>Abbau</span></button>" +
           "<button class='actionBtn btn-history' type='button'><span class='ico'>◷</span><span class='lbl'>Historie</span></button>" +
@@ -10929,13 +10934,81 @@ body.v105EditOpen #fabAdd{display:none!important}
 }
 </style>
 
-<script id="v122-edit-no-scroll-flicker-js">
+<script id="v122-edit-no-scroll-flicker-js-disabled-v123">/* disabled in v123: edit is built into render */</script>
+
+
+<style id="v123-fixed-edit-no-flicker-style">
+/* v123: Buttons ruhig beim Scrollen, Bearbeiten fest gerendert */
+[data-v105-edit],[data-v106-mobile-edit],[data-v107-edit],[data-v108-edit],[data-v109-edit],[data-v110-edit],
+[data-v115-edit],[data-v116-edit],[data-v117-edit],[data-v118-edit],[data-v119-edit],[data-v122-edit],
+.v106MobileEditTop,.v107EditLine,.v108EditInline,.v109EditActionBtn,.v110EditBeforeStatus,.v115EditBtn,.v116EditStableBtn,.v117EditBtn,.v118EditBtn,.v119EditBtn,.v122EditBtn{
+  display:none!important;
+}
+
+.btn-edit-fixed,
+.editBtn.btn-edit-fixed{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:7px!important;
+  min-height:38px!important;
+  padding:0 12px!important;
+  border-radius:12px!important;
+  font-size:13px!important;
+  font-weight:900!important;
+  background:#12233a!important;
+  color:#eaf2ff!important;
+  border:1px solid rgba(255,255,255,.09)!important;
+  box-shadow:none!important;
+  transform:none!important;
+  transition:none!important;
+  white-space:nowrap!important;
+  opacity:1!important;
+  visibility:visible!important;
+  pointer-events:auto!important;
+}
+
+.actionRow button,
+.tableActions button,
+.mobileRow button,
+.mobileActionMain button,
+.mobileTinyActions button{
+  transform:none!important;
+  transition:none!important;
+  animation:none!important;
+  will-change:auto!important;
+  backface-visibility:hidden!important;
+}
+
+.actionRow button:hover,
+.tableActions button:hover,
+.mobileRow button:hover,
+.mobileActionMain button:hover,
+.mobileTinyActions button:hover,
+.actionRow button:active,
+.tableActions button:active,
+.mobileRow button:active,
+.mobileActionMain button:active,
+.mobileTinyActions button:active{
+  transform:none!important;
+}
+
+@media(max-width:1180px){
+  .mobileRow .btn-edit-fixed,
+  .mobileActionMain .btn-edit-fixed,
+  .mobileTinyActions .btn-edit-fixed{
+    width:100%!important;
+    min-height:42px!important;
+  }
+}
+</style>
+
+<script id="v123-fixed-edit-no-flicker-js">
 (function(){
-  const VERSION='v122';
+  const VERSION='v123';
   let currentEditIndex=-1;
 
   function $(id){return document.getElementById(id);}
-
   function debtsArr(){
     try{ if(Array.isArray(debts)) return debts; }catch(e){}
     try{ if(Array.isArray(window.debts)) return window.debts; }catch(e){}
@@ -10945,7 +11018,6 @@ body.v105EditOpen #fabAdd{display:none!important}
       return Array.isArray(parsed) ? parsed : [];
     }catch(e){ return []; }
   }
-
   function visibleIndices(){
     const list=debtsArr();
     const s=String($('search')?.value||'').toLowerCase();
@@ -10956,23 +11028,19 @@ body.v105EditOpen #fabAdd{display:none!important}
     });
     return out;
   }
-
-  function saveAll(list){
-    try{ if(typeof save==='function') save(); else localStorage.setItem('godmode_debts',JSON.stringify(list)); }
-    catch(e){ localStorage.setItem('godmode_debts',JSON.stringify(list)); }
-  }
-
-  function toast(msg){
-    try{ if(typeof showToast==='function') return showToast(msg); }catch(e){}
-    alert(msg);
-  }
-
   function parseAmount(v){
     const n=parseFloat(String(v||'').replace(/\./g,'').replace(',','.'));
     return Number.isFinite(n)?n:NaN;
   }
-
-  function setVal(id,v){ const el=$(id); if(el) el.value=v==null?'':String(v); }
+  function saveAll(list){
+    try{ if(typeof save==='function') save(); else localStorage.setItem('godmode_debts',JSON.stringify(list)); }
+    catch(e){ localStorage.setItem('godmode_debts',JSON.stringify(list)); }
+  }
+  function toast(msg){
+    try{ if(typeof showToast==='function') return showToast(msg); }catch(e){}
+    alert(msg);
+  }
+  function setVal(id,v){const el=$(id); if(el) el.value=v==null?'':String(v);}
 
   function openEditor(i){
     const list=debtsArr();
@@ -11059,137 +11127,81 @@ body.v105EditOpen #fabAdd{display:none!important}
     return true;
   }
 
-  function removeOldButtons(root){
-    (root||document).querySelectorAll('[data-v105-edit],[data-v106-mobile-edit],[data-v107-edit],[data-v108-edit],[data-v109-edit],[data-v110-edit],[data-v115-edit],[data-v116-edit],[data-v117-edit],[data-v118-edit],[data-v119-edit],.v106MobileEditTop,.v107EditLine,.v108EditInline,.v109EditActionBtn,.v110EditBeforeStatus,.v115EditBtn,.v116EditStableBtn,.v117EditBtn,.v118EditBtn,.v119EditBtn').forEach(el=>el.remove());
-  }
-
-  function makeBtn(i){
-    const b=document.createElement('button');
-    b.type='button';
-    b.className='v122EditBtn';
-    b.setAttribute('data-v122-edit','1');
-    b.setAttribute('data-index',String(i));
-    b.textContent='✎ Bearbeiten';
-    b.addEventListener('click',function(e){
-      e.preventDefault(); e.stopPropagation();
-      openEditor(Number(b.getAttribute('data-index')));
-    },true);
-    b.addEventListener('touchend',function(e){
-      e.preventDefault(); e.stopPropagation();
-      openEditor(Number(b.getAttribute('data-index')));
-    },{capture:true,passive:false});
-    return b;
-  }
-
-  function boxLooksLikeActions(el){
-    if(!el || el.nodeType!==1) return false;
-    if(el.classList.contains('actionRow') || el.classList.contains('tableActions') || el.classList.contains('mobileRow') || el.classList.contains('mobileActionMain') || el.classList.contains('mobileTinyActions')) return true;
-    const direct=[...el.children].filter(x=>x.tagName==='BUTTON');
-    if(direct.length<2) return false;
-    const txt=direct.map(b=>String(b.textContent||'').toLowerCase()).join(' ');
-    return txt.includes('status') && (txt.includes('löschen') || txt.includes('abbau') || txt.includes('akte') || txt.includes('daten') || txt.includes('info') || txt.includes('ansprech'));
-  }
-
-  function collectActionBoxes(){
-    const set=new Set();
-    document.querySelectorAll('.actionRow,.tableActions,.mobileRow,.mobileActionMain,.mobileTinyActions').forEach(x=>set.add(x));
-    document.querySelectorAll('button').forEach(btn=>{
-      if(!String(btn.textContent||'').toLowerCase().includes('status')) return;
-      let p=btn.parentElement;
-      for(let d=0;p&&d<4;d++,p=p.parentElement){
-        if(boxLooksLikeActions(p)){ set.add(p); break; }
-      }
-    });
-    return [...set].filter(x=>x && x.isConnected);
-  }
-
-  function indexForBox(box,fallback){
+  function indexForButton(btn){
     const vis=visibleIndices();
-
-    const tr=box.closest('#tbody tr');
+    const tr=btn.closest('#tbody tr');
     if(tr){
       const rows=[...document.querySelectorAll('#tbody tr')];
       const pos=rows.indexOf(tr);
       if(vis[pos]!=null) return vis[pos];
     }
-
-    const card=box.closest('#mobileList .mobileCard');
+    const card=btn.closest('#mobileList .mobileCard');
     if(card){
       const cards=[...document.querySelectorAll('#mobileList .mobileCard')];
       const pos=cards.indexOf(card);
       if(vis[pos]!=null) return vis[pos];
     }
-
-    const carrier=box.closest('[data-debt-index],[data-index]');
+    const carrier=btn.closest('[data-debt-index],[data-index]');
     if(carrier){
       const n=Number(carrier.getAttribute('data-debt-index') || carrier.getAttribute('data-index'));
       if(Number.isInteger(n)&&n>=0) return n;
     }
-
-    if(vis[fallback]!=null) return vis[fallback];
-    return fallback;
+    return -1;
   }
 
-  function placeButton(box,i){
-    if(!box || i==null || i<0) return;
-    let btn=box.querySelector('[data-v122-edit]');
-    box.querySelectorAll('[data-v122-edit]').forEach((b,idx)=>{ if(idx>0) b.remove(); });
+  function bindEditButtons(){
+    document.querySelectorAll('.btn-edit-fixed').forEach(btn=>{
+      if(btn.dataset.v123Bound==='1') return;
+      btn.dataset.v123Bound='1';
+      const handler=function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        const i=indexForButton(btn);
+        if(i>=0) openEditor(i);
+      };
+      btn.addEventListener('click',handler,true);
+      btn.addEventListener('touchend',handler,{capture:true,passive:false});
+    });
 
-    if(!btn){
-      btn=makeBtn(i);
-      const status=[...box.children].find(el=>el.tagName==='BUTTON' && String(el.textContent||'').toLowerCase().includes('status'));
-      if(status) box.insertBefore(btn,status);
-      else box.insertBefore(btn,box.firstChild);
-    }
-    btn.setAttribute('data-index',String(i));
-  }
-
-  function applyOnce(){
-    removeOldButtons(document);
-    collectActionBoxes().forEach((box,pos)=>placeButton(box,indexForBox(box,pos)));
     document.querySelectorAll('.v59MenuVersion').forEach(el=>el.textContent=VERSION);
     ['v98OnlyVersion','v76OnlyVersion','v101OnlyVersion'].forEach(id=>{ const el=$(id); if(el) el.textContent=VERSION; });
   }
 
   function bindSave(){
     const saveBtn=$('v105EditSave');
-    if(saveBtn && saveBtn.dataset.v122Save!=='1'){
-      saveBtn.dataset.v122Save='1';
+    if(saveBtn && saveBtn.dataset.v123Save!=='1'){
+      saveBtn.dataset.v123Save='1';
       saveBtn.onclick=function(e){ e.preventDefault(); e.stopPropagation(); return saveEditor(); };
     }
     ['v105EditCancel','v105EditClose'].forEach(id=>{
       const b=$(id);
-      if(b && b.dataset.v122Close!=='1'){
-        b.dataset.v122Close='1';
+      if(b && b.dataset.v123Close!=='1'){
+        b.dataset.v123Close='1';
         b.onclick=function(e){ e.preventDefault(); e.stopPropagation(); closeEditor(); };
       }
     });
   }
 
   const oldRender=window.render;
-  if(typeof oldRender==='function' && !oldRender.__v122NoScrollFlicker){
+  if(typeof oldRender==='function' && !oldRender.__v123FixedEdit){
     const wrapped=function(){
       const r=oldRender.apply(this,arguments);
-      setTimeout(applyOnce,60);
-      setTimeout(applyOnce,220);
+      setTimeout(()=>{bindEditButtons();bindSave();},80);
       return r;
     };
-    wrapped.__v122NoScrollFlicker=true;
+    wrapped.__v123FixedEdit=true;
     window.render=wrapped;
     try{ render=wrapped; }catch(e){}
   }
 
   function init(){
+    bindEditButtons();
     bindSave();
-    applyOnce();
   }
 
-  document.addEventListener('DOMContentLoaded',()=>{init();setTimeout(init,400);});
+  document.addEventListener('DOMContentLoaded',()=>{init();setTimeout(init,500);});
   window.addEventListener('load',()=>{init();setTimeout(init,700);});
-  window.addEventListener('resize',()=>setTimeout(applyOnce,120));
-  $('search')?.addEventListener('input',()=>setTimeout(applyOnce,120));
-
-  // Wichtig: kein MutationObserver, kein Scroll-Listener, kein dauerhaftes Intervall.
+  $('search')?.addEventListener('input',()=>setTimeout(bindEditButtons,100));
   init();
 })();
 </script>
