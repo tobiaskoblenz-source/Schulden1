@@ -1,3 +1,3 @@
-Schulden Manager v126
+Schulden Manager v128
 
-Fix: Bearbeiten-Button ist wieder auf Desktop sichtbar. Handy-/Tablet-Bearbeiten aus v125 bleibt erhalten.
+Fix: Papierkorb auf der Handy-/Tablet-Seite wieder sichtbar. Desktop bleibt wie v127.

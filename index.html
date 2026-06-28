@@ -3725,8 +3725,7 @@ function render(){
       "<td><span class='"+badgeClass+"'>"+badgeText+"</span></td>" +
       "<td>" +
         "<div class='actionRow'>" +
-          "<button class='btn-edit btn-edit-fixed' type='button'>✎ Bearbeiten</button>" +
-          "<button class='btn-edit-fixed' type='button'>✎ Bearbeiten</button><button class='btn-status' type='button'>Status</button>" +
+          "<button class='desktopEditBtnFinal' data-action='edit' type='button'>✎ Bearbeiten</button><button class='btn-status' type='button'>Status</button>" +
           "<button class='btn-delete' type='button'>Löschen</button>" +
           "<button class='btn-pay' type='button'>Abbauen</button>" +
           "<button class='btn-history' type='button'>Historie</button>" +
@@ -4105,7 +4104,7 @@ if ('serviceWorker' in navigator) {
           '<button class="miniBtn primary" type="button">Info</button>' +
           '<button class="miniBtn" type="button">Abbau</button>' +
           '<button class="miniBtn" type="button">Ansprechpartner</button>' +
-          '<button class="miniBtn editBtn btn-edit-fixed" type="button">✎ Bearbeiten</button><button class="miniBtn editBtn btn-edit-fixed" type="button">✎ Bearbeiten</button><button class="miniBtn btn-correspondence" type="button">📎 Daten</button>' +
+          '<button class="miniBtn desktopEditBtnFinal" data-action="edit" type="button">✎ Bearbeiten</button><button class="miniBtn btn-correspondence" type="button">📎 Daten</button>' +
           '<button class="miniBtn" type="button">Status</button>' +
           '<button class="miniBtn" type="button">Historie</button>' +
           '<button class="miniBtn" type="button">Löschen</button>' +
@@ -4130,7 +4129,7 @@ if ('serviceWorker' in navigator) {
           '<button class="miniBtn" type="button">Info</button>' +
           '<button class="miniBtn" type="button">Abbau</button>' +
           '<button class="miniBtn" type="button">Kontakt</button>' +
-          '<button class="miniBtn editBtn btn-edit-fixed" type="button">✎ Bearbeiten</button><button class="miniBtn editBtn btn-edit-fixed" type="button">✎ Bearbeiten</button><button class="miniBtn btn-correspondence" type="button">📎 Daten</button>' +
+          '<button class="miniBtn desktopEditBtnFinal" data-action="edit" type="button">✎ Bearbeiten</button><button class="miniBtn btn-correspondence" type="button">📎 Daten</button>' +
           '<button class="miniBtn" type="button">Status</button>' +
           '<button class="miniBtn" type="button">Historie</button>' +
           '<button class="miniBtn" type="button">Löschen</button>' +
@@ -4408,7 +4407,7 @@ if ('serviceWorker' in navigator) {
         '<td><span class="statusBadge ' + statusCss(d.status) + '">' + escapeHTML2(prettyStatus(d.status)) + '</span></td>' +
         '<td><div class="tableActions">' +
           '<button class="miniBtn infoBtn" type="button">Info</button>' +
-          '<button class="miniBtn editBtn btn-edit-fixed" type="button">✎ Bearbeiten</button><button class="miniBtn editBtn btn-edit-fixed" type="button">✎ Bearbeiten</button><button class="miniBtn desktopEditBtn" type="button">✎ Bearbeiten</button><button class="miniBtn payBtn" type="button">Abbau</button>' +
+          '<button class="miniBtn desktopEditBtnFinal" data-action="edit" type="button">✎ Bearbeiten</button><button class="miniBtn desktopEditBtn" type="button">✎ Bearbeiten</button><button class="miniBtn payBtn" type="button">Abbau</button>' +
           '<button class="miniBtn contactBtn" type="button">Ansprechpartner</button>' +
           '<div class="tableUtilityActions">' +
             '<button class="tinyBtn" type="button" title="Status">↺</button>' +
@@ -11474,23 +11473,55 @@ body.v105EditOpen #fabAdd{display:none!important}
 }
 </style>
 
-<script id="v126-desktop-edit-js">
+<script id="v126-desktop-edit-js-disabled">/* disabled in v127: desktop edit is patched into final table render */</script>
+
+
+<style id="v127-desktop-edit-final-style">
+/* v127: Desktop-Bearbeiten fest in der finalen Tabelle */
+.desktopEditBtnFinal{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:7px!important;
+  min-height:40px!important;
+  padding:0 12px!important;
+  border-radius:12px!important;
+  font-size:13px!important;
+  font-weight:900!important;
+  background:#12233a!important;
+  color:#eaf2ff!important;
+  border:1px solid rgba(255,255,255,.09)!important;
+  box-shadow:none!important;
+  transform:none!important;
+  transition:none!important;
+  white-space:nowrap!important;
+  opacity:1!important;
+  visibility:visible!important;
+  pointer-events:auto!important;
+}
+.desktopEditBtnFinal:hover,
+.desktopEditBtnFinal:active,
+.desktopEditBtnFinal:focus{
+  background:#183154!important;
+  transform:none!important;
+}
+</style>
+
+<script id="v127-desktop-edit-final-js">
 (function(){
-  const VERSION='v126';
+  const VERSION='v127';
   let currentEditIndex=-1;
 
-  function $(id){ return document.getElementById(id); }
-
+  function $(id){return document.getElementById(id);}
   function getDebts(){
     try{ if(Array.isArray(debts)) return debts; }catch(e){}
     try{ if(Array.isArray(window.debts)) return window.debts; }catch(e){}
     try{
-      const raw = localStorage.getItem('godmode_debts');
-      const parsed = raw ? JSON.parse(raw) : [];
+      const raw=localStorage.getItem('godmode_debts');
+      const parsed=raw ? JSON.parse(raw) : [];
       return Array.isArray(parsed) ? parsed : [];
     }catch(e){ return []; }
   }
-
   function visibleIndices(){
     const list=getDebts();
     const s=String($('search')?.value||'').toLowerCase();
@@ -11501,30 +11532,10 @@ body.v105EditOpen #fabAdd{display:none!important}
     });
     return out;
   }
-
-  function saveAll(list){
-    try{
-      if(typeof save === 'function') save();
-      else localStorage.setItem('godmode_debts', JSON.stringify(list));
-    }catch(e){
-      localStorage.setItem('godmode_debts', JSON.stringify(list));
-    }
-  }
-
-  function toast(msg){
-    try{ if(typeof showToast === 'function') return showToast(msg); }catch(e){}
-    alert(msg);
-  }
-
-  function setVal(id,v){
-    const el=$(id);
-    if(el) el.value = v == null ? '' : String(v);
-  }
-
-  function parseAmount(v){
-    const n=parseFloat(String(v||'').replace(/\./g,'').replace(',','.'));
-    return Number.isFinite(n) ? n : NaN;
-  }
+  function toast(msg){try{ if(typeof showToast==='function') return showToast(msg); }catch(e){} alert(msg);}
+  function setVal(id,v){const el=$(id); if(el) el.value=v==null?'':String(v);}
+  function parseAmount(v){const n=parseFloat(String(v||'').replace(/\./g,'').replace(',','.')); return Number.isFinite(n)?n:NaN;}
+  function saveAll(list){try{ if(typeof save==='function') save(); else localStorage.setItem('godmode_debts',JSON.stringify(list)); }catch(e){localStorage.setItem('godmode_debts',JSON.stringify(list));}}
 
   function indexFromButton(btn){
     const vis=visibleIndices();
@@ -11534,24 +11545,15 @@ body.v105EditOpen #fabAdd{display:none!important}
       const pos=rows.indexOf(tr);
       if(vis[pos]!=null) return vis[pos];
     }
-    const card=btn.closest('#mobileList .mobileCard,.v19MobileRow');
-    if(card){
-      const cards=[...document.querySelectorAll('#mobileList .mobileCard,#mobileList .v19MobileRow')];
-      const pos=cards.indexOf(card);
-      if(vis[pos]!=null) return vis[pos];
-      const n=Number(card.getAttribute('data-index'));
-      if(Number.isInteger(n) && n>=0) return n;
-    }
     const carrier=btn.closest('[data-index],[data-debt-index]');
     if(carrier){
       const n=Number(carrier.getAttribute('data-debt-index') || carrier.getAttribute('data-index'));
-      if(Number.isInteger(n) && n>=0) return n;
+      if(Number.isInteger(n)&&n>=0) return n;
     }
     return -1;
   }
 
   function openEditor(i){
-    // Use existing v125 mobile editor if available to keep one behavior everywhere.
     if(typeof window.v125OpenDebtEditor === 'function'){
       window.v125OpenDebtEditor(i);
       currentEditIndex=i;
@@ -11565,19 +11567,19 @@ body.v105EditOpen #fabAdd{display:none!important}
 
     currentEditIndex=i;
     overlay.setAttribute('data-edit-index',String(i));
-
     const c=(d.contactDetails && typeof d.contactDetails==='object') ? d.contactDetails : {};
-    setVal('v105Name', d.name || '');
-    setVal('v105Reason', d.grund || d.reason || '');
-    setVal('v105Amount', String(Math.round((Number(d.betrag ?? d.amount ?? 0))*100)/100));
-    setVal('v105Date', d.datum || d.date || '');
-    setVal('v105Case', d.aktenzeichen || d.caseNumber || '');
-    setVal('v105Category', d.category || d.kategorie || 'Sonstiges');
-    setVal('v105Status', d.status || 'offen');
-    setVal('v105ContactName', c.representative || d.contactPerson || '');
-    setVal('v105ContactPhone', c.phone || '');
-    setVal('v105ContactEmail', c.email || '');
-    setVal('v105ContactAddress', c.address || '');
+
+    setVal('v105Name',d.name||'');
+    setVal('v105Reason',d.grund||d.reason||'');
+    setVal('v105Amount',String(Math.round((Number(d.betrag??d.amount??0))*100)/100));
+    setVal('v105Date',d.datum||d.date||'');
+    setVal('v105Case',d.aktenzeichen||d.caseNumber||'');
+    setVal('v105Category',d.category||d.kategorie||'Sonstiges');
+    setVal('v105Status',d.status||'offen');
+    setVal('v105ContactName',c.representative||d.contactPerson||'');
+    setVal('v105ContactPhone',c.phone||'');
+    setVal('v105ContactEmail',c.email||'');
+    setVal('v105ContactAddress',c.address||'');
 
     overlay.classList.add('show');
     overlay.setAttribute('aria-hidden','false');
@@ -11599,8 +11601,8 @@ body.v105EditOpen #fabAdd{display:none!important}
 
   function readIndex(){
     const n=Number($('v105EditOverlay')?.getAttribute('data-edit-index'));
-    if(Number.isInteger(n) && n>=0) return n;
-    if(Number.isInteger(currentEditIndex) && currentEditIndex>=0) return currentEditIndex;
+    if(Number.isInteger(n)&&n>=0) return n;
+    if(Number.isInteger(currentEditIndex)&&currentEditIndex>=0) return currentEditIndex;
     return -1;
   }
 
@@ -11610,61 +11612,42 @@ body.v105EditOpen #fabAdd{display:none!important}
     const d=list[i];
     if(i<0 || !d){ toast('Bearbeiten konnte nicht gespeichert werden: Eintrag nicht gefunden.'); return false; }
 
-    const name=String($('v105Name')?.value || '').trim();
-    const grund=String($('v105Reason')?.value || '').trim();
+    const name=String($('v105Name')?.value||'').trim();
+    const grund=String($('v105Reason')?.value||'').trim();
     const betrag=parseAmount($('v105Amount')?.value);
-
     if(!name){ toast('Bitte Name / Gläubiger eintragen.'); $('v105Name')?.focus(); return false; }
     if(!grund){ toast('Bitte Grund eintragen.'); $('v105Reason')?.focus(); return false; }
-    if(!Number.isFinite(betrag) || betrag <= 0){ toast('Bitte Betrag korrekt eintragen.'); $('v105Amount')?.focus(); return false; }
+    if(!Number.isFinite(betrag)||betrag<=0){ toast('Bitte Betrag korrekt eintragen.'); $('v105Amount')?.focus(); return false; }
 
-    const category=String($('v105Category')?.value || 'Sonstiges').trim() || 'Sonstiges';
+    const category=String($('v105Category')?.value||'Sonstiges').trim()||'Sonstiges';
     const contact={
-      representative:String($('v105ContactName')?.value || '').trim(),
-      address:String($('v105ContactAddress')?.value || '').trim(),
-      email:String($('v105ContactEmail')?.value || '').trim(),
-      phone:String($('v105ContactPhone')?.value || '').trim()
+      representative:String($('v105ContactName')?.value||'').trim(),
+      address:String($('v105ContactAddress')?.value||'').trim(),
+      email:String($('v105ContactEmail')?.value||'').trim(),
+      phone:String($('v105ContactPhone')?.value||'').trim()
     };
 
     d.name=name; d.grund=grund; d.reason=grund; d.betrag=betrag; d.amount=betrag;
-    d.datum=$('v105Date')?.value || ''; d.date=d.datum;
-    d.aktenzeichen=String($('v105Case')?.value || '').trim(); d.caseNumber=d.aktenzeichen;
-    d.status=$('v105Status')?.value || 'offen';
+    d.datum=$('v105Date')?.value||''; d.date=d.datum;
+    d.aktenzeichen=String($('v105Case')?.value||'').trim(); d.caseNumber=d.aktenzeichen;
+    d.status=$('v105Status')?.value||'offen';
     d.category=category; d.kategorie=category;
     d.contactDetails=contact;
-    d.contactPerson=[contact.representative, contact.address, contact.email, contact.phone].filter(Boolean).join(' | ');
-
+    d.contactPerson=[contact.representative,contact.address,contact.email,contact.phone].filter(Boolean).join(' | ');
     if(!Array.isArray(d.editHistory)) d.editHistory=[];
-    d.editHistory.push({at:new Date().toISOString(), text:'Schuldendaten bearbeitet'});
+    d.editHistory.push({at:new Date().toISOString(),text:'Schuldendaten bearbeitet'});
 
     saveAll(list);
-    try{ if(typeof render === 'function') render(); }catch(e){}
+    try{ if(typeof render==='function') render(); }catch(e){}
     closeEditor();
     toast('Änderungen gespeichert ✅');
     return true;
   }
 
-  function addDesktopFallbackButtons(){
-    // If the string patch misses a desktop render, add a single button only to desktop table rows.
-    document.querySelectorAll('#tbody tr').forEach((row,pos)=>{
-      const box=row.querySelector('.tableActions,.actionRow') || row.querySelector('td:last-child');
-      if(!box || box.querySelector('.desktopEditBtn,.btn-edit-desktop')) return;
-      const btn=document.createElement('button');
-      btn.type='button';
-      btn.className='miniBtn desktopEditBtn';
-      btn.textContent='✎ Bearbeiten';
-      const status=[...box.querySelectorAll('button')].find(b=>String(b.textContent||'').toLowerCase().includes('status'));
-      if(status && status.parentElement===box) box.insertBefore(btn,status);
-      else box.insertBefore(btn,box.firstChild);
-    });
-  }
-
   function bindButtons(){
-    addDesktopFallbackButtons();
-
-    document.querySelectorAll('.desktopEditBtn,.btn-edit-desktop').forEach(btn=>{
-      if(btn.dataset.v126Bound==='1') return;
-      btn.dataset.v126Bound='1';
+    document.querySelectorAll('.desktopEditBtnFinal').forEach(btn=>{
+      if(btn.dataset.v127Bound==='1') return;
+      btn.dataset.v127Bound='1';
       const handler=function(e){
         e.preventDefault();
         e.stopPropagation();
@@ -11684,40 +11667,160 @@ body.v105EditOpen #fabAdd{display:none!important}
 
   function bindSave(){
     const saveBtn=$('v105EditSave');
-    if(saveBtn && saveBtn.dataset.v126Save!=='1'){
-      saveBtn.dataset.v126Save='1';
+    if(saveBtn && saveBtn.dataset.v127Save!=='1'){
+      saveBtn.dataset.v127Save='1';
       saveBtn.onclick=function(e){ e.preventDefault(); e.stopPropagation(); return saveEditor(); };
     }
     ['v105EditCancel','v105EditClose'].forEach(id=>{
       const b=$(id);
-      if(b && b.dataset.v126Close!=='1'){
-        b.dataset.v126Close='1';
+      if(b && b.dataset.v127Close!=='1'){
+        b.dataset.v127Close='1';
         b.onclick=function(e){ e.preventDefault(); e.stopPropagation(); closeEditor(); };
       }
     });
   }
 
   const oldRender=window.render;
-  if(typeof oldRender==='function' && !oldRender.__v126DesktopEdit){
+  if(typeof oldRender==='function' && !oldRender.__v127DesktopFinal){
     const wrapped=function(){
       const r=oldRender.apply(this,arguments);
       setTimeout(()=>{bindButtons();bindSave();},80);
       return r;
     };
-    wrapped.__v126DesktopEdit=true;
+    wrapped.__v127DesktopFinal=true;
     window.render=wrapped;
     try{ render=wrapped; }catch(e){}
   }
 
-  function init(){
-    bindButtons();
-    bindSave();
-  }
-
+  function init(){bindButtons(); bindSave();}
   document.addEventListener('DOMContentLoaded',()=>{init();setTimeout(init,500);});
   window.addEventListener('load',()=>{init();setTimeout(init,700);});
-  $('search')?.addEventListener('input',()=>setTimeout(bindButtons,120));
+  $('search')?.addEventListener('input',()=>setTimeout(bindButtons,100));
   init();
+})();
+</script>
+
+
+<style id="v128-mobile-trash-style">
+/* v128: Papierkorb auf Handy/Tablet wieder sichtbar */
+.mobileTrashBtnV128{
+  display:none;
+}
+
+@media(max-width:1180px){
+  .mobileTrashBtnV128{
+    position:fixed;
+    right:16px;
+    bottom:82px;
+    z-index:9500;
+    min-height:46px;
+    padding:0 14px;
+    border-radius:999px;
+    border:1px solid rgba(255,255,255,.12);
+    background:linear-gradient(135deg,#3a1520,#2a1017)!important;
+    color:#ffccd6!important;
+    box-shadow:0 14px 36px rgba(0,0,0,.34);
+    font-size:13px;
+    font-weight:950;
+    display:inline-flex!important;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    transform:none!important;
+    transition:none!important;
+  }
+
+  body.modalOpen .mobileTrashBtnV128,
+  body.v105EditOpen .mobileTrashBtnV128{
+    display:none!important;
+  }
+}
+
+@media(max-width:480px){
+  .mobileTrashBtnV128{
+    right:12px;
+    bottom:76px;
+    min-height:44px;
+    padding:0 12px;
+    font-size:12.5px;
+  }
+}
+</style>
+
+<script id="v128-mobile-trash-js">
+(function(){
+  const VERSION='v128';
+
+  function $(id){return document.getElementById(id);}
+
+  function openTrash(){
+    try{
+      if(typeof window.openTrash === 'function'){
+        window.openTrash();
+        return;
+      }
+    }catch(e){}
+
+    try{
+      if(typeof openTrash === 'function'){
+        openTrash();
+        return;
+      }
+    }catch(e){}
+
+    try{
+      if(typeof showTrash === 'function'){
+        showTrash();
+        return;
+      }
+    }catch(e){}
+
+    try{
+      const btn = document.querySelector('[data-v59="trash"], #sideTrash, #trashBtn, [data-scroll-target="trash"], button[onclick*="trash"], button[onclick*="Trash"]');
+      if(btn){
+        btn.click();
+        return;
+      }
+    }catch(e){}
+
+    try{
+      const candidates = [...document.querySelectorAll('button,.sideNavBtn')];
+      const trashBtn = candidates.find(b => String(b.textContent||'').toLowerCase().includes('papierkorb'));
+      if(trashBtn){
+        trashBtn.click();
+        return;
+      }
+    }catch(e){}
+
+    alert('Papierkorb konnte nicht geöffnet werden.');
+  }
+
+  function ensureButton(){
+    let b = $('mobileTrashBtnV128');
+    if(!b){
+      b = document.createElement('button');
+      b.id = 'mobileTrashBtnV128';
+      b.className = 'mobileTrashBtnV128';
+      b.type = 'button';
+      b.innerHTML = '🗑 Papierkorb';
+      b.addEventListener('click', function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        openTrash();
+      }, true);
+      document.body.appendChild(b);
+    }
+
+    document.querySelectorAll('.v59MenuVersion').forEach(el=>el.textContent=VERSION);
+    ['v98OnlyVersion','v76OnlyVersion','v101OnlyVersion'].forEach(id=>{
+      const el=$(id);
+      if(el) el.textContent=VERSION;
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', ensureButton);
+  window.addEventListener('load', ensureButton);
+  ensureButton();
 })();
 </script>
 
