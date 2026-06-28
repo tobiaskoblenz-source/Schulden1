@@ -9771,211 +9771,7 @@ body.v105EditOpen #fabAdd{display:none!important}
   </div>
 </div>
 
-<script id="v105-edit-debt-js">
-(function(){
-  const VERSION='v105';
-  let editIndex = -1;
-
-  function $(id){ return document.getElementById(id); }
-  function arr(){
-    try{
-      if(Array.isArray(debts)) return debts;
-    }catch(e){}
-    if(Array.isArray(window.debts)) return window.debts;
-    try{
-      const raw = localStorage.getItem('godmode_debts');
-      const parsed = raw ? JSON.parse(raw) : [];
-      return Array.isArray(parsed) ? parsed : [];
-    }catch(e){ return []; }
-  }
-  function saveAll(){
-    try{
-      if(typeof save === 'function') save();
-      else localStorage.setItem('godmode_debts', JSON.stringify(arr()));
-    }catch(e){
-      localStorage.setItem('godmode_debts', JSON.stringify(arr()));
-    }
-  }
-  function toast(msg){
-    try{ if(typeof showToast === 'function') return showToast(msg); }catch(e){}
-    try{ alert(msg); }catch(e){}
-  }
-  function parseAmount(v){
-    const n = parseFloat(String(v||'').replace(/\./g,'').replace(',','.'));
-    return Number.isFinite(n) ? n : NaN;
-  }
-  function fmtAmount(n){
-    const x = Number(n)||0;
-    return String(Math.round(x*100)/100);
-  }
-  function contactOf(d){
-    const c = (d && typeof d.contactDetails==='object' && d.contactDetails) ? d.contactDetails : {};
-    const legacy = String((d && (d.contactPerson || d.ansprechpartner || d.kontakt)) || '').trim();
-    return {
-      representative: c.representative || c.name || legacy.split('|')[0]?.trim() || '',
-      address: c.address || '',
-      email: c.email || '',
-      phone: c.phone || ''
-    };
-  }
-  function visibleIndices(){
-    const list = arr();
-    const s = String($('search')?.value || '').toLowerCase();
-    const out = [];
-    list.forEach((d,i)=>{
-      if(s && !JSON.stringify(d||{}).toLowerCase().includes(s)) return;
-      out.push(i);
-    });
-    return out;
-  }
-  function setVal(id,v){ const el=$(id); if(el) el.value = v == null ? '' : String(v); }
-
-  function openEdit(i){
-    const list = arr();
-    const d = list[i];
-    if(!d) return;
-    editIndex = i;
-    const c = contactOf(d);
-
-    setVal('v105Name', d.name || '');
-    setVal('v105Reason', d.grund || d.reason || '');
-    setVal('v105Amount', fmtAmount(d.betrag ?? d.amount ?? 0));
-    setVal('v105Date', d.datum || d.date || '');
-    setVal('v105Case', d.aktenzeichen || d.caseNumber || '');
-    setVal('v105Category', d.category || d.kategorie || 'Sonstiges');
-    setVal('v105Status', d.status || 'offen');
-    setVal('v105ContactName', c.representative || '');
-    setVal('v105ContactPhone', c.phone || '');
-    setVal('v105ContactEmail', c.email || '');
-    setVal('v105ContactAddress', c.address || '');
-
-    const overlay = $('v105EditOverlay');
-    if(overlay){
-      overlay.classList.add('show');
-      overlay.setAttribute('aria-hidden','false');
-      document.body.classList.add('modalOpen','v105EditOpen');
-      setTimeout(()=>$('v105Name')?.focus(), 60);
-    }
-  }
-
-  function closeEdit(){
-    editIndex = -1;
-    const overlay = $('v105EditOverlay');
-    if(overlay){
-      overlay.classList.remove('show');
-      overlay.setAttribute('aria-hidden','true');
-      document.body.classList.remove('v105EditOpen');
-      const addOpen = $('addModal') && ($('addModal').getAttribute('aria-hidden') === 'false' || $('addModal').style.display === 'flex' || $('addModal').style.display === 'block');
-      if(!addOpen) document.body.classList.remove('modalOpen');
-    }
-  }
-
-  function saveEdit(){
-    const list = arr();
-    const d = list[editIndex];
-    if(!d) return closeEdit();
-
-    const name = String($('v105Name')?.value || '').trim();
-    const grund = String($('v105Reason')?.value || '').trim();
-    const betrag = parseAmount($('v105Amount')?.value);
-    if(!name){ toast('Bitte Name / Gläubiger eintragen.'); $('v105Name')?.focus(); return; }
-    if(!grund){ toast('Bitte Grund eintragen.'); $('v105Reason')?.focus(); return; }
-    if(!Number.isFinite(betrag) || betrag <= 0){ toast('Bitte Betrag korrekt eintragen.'); $('v105Amount')?.focus(); return; }
-
-    const category = String($('v105Category')?.value || 'Sonstiges').trim() || 'Sonstiges';
-    const contact = {
-      representative: String($('v105ContactName')?.value || '').trim(),
-      address: String($('v105ContactAddress')?.value || '').trim(),
-      email: String($('v105ContactEmail')?.value || '').trim(),
-      phone: String($('v105ContactPhone')?.value || '').trim()
-    };
-
-    d.name = name;
-    d.grund = grund;
-    d.reason = grund;
-    d.betrag = betrag;
-    d.amount = betrag;
-    d.datum = $('v105Date')?.value || '';
-    d.date = d.datum;
-    d.aktenzeichen = String($('v105Case')?.value || '').trim();
-    d.caseNumber = d.aktenzeichen;
-    d.status = $('v105Status')?.value || 'offen';
-    d.category = category;
-    d.kategorie = category;
-    d.contactDetails = contact;
-    d.contactPerson = [contact.representative, contact.address, contact.email, contact.phone].filter(Boolean).join(' | ');
-
-    if(!Array.isArray(d.editHistory)) d.editHistory = [];
-    d.editHistory.push({at:new Date().toISOString(), text:'Schuldendaten bearbeitet'});
-
-    saveAll();
-    try{ if(typeof render === 'function') render(); }catch(e){}
-    setTimeout(injectEditButtons, 50);
-    closeEdit();
-    toast('Änderungen gespeichert ✅');
-  }
-
-  function makeEditButton(i, mobile){
-    const b = document.createElement('button');
-    b.type = 'button';
-    b.className = mobile ? 'actionBtn v105EditBtn' : 'v105EditBtn miniBtn';
-    b.setAttribute('data-v105-edit','1');
-    b.setAttribute('data-index', String(i));
-    b.innerHTML = mobile ? "<span class='ico'>✎</span><span class='lbl'>Bearbeiten</span>" : "✎ Bearbeiten";
-    b.addEventListener('click', function(e){
-      e.preventDefault();
-      e.stopPropagation();
-      openEdit(i);
-    });
-    return b;
-  }
-
-  function injectEditButtons(){
-    const vis = visibleIndices();
-
-    document.querySelectorAll('#tbody tr').forEach((row,pos)=>{
-      const i = vis[pos];
-      if(i == null || row.querySelector('[data-v105-edit]')) return;
-      const target = row.querySelector('.tableActions,.actionRow') || row.querySelector('td:last-child');
-      if(target) target.insertBefore(makeEditButton(i,false), target.firstChild || null);
-    });
-
-    document.querySelectorAll('#mobileList .mobileCard').forEach((card,pos)=>{
-      const i = vis[pos];
-      if(i == null || card.querySelector('[data-v105-edit]')) return;
-      const target = card.querySelector('.mobileRow,.mobileActionMain,.mobileTinyActions');
-      if(target) target.insertBefore(makeEditButton(i,true), target.firstChild || null);
-    });
-
-    document.querySelectorAll('.v59MenuVersion').forEach(el=>el.textContent=VERSION);
-    ['v98OnlyVersion','v76OnlyVersion','v101OnlyVersion'].forEach(id=>{ const el=$(id); if(el) el.textContent=VERSION; });
-  }
-
-  const oldRender = window.render;
-  if(typeof oldRender === 'function' && !oldRender.__v105EditDebt){
-    const wrapped = function(){
-      const r = oldRender.apply(this, arguments);
-      setTimeout(injectEditButtons, 0);
-      setTimeout(injectEditButtons, 120);
-      return r;
-    };
-    wrapped.__v105EditDebt = true;
-    window.render = wrapped;
-    try{ render = wrapped; }catch(e){}
-  }
-
-  $('v105EditClose')?.addEventListener('click', closeEdit);
-  $('v105EditCancel')?.addEventListener('click', closeEdit);
-  $('v105EditSave')?.addEventListener('click', function(e){ e.preventDefault(); saveEdit(); });
-  $('v105EditOverlay')?.addEventListener('click', function(e){ if(e.target === this) closeEdit(); });
-  document.addEventListener('keydown', function(e){ if(e.key === 'Escape' && $('v105EditOverlay')?.classList.contains('show')) closeEdit(); });
-  document.addEventListener('DOMContentLoaded', ()=>{ setTimeout(injectEditButtons, 100); setTimeout(injectEditButtons, 700); });
-  window.addEventListener('load', ()=>{ setTimeout(injectEditButtons, 150); });
-  document.getElementById('search')?.addEventListener('input', ()=>setTimeout(injectEditButtons, 100));
-  setInterval(injectEditButtons, 2000);
-  setTimeout(injectEditButtons, 100);
-})();
-</script>
+<script id="v105-edit-debt-js-disabled">/* disabled in v117: replaced by one stable edit implementation */</script>
 
 
 <style id="v106-mobile-edit-button-style">
@@ -10018,150 +9814,7 @@ body.v105EditOpen #fabAdd{display:none!important}
 }
 </style>
 
-<script id="v106-mobile-edit-button-js">
-(function(){
-  const VERSION = 'v106';
-
-  function $(id){ return document.getElementById(id); }
-
-  function getDebts(){
-    try{ if(Array.isArray(debts)) return debts; }catch(e){}
-    try{ if(Array.isArray(window.debts)) return window.debts; }catch(e){}
-    return [];
-  }
-
-  function visibleIndices(){
-    const list = getDebts();
-    const s = String($('search')?.value || '').toLowerCase();
-    const out = [];
-    list.forEach((d,i)=>{
-      try{
-        if(s && !JSON.stringify(d || {}).toLowerCase().includes(s)) return;
-      }catch(e){}
-      out.push(i);
-    });
-    return out;
-  }
-
-  function openEdit(i){
-    const old = document.querySelector('[data-v105-edit][data-index="'+i+'"]');
-    if(old){
-      old.click();
-      return;
-    }
-
-    // Fallback: öffnet das v105-Bearbeitungsfenster direkt, falls der alte Button noch nicht injiziert wurde.
-    try{
-      const overlay = $('v105EditOverlay');
-      const list = getDebts();
-      const d = list[i];
-      if(!overlay || !d) return;
-
-      function val(id, v){ const el=$(id); if(el) el.value = v == null ? '' : String(v); }
-      const c = (d.contactDetails && typeof d.contactDetails === 'object') ? d.contactDetails : {};
-      val('v105Name', d.name || '');
-      val('v105Reason', d.grund || d.reason || '');
-      val('v105Amount', String(Math.round((Number(d.betrag || d.amount || 0))*100)/100));
-      val('v105Date', d.datum || d.date || '');
-      val('v105Case', d.aktenzeichen || d.caseNumber || '');
-      val('v105Category', d.category || d.kategorie || 'Sonstiges');
-      val('v105Status', d.status || 'offen');
-      val('v105ContactName', c.representative || d.contactPerson || '');
-      val('v105ContactPhone', c.phone || '');
-      val('v105ContactEmail', c.email || '');
-      val('v105ContactAddress', c.address || '');
-
-      overlay.classList.add('show');
-      overlay.setAttribute('aria-hidden','false');
-      document.body.classList.add('modalOpen','v105EditOpen');
-    }catch(e){
-      console.error('v106 open edit fallback', e);
-    }
-  }
-
-  function makeMobileEditButton(i){
-    const b = document.createElement('button');
-    b.type = 'button';
-    b.className = 'v106MobileEditTop';
-    b.setAttribute('data-v106-mobile-edit','1');
-    b.setAttribute('data-index', String(i));
-    b.innerHTML = '<span>✎</span><span>Bearbeiten</span>';
-    b.addEventListener('click', function(e){
-      e.preventDefault();
-      e.stopPropagation();
-      openEdit(i);
-    }, true);
-    b.addEventListener('touchend', function(e){
-      e.preventDefault();
-      e.stopPropagation();
-      openEdit(i);
-    }, {capture:true, passive:false});
-    return b;
-  }
-
-  function injectMobileEditButtons(){
-    const cards = document.querySelectorAll('#mobileList .mobileCard');
-    if(!cards.length) return;
-
-    const vis = visibleIndices();
-    cards.forEach((card, pos)=>{
-      const i = vis[pos];
-      if(i == null) return;
-
-      let btn = card.querySelector('[data-v106-mobile-edit]');
-      if(!btn){
-        btn = makeMobileEditButton(i);
-
-        // Direkt nach Betrag/Meta einfügen, damit er auf Handy und Tablet sofort sichtbar ist.
-        const meta = card.querySelector('.mobileMeta');
-        const row = card.querySelector('.mobileRow,.mobileActionMain,.mobileTinyActions');
-        if(meta && meta.parentNode){
-          meta.insertAdjacentElement('afterend', btn);
-        }else if(row && row.parentNode){
-          row.parentNode.insertBefore(btn, row);
-        }else{
-          card.appendChild(btn);
-        }
-      }else{
-        btn.setAttribute('data-index', String(i));
-      }
-    });
-
-    document.querySelectorAll('.v59MenuVersion').forEach(el=>el.textContent=VERSION);
-    ['v98OnlyVersion','v76OnlyVersion','v101OnlyVersion'].forEach(id=>{
-      const el=$(id);
-      if(el) el.textContent=VERSION;
-    });
-  }
-
-  const oldRender = window.render;
-  if(typeof oldRender === 'function' && !oldRender.__v106MobileEdit){
-    const wrapped = function(){
-      const r = oldRender.apply(this, arguments);
-      setTimeout(injectMobileEditButtons, 0);
-      setTimeout(injectMobileEditButtons, 120);
-      setTimeout(injectMobileEditButtons, 400);
-      return r;
-    };
-    wrapped.__v106MobileEdit = true;
-    window.render = wrapped;
-    try{ render = wrapped; }catch(e){}
-  }
-
-  document.addEventListener('DOMContentLoaded', ()=>{
-    setTimeout(injectMobileEditButtons, 100);
-    setTimeout(injectMobileEditButtons, 600);
-    setTimeout(injectMobileEditButtons, 1400);
-  });
-  window.addEventListener('load', ()=>{
-    setTimeout(injectMobileEditButtons, 150);
-    setTimeout(injectMobileEditButtons, 800);
-  });
-  $('search')?.addEventListener('input', ()=>setTimeout(injectMobileEditButtons, 120));
-  setInterval(injectMobileEditButtons, 1200);
-  setTimeout(injectMobileEditButtons, 100);
-})();
-</script>
+<script id="v106-mobile-edit-button-js-disabled">/* disabled in v117: replaced by one stable edit implementation */</script>
 
 
 <style id="v107-mobile-edit-force-style">
@@ -10203,183 +9856,7 @@ body.v105EditOpen #fabAdd{display:none!important}
 }
 </style>
 
-<script id="v107-mobile-edit-force-js">
-(function(){
-  const VERSION='v107';
-
-  function $(id){ return document.getElementById(id); }
-
-  function getDebts(){
-    try{ if(Array.isArray(debts)) return debts; }catch(e){}
-    try{ if(Array.isArray(window.debts)) return window.debts; }catch(e){}
-    try{
-      const raw=localStorage.getItem('godmode_debts');
-      const parsed=raw ? JSON.parse(raw) : [];
-      return Array.isArray(parsed) ? parsed : [];
-    }catch(e){ return []; }
-  }
-
-  function visibleIndices(){
-    const list=getDebts();
-    const s=String($('search')?.value||'').toLowerCase();
-    const out=[];
-    list.forEach((d,i)=>{
-      try{
-        if(s && !JSON.stringify(d||{}).toLowerCase().includes(s)) return;
-      }catch(e){}
-      out.push(i);
-    });
-    return out;
-  }
-
-  function clickExistingEdit(i){
-    const selectors=[
-      '[data-v105-edit][data-index="'+i+'"]',
-      '[data-v106-mobile-edit][data-index="'+i+'"]'
-    ];
-    for(const sel of selectors){
-      const el=document.querySelector(sel);
-      if(el){
-        el.dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true}));
-        return true;
-      }
-    }
-    return false;
-  }
-
-  function fallbackOpenEdit(i){
-    if(clickExistingEdit(i)) return;
-
-    try{
-      const overlay=$('v105EditOverlay');
-      const list=getDebts();
-      const d=list[i];
-      if(!overlay || !d){
-        if(typeof showToast==='function') showToast('Bearbeiten-Fenster nicht gefunden.');
-        return;
-      }
-
-      function set(id,v){ const el=$(id); if(el) el.value = v == null ? '' : String(v); }
-      const c=(d.contactDetails && typeof d.contactDetails==='object') ? d.contactDetails : {};
-      set('v105Name', d.name || '');
-      set('v105Reason', d.grund || d.reason || '');
-      set('v105Amount', String(Math.round((Number(d.betrag ?? d.amount ?? 0))*100)/100));
-      set('v105Date', d.datum || d.date || '');
-      set('v105Case', d.aktenzeichen || d.caseNumber || '');
-      set('v105Category', d.category || d.kategorie || 'Sonstiges');
-      set('v105Status', d.status || 'offen');
-      set('v105ContactName', c.representative || d.contactPerson || '');
-      set('v105ContactPhone', c.phone || '');
-      set('v105ContactEmail', c.email || '');
-      set('v105ContactAddress', c.address || '');
-
-      overlay.classList.add('show');
-      overlay.setAttribute('aria-hidden','false');
-      document.body.classList.add('modalOpen','v105EditOpen');
-    }catch(e){
-      console.error('v107 edit fallback failed', e);
-    }
-  }
-
-  function makeBtn(i){
-    const btn=document.createElement('button');
-    btn.type='button';
-    btn.className='v107EditLine';
-    btn.setAttribute('data-v107-edit','1');
-    btn.setAttribute('data-index',String(i));
-    btn.innerHTML='<span>✎</span><span>Bearbeiten</span>';
-    const handler=function(e){
-      e.preventDefault();
-      e.stopPropagation();
-      fallbackOpenEdit(Number(btn.getAttribute('data-index')));
-    };
-    btn.addEventListener('click',handler,true);
-    btn.addEventListener('touchend',handler,{capture:true,passive:false});
-    return btn;
-  }
-
-  function ensureButtons(){
-    const cards=[...document.querySelectorAll('#mobileList .mobileCard')];
-    if(!cards.length) return;
-
-    const vis=visibleIndices();
-
-    cards.forEach((card,pos)=>{
-      const i=vis[pos];
-      if(i==null) return;
-
-      let btn=card.querySelector('.v107EditLine');
-      if(!btn){
-        btn=makeBtn(i);
-
-        // Ganz oben sichtbar, direkt nach dem Kopf der Karte.
-        const top=card.querySelector('.mobileTop');
-        if(top && top.parentNode){
-          top.insertAdjacentElement('afterend',btn);
-        }else{
-          card.insertBefore(btn,card.firstChild);
-        }
-      }
-      btn.setAttribute('data-index',String(i));
-      btn.style.setProperty('display','flex','important');
-      btn.style.setProperty('visibility','visible','important');
-      btn.style.setProperty('opacity','1','important');
-      btn.style.setProperty('pointer-events','auto','important');
-    });
-
-    document.querySelectorAll('.v59MenuVersion').forEach(el=>el.textContent=VERSION);
-    ['v98OnlyVersion','v76OnlyVersion','v101OnlyVersion'].forEach(id=>{
-      const el=$(id);
-      if(el) el.textContent=VERSION;
-    });
-  }
-
-  const oldRender=window.render;
-  if(typeof oldRender==='function' && !oldRender.__v107MobileEditForce){
-    const wrapped=function(){
-      const r=oldRender.apply(this,arguments);
-      requestAnimationFrame(ensureButtons);
-      setTimeout(ensureButtons,80);
-      setTimeout(ensureButtons,300);
-      return r;
-    };
-    wrapped.__v107MobileEditForce=true;
-    window.render=wrapped;
-    try{ render=wrapped; }catch(e){}
-  }
-
-  function startObserver(){
-    const list=$('mobileList');
-    if(!list || list.dataset.v107Observer==='1') return;
-    list.dataset.v107Observer='1';
-    const obs=new MutationObserver(()=>setTimeout(ensureButtons,40));
-    obs.observe(list,{childList:true,subtree:true});
-  }
-
-  document.addEventListener('DOMContentLoaded',()=>{
-    startObserver();
-    ensureButtons();
-    setTimeout(ensureButtons,300);
-    setTimeout(ensureButtons,1000);
-    setTimeout(ensureButtons,2000);
-  });
-  window.addEventListener('load',()=>{
-    startObserver();
-    ensureButtons();
-    setTimeout(ensureButtons,500);
-    setTimeout(ensureButtons,1500);
-  });
-  window.addEventListener('resize',()=>setTimeout(ensureButtons,120));
-  $('search')?.addEventListener('input',()=>setTimeout(ensureButtons,120));
-
-  setInterval(()=>{
-    startObserver();
-    ensureButtons();
-  },1000);
-
-  setTimeout(ensureButtons,100);
-})();
-</script>
+<script id="v107-mobile-edit-force-js-disabled">/* disabled in v117: replaced by one stable edit implementation */</script>
 
 
 <style id="v108-mobile-edit-inline-style">
@@ -10422,170 +9899,7 @@ body.v105EditOpen #fabAdd{display:none!important}
 }
 </style>
 
-<script id="v108-mobile-edit-inline-js">
-(function(){
-  const VERSION='v108';
-
-  function $(id){ return document.getElementById(id); }
-
-  function getDebts(){
-    try{ if(Array.isArray(debts)) return debts; }catch(e){}
-    try{ if(Array.isArray(window.debts)) return window.debts; }catch(e){}
-    try{
-      const raw=localStorage.getItem('godmode_debts');
-      const parsed=raw ? JSON.parse(raw) : [];
-      return Array.isArray(parsed) ? parsed : [];
-    }catch(e){ return []; }
-  }
-
-  function visibleIndices(){
-    const list=getDebts();
-    const s=String($('search')?.value||'').toLowerCase();
-    const out=[];
-    list.forEach((d,i)=>{
-      try{
-        if(s && !JSON.stringify(d||{}).toLowerCase().includes(s)) return;
-      }catch(e){}
-      out.push(i);
-    });
-    return out;
-  }
-
-  function openEditByExisting(i){
-    const el =
-      document.querySelector('[data-v105-edit][data-index="'+i+'"]') ||
-      document.querySelector('[data-v106-mobile-edit][data-index="'+i+'"]');
-    if(el){
-      el.dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true}));
-      return true;
-    }
-    return false;
-  }
-
-  function openEditFallback(i){
-    if(openEditByExisting(i)) return;
-
-    try{
-      const overlay=$('v105EditOverlay');
-      const list=getDebts();
-      const d=list[i];
-      if(!overlay || !d){
-        if(typeof showToast==='function') showToast('Bearbeiten-Fenster nicht gefunden.');
-        return;
-      }
-
-      function set(id,v){ const el=$(id); if(el) el.value = v == null ? '' : String(v); }
-      const c=(d.contactDetails && typeof d.contactDetails==='object') ? d.contactDetails : {};
-      set('v105Name', d.name || '');
-      set('v105Reason', d.grund || d.reason || '');
-      set('v105Amount', String(Math.round((Number(d.betrag ?? d.amount ?? 0))*100)/100));
-      set('v105Date', d.datum || d.date || '');
-      set('v105Case', d.aktenzeichen || d.caseNumber || '');
-      set('v105Category', d.category || d.kategorie || 'Sonstiges');
-      set('v105Status', d.status || 'offen');
-      set('v105ContactName', c.representative || d.contactPerson || '');
-      set('v105ContactPhone', c.phone || '');
-      set('v105ContactEmail', c.email || '');
-      set('v105ContactAddress', c.address || '');
-
-      overlay.classList.add('show');
-      overlay.setAttribute('aria-hidden','false');
-      document.body.classList.add('modalOpen','v105EditOpen');
-    }catch(e){
-      console.error('v108 edit fallback failed', e);
-    }
-  }
-
-  function makeBtn(i){
-    const btn=document.createElement('button');
-    btn.type='button';
-    btn.className='actionBtn v108EditInline';
-    btn.setAttribute('data-v108-edit','1');
-    btn.setAttribute('data-index',String(i));
-    btn.innerHTML='<span class="ico">✎</span><span class="lbl">Bearbeiten</span>';
-    const handler=function(e){
-      e.preventDefault();
-      e.stopPropagation();
-      openEditFallback(Number(btn.getAttribute('data-index')));
-    };
-    btn.addEventListener('click',handler,true);
-    btn.addEventListener('touchend',handler,{capture:true,passive:false});
-    return btn;
-  }
-
-  function placeButtons(){
-    // Den alten oberen Button entfernen/ausblenden, damit nur der Button in der Buttonreihe bleibt.
-    document.querySelectorAll('#mobileList .mobileCard .v107EditLine').forEach(el=>el.remove());
-    document.querySelectorAll('#mobileList .mobileCard .v106MobileEditTop').forEach(el=>el.remove());
-
-    const cards=[...document.querySelectorAll('#mobileList .mobileCard')];
-    if(!cards.length) return;
-
-    const vis=visibleIndices();
-    cards.forEach((card,pos)=>{
-      const i=vis[pos];
-      if(i==null) return;
-
-      const row=card.querySelector('.mobileRow,.mobileActionMain');
-      if(!row) return;
-
-      let btn=row.querySelector('[data-v108-edit]');
-      if(!btn){
-        btn=makeBtn(i);
-        row.insertBefore(btn,row.firstChild);
-      }
-      btn.setAttribute('data-index',String(i));
-      btn.style.setProperty('display','flex','important');
-      btn.style.setProperty('visibility','visible','important');
-      btn.style.setProperty('opacity','1','important');
-      btn.style.setProperty('pointer-events','auto','important');
-    });
-
-    document.querySelectorAll('.v59MenuVersion').forEach(el=>el.textContent=VERSION);
-    ['v98OnlyVersion','v76OnlyVersion','v101OnlyVersion'].forEach(id=>{
-      const el=$(id);
-      if(el) el.textContent=VERSION;
-    });
-  }
-
-  const oldRender=window.render;
-  if(typeof oldRender==='function' && !oldRender.__v108MobileEditInline){
-    const wrapped=function(){
-      const r=oldRender.apply(this,arguments);
-      requestAnimationFrame(placeButtons);
-      setTimeout(placeButtons,100);
-      setTimeout(placeButtons,350);
-      return r;
-    };
-    wrapped.__v108MobileEditInline=true;
-    window.render=wrapped;
-    try{ render=wrapped; }catch(e){}
-  }
-
-  function observe(){
-    const list=$('mobileList');
-    if(!list || list.dataset.v108Observer==='1') return;
-    list.dataset.v108Observer='1';
-    new MutationObserver(()=>setTimeout(placeButtons,40)).observe(list,{childList:true,subtree:true});
-  }
-
-  document.addEventListener('DOMContentLoaded',()=>{
-    observe();
-    placeButtons();
-    setTimeout(placeButtons,300);
-    setTimeout(placeButtons,1000);
-  });
-  window.addEventListener('load',()=>{
-    observe();
-    placeButtons();
-    setTimeout(placeButtons,600);
-  });
-  window.addEventListener('resize',()=>setTimeout(placeButtons,100));
-  $('search')?.addEventListener('input',()=>setTimeout(placeButtons,120));
-  setInterval(()=>{observe();placeButtons();},1200);
-  setTimeout(placeButtons,100);
-})();
-</script>
+<script id="v108-mobile-edit-inline-js-disabled">/* disabled in v117: replaced by one stable edit implementation */</script>
 
 
 <style id="v109-edit-every-actionbar-style">
@@ -10636,194 +9950,7 @@ body.v105EditOpen #fabAdd{display:none!important}
 }
 </style>
 
-<script id="v109-edit-every-actionbar-js">
-(function(){
-  const VERSION='v109';
-
-  function $(id){ return document.getElementById(id); }
-
-  function getDebts(){
-    try{ if(Array.isArray(debts)) return debts; }catch(e){}
-    try{ if(Array.isArray(window.debts)) return window.debts; }catch(e){}
-    try{
-      const raw=localStorage.getItem('godmode_debts');
-      const parsed=raw ? JSON.parse(raw) : [];
-      return Array.isArray(parsed) ? parsed : [];
-    }catch(e){ return []; }
-  }
-
-  function visibleIndices(){
-    const list=getDebts();
-    const s=String($('search')?.value||'').toLowerCase();
-    const out=[];
-    list.forEach((d,i)=>{
-      try{
-        if(s && !JSON.stringify(d||{}).toLowerCase().includes(s)) return;
-      }catch(e){}
-      out.push(i);
-    });
-    return out;
-  }
-
-  function setVal(id,v){
-    const el=$(id);
-    if(el) el.value = v == null ? '' : String(v);
-  }
-
-  function openEditorDirect(i){
-    const overlay=$('v105EditOverlay');
-    const list=getDebts();
-    const d=list[i];
-
-    if(!overlay || !d){
-      if(typeof showToast==='function') showToast('Bearbeiten-Fenster nicht gefunden.');
-      return;
-    }
-
-    const c=(d.contactDetails && typeof d.contactDetails==='object') ? d.contactDetails : {};
-    setVal('v105Name', d.name || '');
-    setVal('v105Reason', d.grund || d.reason || '');
-    setVal('v105Amount', String(Math.round((Number(d.betrag ?? d.amount ?? 0))*100)/100));
-    setVal('v105Date', d.datum || d.date || '');
-    setVal('v105Case', d.aktenzeichen || d.caseNumber || '');
-    setVal('v105Category', d.category || d.kategorie || 'Sonstiges');
-    setVal('v105Status', d.status || 'offen');
-    setVal('v105ContactName', c.representative || d.contactPerson || '');
-    setVal('v105ContactPhone', c.phone || '');
-    setVal('v105ContactEmail', c.email || '');
-    setVal('v105ContactAddress', c.address || '');
-
-    overlay.classList.add('show');
-    overlay.setAttribute('aria-hidden','false');
-    document.body.classList.add('modalOpen','v105EditOpen');
-  }
-
-  function makeBtn(i, mobile){
-    const btn=document.createElement('button');
-    btn.type='button';
-    btn.className=(mobile ? 'actionBtn ' : 'miniBtn ') + 'v109EditActionBtn';
-    btn.setAttribute('data-v109-edit','1');
-    btn.setAttribute('data-index',String(i));
-    btn.innerHTML=mobile
-      ? '<span class="ico">✎</span><span class="lbl">Bearbeiten</span>'
-      : '✎ Bearbeiten';
-
-    const handler=function(e){
-      e.preventDefault();
-      e.stopPropagation();
-      openEditorDirect(Number(btn.getAttribute('data-index')));
-    };
-    btn.addEventListener('click',handler,true);
-    btn.addEventListener('touchend',handler,{capture:true,passive:false});
-    return btn;
-  }
-
-  function injectIntoDesktopTable(){
-    const rows=[...document.querySelectorAll('#tbody tr')];
-    if(!rows.length) return;
-    const vis=visibleIndices();
-
-    rows.forEach((row,pos)=>{
-      const i=vis[pos];
-      if(i==null) return;
-
-      const actionBox=row.querySelector('.actionRow,.tableActions') || row.querySelector('td:last-child');
-      if(!actionBox) return;
-
-      let btn=actionBox.querySelector('[data-v109-edit]');
-      if(!btn){
-        btn=makeBtn(i,false);
-        actionBox.insertBefore(btn, actionBox.firstChild || null);
-      }
-      btn.setAttribute('data-index',String(i));
-      btn.style.setProperty('display','inline-flex','important');
-      btn.style.setProperty('visibility','visible','important');
-      btn.style.setProperty('opacity','1','important');
-      btn.style.setProperty('pointer-events','auto','important');
-    });
-  }
-
-  function injectIntoMobileCards(){
-    document.querySelectorAll('#mobileList .mobileCard .v107EditLine,#mobileList .mobileCard .v106MobileEditTop').forEach(el=>el.remove());
-
-    const cards=[...document.querySelectorAll('#mobileList .mobileCard')];
-    if(!cards.length) return;
-    const vis=visibleIndices();
-
-    cards.forEach((card,pos)=>{
-      const i=vis[pos];
-      if(i==null) return;
-
-      const actionBox=card.querySelector('.mobileRow,.mobileActionMain,.mobileTinyActions');
-      if(!actionBox) return;
-
-      let btn=actionBox.querySelector('[data-v109-edit]');
-      if(!btn){
-        btn=makeBtn(i,true);
-        actionBox.insertBefore(btn, actionBox.firstChild || null);
-      }
-      btn.setAttribute('data-index',String(i));
-      btn.style.setProperty('display','flex','important');
-      btn.style.setProperty('visibility','visible','important');
-      btn.style.setProperty('opacity','1','important');
-      btn.style.setProperty('pointer-events','auto','important');
-    });
-  }
-
-  function apply(){
-    injectIntoDesktopTable();
-    injectIntoMobileCards();
-
-    document.querySelectorAll('.v59MenuVersion').forEach(el=>el.textContent=VERSION);
-    ['v98OnlyVersion','v76OnlyVersion','v101OnlyVersion'].forEach(id=>{
-      const el=$(id);
-      if(el) el.textContent=VERSION;
-    });
-  }
-
-  const oldRender=window.render;
-  if(typeof oldRender==='function' && !oldRender.__v109EditEverywhere){
-    const wrapped=function(){
-      const r=oldRender.apply(this,arguments);
-      requestAnimationFrame(apply);
-      setTimeout(apply,80);
-      setTimeout(apply,300);
-      setTimeout(apply,800);
-      return r;
-    };
-    wrapped.__v109EditEverywhere=true;
-    window.render=wrapped;
-    try{ render=wrapped; }catch(e){}
-  }
-
-  function observe(){
-    ['tbody','mobileList'].forEach(id=>{
-      const el=$(id);
-      if(!el || el.dataset.v109Observer==='1') return;
-      el.dataset.v109Observer='1';
-      new MutationObserver(()=>setTimeout(apply,40)).observe(el,{childList:true,subtree:true});
-    });
-  }
-
-  document.addEventListener('DOMContentLoaded',()=>{
-    observe();
-    apply();
-    setTimeout(apply,300);
-    setTimeout(apply,1200);
-  });
-  window.addEventListener('load',()=>{
-    observe();
-    apply();
-    setTimeout(apply,600);
-    setTimeout(apply,1500);
-  });
-  window.addEventListener('resize',()=>setTimeout(apply,120));
-  $('search')?.addEventListener('input',()=>setTimeout(apply,120));
-
-  setInterval(()=>{observe();apply();},1000);
-  setTimeout(apply,100);
-})();
-</script>
+<script id="v109-edit-every-actionbar-js-disabled">/* disabled in v117: replaced by one stable edit implementation */</script>
 
 
 <style id="v110-edit-before-status-style">
@@ -10872,464 +9999,10 @@ body.v105EditOpen #fabAdd{display:none!important}
 }
 </style>
 
-<script id="v110-edit-before-status-js">
-(function(){
-  const VERSION='v110';
-
-  function $(id){ return document.getElementById(id); }
-
-  function getDebts(){
-    try{ if(Array.isArray(debts)) return debts; }catch(e){}
-    try{ if(Array.isArray(window.debts)) return window.debts; }catch(e){}
-    try{
-      const raw=localStorage.getItem('godmode_debts');
-      const parsed=raw ? JSON.parse(raw) : [];
-      return Array.isArray(parsed) ? parsed : [];
-    }catch(e){ return []; }
-  }
-
-  function visibleIndices(){
-    const list=getDebts();
-    const s=String($('search')?.value||'').toLowerCase();
-    const out=[];
-    list.forEach((d,i)=>{
-      try{
-        if(s && !JSON.stringify(d||{}).toLowerCase().includes(s)) return;
-      }catch(e){}
-      out.push(i);
-    });
-    return out;
-  }
-
-  function setVal(id,v){
-    const el=$(id);
-    if(el) el.value = v == null ? '' : String(v);
-  }
-
-  function openEditor(i){
-    const overlay=$('v105EditOverlay');
-    const list=getDebts();
-    const d=list[i];
-
-    if(!overlay || !d){
-      if(typeof showToast==='function') showToast('Bearbeiten-Fenster nicht gefunden.');
-      return;
-    }
-
-    const c=(d.contactDetails && typeof d.contactDetails==='object') ? d.contactDetails : {};
-    setVal('v105Name', d.name || '');
-    setVal('v105Reason', d.grund || d.reason || '');
-    setVal('v105Amount', String(Math.round((Number(d.betrag ?? d.amount ?? 0))*100)/100));
-    setVal('v105Date', d.datum || d.date || '');
-    setVal('v105Case', d.aktenzeichen || d.caseNumber || '');
-    setVal('v105Category', d.category || d.kategorie || 'Sonstiges');
-    setVal('v105Status', d.status || 'offen');
-    setVal('v105ContactName', c.representative || d.contactPerson || '');
-    setVal('v105ContactPhone', c.phone || '');
-    setVal('v105ContactEmail', c.email || '');
-    setVal('v105ContactAddress', c.address || '');
-
-    overlay.classList.add('show');
-    overlay.setAttribute('aria-hidden','false');
-    document.body.classList.add('modalOpen','v105EditOpen');
-  }
-
-  function makeBtn(i){
-    const btn=document.createElement('button');
-    btn.type='button';
-    btn.className='v110EditBeforeStatus actionBtn miniBtn';
-    btn.setAttribute('data-v110-edit','1');
-    btn.setAttribute('data-index',String(i));
-    btn.innerHTML='<span class="ico">✎</span><span class="lbl">Bearbeiten</span>';
-    const handler=function(e){
-      e.preventDefault();
-      e.stopPropagation();
-      openEditor(Number(btn.getAttribute('data-index')));
-    };
-    btn.addEventListener('click',handler,true);
-    btn.addEventListener('touchend',handler,{capture:true,passive:false});
-    return btn;
-  }
-
-  function findDebtIndexForElement(el, fallbackPosition){
-    // 1. Falls irgendwo schon ein alter Bearbeiten-Button mit Index steckt, übernehmen.
-    const indexed=el.querySelector('[data-index]');
-    if(indexed && indexed.getAttribute('data-index') != null){
-      const n=Number(indexed.getAttribute('data-index'));
-      if(Number.isInteger(n) && n>=0) return n;
-    }
-
-    // 2. Position innerhalb der sichtbaren Karten/Zeilen verwenden.
-    const vis=visibleIndices();
-
-    const card=el.closest('.mobileCard,tr,.debtCard,.debtItem,.debtRow,[data-debt-index]');
-    if(card){
-      const dataIndex=card.getAttribute('data-debt-index') || card.getAttribute('data-index');
-      if(dataIndex != null){
-        const n=Number(dataIndex);
-        if(Number.isInteger(n) && n>=0) return n;
-      }
-
-      const allCards=[...document.querySelectorAll('#mobileList .mobileCard, tbody tr, .debtCard, .debtItem, .debtRow')];
-      const pos=allCards.indexOf(card);
-      if(pos>=0 && vis[pos]!=null) return vis[pos];
-    }
-
-    if(vis[fallbackPosition] != null) return vis[fallbackPosition];
-    return fallbackPosition;
-  }
-
-  function isActionContainer(el){
-    if(!el || el.nodeType!==1) return false;
-    if(el.classList.contains('actionRow') || el.classList.contains('tableActions') || el.classList.contains('mobileRow') || el.classList.contains('mobileActionMain') || el.classList.contains('mobileTinyActions')) return true;
-
-    // Alternative Handy-Seite: Container erkennen, wenn Status/Löschen/Abbau/Info/Daten/QR Buttons drin sind.
-    const text=String(el.textContent||'').toLowerCase();
-    const hasStatus=text.includes('status');
-    const hasActionWords=(text.includes('löschen') || text.includes('abbau') || text.includes('historie') || text.includes('info') || text.includes('daten') || text.includes('qr') || text.includes('ansprech'));
-    const buttons=el.querySelectorAll('button').length;
-    return buttons>=2 && hasStatus && hasActionWords;
-  }
-
-  function collectActionContainers(){
-    const set=new Set();
-
-    document.querySelectorAll('.actionRow,.tableActions,.mobileRow,.mobileActionMain,.mobileTinyActions').forEach(el=>set.add(el));
-
-    // Suche zusätzlich nach Button-Gruppen in der Handy-Seite, die nicht die Standard-Klassen haben.
-    document.querySelectorAll('#mobileList button, .contentArea button, main button').forEach(btn=>{
-      const label=String(btn.textContent||'').toLowerCase();
-      if(!label.includes('status')) return;
-
-      let p=btn.parentElement;
-      for(let depth=0; p && depth<4; depth++, p=p.parentElement){
-        if(isActionContainer(p)){
-          set.add(p);
-          break;
-        }
-      }
-    });
-
-    return [...set];
-  }
-
-  function insertBeforeStatus(container, pos){
-    if(!container || container.querySelector('[data-v110-edit]')) return;
-
-    const i=findDebtIndexForElement(container,pos);
-    if(i==null || i<0) return;
-
-    const btn=makeBtn(i);
-
-    const statusBtn=[...container.querySelectorAll('button')].find(b=>String(b.textContent||'').toLowerCase().includes('status'));
-    if(statusBtn && statusBtn.parentElement===container){
-      container.insertBefore(btn,statusBtn);
-    }else if(statusBtn){
-      statusBtn.insertAdjacentElement('beforebegin',btn);
-    }else{
-      container.insertBefore(btn,container.firstChild);
-    }
-  }
-
-  function apply(){
-    // Alte falsche Top-Buttons entfernen.
-    document.querySelectorAll('#mobileList .v107EditLine,#mobileList .v106MobileEditTop').forEach(el=>el.remove());
-
-    const containers=collectActionContainers();
-    containers.forEach((el,pos)=>insertBeforeStatus(el,pos));
-
-    // vorhandene v110 Buttons aktualisieren / sichtbar halten
-    document.querySelectorAll('[data-v110-edit]').forEach((btn)=>{
-      btn.style.setProperty('display','inline-flex','important');
-      btn.style.setProperty('visibility','visible','important');
-      btn.style.setProperty('opacity','1','important');
-      btn.style.setProperty('pointer-events','auto','important');
-    });
-
-    document.querySelectorAll('.v59MenuVersion').forEach(el=>el.textContent=VERSION);
-    ['v98OnlyVersion','v76OnlyVersion','v101OnlyVersion'].forEach(id=>{
-      const el=$(id);
-      if(el) el.textContent=VERSION;
-    });
-  }
-
-  const oldRender=window.render;
-  if(typeof oldRender==='function' && !oldRender.__v110EditBeforeStatus){
-    const wrapped=function(){
-      const r=oldRender.apply(this,arguments);
-      requestAnimationFrame(apply);
-      setTimeout(apply,80);
-      setTimeout(apply,300);
-      setTimeout(apply,900);
-      return r;
-    };
-    wrapped.__v110EditBeforeStatus=true;
-    window.render=wrapped;
-    try{ render=wrapped; }catch(e){}
-  }
-
-  function observe(){
-    ['tbody','mobileList','debtListSection','dashboardTop'].forEach(id=>{
-      const el=$(id);
-      if(!el || el.dataset.v110Observer==='1') return;
-      el.dataset.v110Observer='1';
-      new MutationObserver(()=>setTimeout(apply,50)).observe(el,{childList:true,subtree:true});
-    });
-  }
-
-  document.addEventListener('DOMContentLoaded',()=>{
-    observe();
-    apply();
-    setTimeout(apply,300);
-    setTimeout(apply,1200);
-    setTimeout(apply,2500);
-  });
-  window.addEventListener('load',()=>{
-    observe();
-    apply();
-    setTimeout(apply,600);
-    setTimeout(apply,1600);
-  });
-  window.addEventListener('resize',()=>setTimeout(apply,120));
-  $('search')?.addEventListener('input',()=>setTimeout(apply,120));
-
-  setInterval(()=>{observe();apply();},1000);
-  setTimeout(apply,100);
-})();
-</script>
+<script id="v110-edit-before-status-js-disabled">/* disabled in v117: replaced by one stable edit implementation */</script>
 
 
-<script id="v111-edit-save-fix-js">
-(function(){
-  const VERSION='v111';
-  let currentEditIndex = -1;
-
-  function $(id){ return document.getElementById(id); }
-
-  function getDebts(){
-    try{ if(Array.isArray(debts)) return debts; }catch(e){}
-    try{ if(Array.isArray(window.debts)) return window.debts; }catch(e){}
-    try{
-      const raw=localStorage.getItem('godmode_debts');
-      const parsed=raw ? JSON.parse(raw) : [];
-      if(Array.isArray(parsed)){
-        try{ window.debts = parsed; }catch(e){}
-        return parsed;
-      }
-    }catch(e){}
-    return [];
-  }
-
-  function saveDebts(list){
-    try{
-      if(typeof save === 'function') save();
-      else localStorage.setItem('godmode_debts', JSON.stringify(list));
-    }catch(e){
-      localStorage.setItem('godmode_debts', JSON.stringify(list));
-    }
-  }
-
-  function toast(msg){
-    try{ if(typeof showToast === 'function') return showToast(msg); }catch(e){}
-    alert(msg);
-  }
-
-  function parseAmount(v){
-    const n=parseFloat(String(v||'').replace(/\./g,'').replace(',','.'));
-    return Number.isFinite(n) ? n : NaN;
-  }
-
-  function setVal(id,v){
-    const el=$(id);
-    if(el) el.value = v == null ? '' : String(v);
-  }
-
-  function fillEditor(i){
-    const list=getDebts();
-    const d=list[i];
-    if(!d) return false;
-
-    currentEditIndex = i;
-    const overlay=$('v105EditOverlay');
-    if(overlay) overlay.setAttribute('data-edit-index', String(i));
-
-    const c=(d.contactDetails && typeof d.contactDetails==='object') ? d.contactDetails : {};
-    setVal('v105Name', d.name || '');
-    setVal('v105Reason', d.grund || d.reason || '');
-    setVal('v105Amount', String(Math.round((Number(d.betrag ?? d.amount ?? 0))*100)/100));
-    setVal('v105Date', d.datum || d.date || '');
-    setVal('v105Case', d.aktenzeichen || d.caseNumber || '');
-    setVal('v105Category', d.category || d.kategorie || 'Sonstiges');
-    setVal('v105Status', d.status || 'offen');
-    setVal('v105ContactName', c.representative || d.contactPerson || '');
-    setVal('v105ContactPhone', c.phone || '');
-    setVal('v105ContactEmail', c.email || '');
-    setVal('v105ContactAddress', c.address || '');
-    return true;
-  }
-
-  function openEditorFixed(i){
-    if(!fillEditor(i)) return;
-    const overlay=$('v105EditOverlay');
-    if(overlay){
-      overlay.classList.add('show');
-      overlay.setAttribute('aria-hidden','false');
-      document.body.classList.add('modalOpen','v105EditOpen');
-      setTimeout(()=>$('v105Name')?.focus(),60);
-    }
-  }
-
-  function readIndex(){
-    const overlay=$('v105EditOverlay');
-    const fromOverlay=Number(overlay?.getAttribute('data-edit-index'));
-    if(Number.isInteger(fromOverlay) && fromOverlay >= 0) return fromOverlay;
-    if(Number.isInteger(currentEditIndex) && currentEditIndex >= 0) return currentEditIndex;
-    return -1;
-  }
-
-  function closeEditor(){
-    const overlay=$('v105EditOverlay');
-    if(overlay){
-      overlay.classList.remove('show');
-      overlay.setAttribute('aria-hidden','true');
-      overlay.removeAttribute('data-edit-index');
-    }
-    currentEditIndex = -1;
-    document.body.classList.remove('v105EditOpen');
-    const addOpen = $('addModal') && ($('addModal').getAttribute('aria-hidden') === 'false' || $('addModal').style.display === 'flex' || $('addModal').style.display === 'block');
-    if(!addOpen) document.body.classList.remove('modalOpen');
-  }
-
-  function saveEditorFixed(){
-    const i=readIndex();
-    const list=getDebts();
-    const d=list[i];
-
-    if(i < 0 || !d){
-      toast('Bearbeiten konnte nicht gespeichert werden: Eintrag nicht gefunden.');
-      return false;
-    }
-
-    const name=String($('v105Name')?.value || '').trim();
-    const grund=String($('v105Reason')?.value || '').trim();
-    const betrag=parseAmount($('v105Amount')?.value);
-
-    if(!name){ toast('Bitte Name / Gläubiger eintragen.'); $('v105Name')?.focus(); return false; }
-    if(!grund){ toast('Bitte Grund eintragen.'); $('v105Reason')?.focus(); return false; }
-    if(!Number.isFinite(betrag) || betrag <= 0){ toast('Bitte Betrag korrekt eintragen.'); $('v105Amount')?.focus(); return false; }
-
-    const category=String($('v105Category')?.value || 'Sonstiges').trim() || 'Sonstiges';
-    const contact={
-      representative:String($('v105ContactName')?.value || '').trim(),
-      address:String($('v105ContactAddress')?.value || '').trim(),
-      email:String($('v105ContactEmail')?.value || '').trim(),
-      phone:String($('v105ContactPhone')?.value || '').trim()
-    };
-
-    d.name=name;
-    d.grund=grund;
-    d.reason=grund;
-    d.betrag=betrag;
-    d.amount=betrag;
-    d.datum=$('v105Date')?.value || '';
-    d.date=d.datum;
-    d.aktenzeichen=String($('v105Case')?.value || '').trim();
-    d.caseNumber=d.aktenzeichen;
-    d.status=$('v105Status')?.value || 'offen';
-    d.category=category;
-    d.kategorie=category;
-    d.contactDetails=contact;
-    d.contactPerson=[contact.representative, contact.address, contact.email, contact.phone].filter(Boolean).join(' | ');
-
-    if(!Array.isArray(d.editHistory)) d.editHistory=[];
-    d.editHistory.push({at:new Date().toISOString(), text:'Schuldendaten bearbeitet'});
-
-    saveDebts(list);
-
-    try{ if(typeof render === 'function') render(); }catch(e){ console.error(e); }
-    closeEditor();
-    toast('Änderungen gespeichert ✅');
-    return true;
-  }
-
-  function bindEditButtons(){
-    document.querySelectorAll('[data-v110-edit],[data-v109-edit],[data-v108-edit],[data-v107-edit],[data-v106-mobile-edit],[data-v105-edit]').forEach(btn=>{
-      if(btn.dataset.v111Bound === '1') return;
-      btn.dataset.v111Bound='1';
-      const handler=function(e){
-        e.preventDefault();
-        e.stopPropagation();
-        const i=Number(btn.getAttribute('data-index'));
-        if(Number.isInteger(i) && i >= 0) openEditorFixed(i);
-      };
-      btn.addEventListener('click', handler, true);
-      btn.addEventListener('touchend', handler, {capture:true, passive:false});
-    });
-  }
-
-  function bindSaveButtons(){
-    const saveBtn=$('v105EditSave');
-    if(saveBtn && saveBtn.dataset.v111Save !== '1'){
-      saveBtn.dataset.v111Save='1';
-      saveBtn.onclick = function(e){
-        e.preventDefault();
-        e.stopPropagation();
-        return saveEditorFixed();
-      };
-      saveBtn.addEventListener('click', function(e){
-        e.preventDefault();
-        e.stopPropagation();
-        return saveEditorFixed();
-      }, true);
-      saveBtn.addEventListener('touchend', function(e){
-        e.preventDefault();
-        e.stopPropagation();
-        return saveEditorFixed();
-      }, {capture:true, passive:false});
-    }
-
-    ['v105EditCancel','v105EditClose'].forEach(id=>{
-      const b=$(id);
-      if(b && b.dataset.v111Close !== '1'){
-        b.dataset.v111Close='1';
-        b.onclick = function(e){ e.preventDefault(); e.stopPropagation(); closeEditor(); };
-      }
-    });
-  }
-
-  function setVersion(){
-    document.querySelectorAll('.v59MenuVersion').forEach(el=>el.textContent=VERSION);
-    ['v98OnlyVersion','v76OnlyVersion','v101OnlyVersion'].forEach(id=>{
-      const el=$(id);
-      if(el) el.textContent=VERSION;
-    });
-  }
-
-  function init(){
-    bindEditButtons();
-    bindSaveButtons();
-    setVersion();
-  }
-
-  const oldRender=window.render;
-  if(typeof oldRender === 'function' && !oldRender.__v111EditSaveFix){
-    const wrapped=function(){
-      const r=oldRender.apply(this,arguments);
-      setTimeout(init,50);
-      setTimeout(init,250);
-      return r;
-    };
-    wrapped.__v111EditSaveFix=true;
-    window.render=wrapped;
-    try{ render=wrapped; }catch(e){}
-  }
-
-  document.addEventListener('DOMContentLoaded',()=>{init();setTimeout(init,400);setTimeout(init,1200);});
-  window.addEventListener('load',()=>{init();setTimeout(init,600);});
-  setInterval(init,1000);
-  init();
-})();
-</script>
+<script id="v111-edit-save-fix-js-disabled">/* disabled in v117: replaced by one stable edit implementation */</script>
 
 
 <style id="v112-creditor-count-vergleich-placeholder-style">
@@ -11807,285 +10480,7 @@ body.v105EditOpen #fabAdd{display:none!important}
 }
 </style>
 
-<script id="v115-single-edit-button-js">
-(function(){
-  const VERSION='v115';
-  let currentEditIndex = -1;
-
-  function $(id){ return document.getElementById(id); }
-
-  function getDebts(){
-    try{ if(Array.isArray(debts)) return debts; }catch(e){}
-    try{ if(Array.isArray(window.debts)) return window.debts; }catch(e){}
-    try{
-      const raw=localStorage.getItem('godmode_debts');
-      const p=raw ? JSON.parse(raw) : [];
-      return Array.isArray(p) ? p : [];
-    }catch(e){ return []; }
-  }
-
-  function visibleIndices(){
-    const list=getDebts();
-    const s=String($('search')?.value||'').toLowerCase();
-    const out=[];
-    list.forEach((d,i)=>{
-      try{
-        if(s && !JSON.stringify(d||{}).toLowerCase().includes(s)) return;
-      }catch(e){}
-      out.push(i);
-    });
-    return out;
-  }
-
-  function saveDebts(list){
-    try{
-      if(typeof save === 'function') save();
-      else localStorage.setItem('godmode_debts', JSON.stringify(list));
-    }catch(e){
-      localStorage.setItem('godmode_debts', JSON.stringify(list));
-    }
-  }
-
-  function toast(msg){
-    try{ if(typeof showToast==='function') return showToast(msg); }catch(e){}
-    try{ alert(msg); }catch(e){}
-  }
-
-  function parseAmount(v){
-    const n=parseFloat(String(v||'').replace(/\./g,'').replace(',','.'));
-    return Number.isFinite(n) ? n : NaN;
-  }
-
-  function setVal(id,v){
-    const el=$(id);
-    if(el) el.value = v == null ? '' : String(v);
-  }
-
-  function openEditor(i){
-    const list=getDebts();
-    const d=list[i];
-    const overlay=$('v105EditOverlay');
-    if(!d || !overlay){
-      toast('Bearbeiten-Fenster nicht gefunden.');
-      return;
-    }
-
-    currentEditIndex=i;
-    overlay.setAttribute('data-edit-index', String(i));
-
-    const c=(d.contactDetails && typeof d.contactDetails==='object') ? d.contactDetails : {};
-    setVal('v105Name', d.name || '');
-    setVal('v105Reason', d.grund || d.reason || '');
-    setVal('v105Amount', String(Math.round((Number(d.betrag ?? d.amount ?? 0))*100)/100));
-    setVal('v105Date', d.datum || d.date || '');
-    setVal('v105Case', d.aktenzeichen || d.caseNumber || '');
-    setVal('v105Category', d.category || d.kategorie || 'Sonstiges');
-    setVal('v105Status', d.status || 'offen');
-    setVal('v105ContactName', c.representative || d.contactPerson || '');
-    setVal('v105ContactPhone', c.phone || '');
-    setVal('v105ContactEmail', c.email || '');
-    setVal('v105ContactAddress', c.address || '');
-
-    overlay.classList.add('show');
-    overlay.setAttribute('aria-hidden','false');
-    document.body.classList.add('modalOpen','v105EditOpen');
-    setTimeout(()=>$('v105Name')?.focus(),60);
-  }
-
-  function closeEditor(){
-    const overlay=$('v105EditOverlay');
-    if(overlay){
-      overlay.classList.remove('show');
-      overlay.setAttribute('aria-hidden','true');
-      overlay.removeAttribute('data-edit-index');
-    }
-    currentEditIndex=-1;
-    document.body.classList.remove('v105EditOpen');
-    const addOpen = $('addModal') && ($('addModal').getAttribute('aria-hidden') === 'false' || $('addModal').style.display === 'flex' || $('addModal').style.display === 'block');
-    if(!addOpen) document.body.classList.remove('modalOpen');
-  }
-
-  function readIndex(){
-    const overlay=$('v105EditOverlay');
-    const n=Number(overlay?.getAttribute('data-edit-index'));
-    if(Number.isInteger(n) && n>=0) return n;
-    if(Number.isInteger(currentEditIndex) && currentEditIndex>=0) return currentEditIndex;
-    return -1;
-  }
-
-  function saveEditor(){
-    const i=readIndex();
-    const list=getDebts();
-    const d=list[i];
-
-    if(i<0 || !d){
-      toast('Bearbeiten konnte nicht gespeichert werden: Eintrag nicht gefunden.');
-      return false;
-    }
-
-    const name=String($('v105Name')?.value || '').trim();
-    const grund=String($('v105Reason')?.value || '').trim();
-    const betrag=parseAmount($('v105Amount')?.value);
-
-    if(!name){ toast('Bitte Name / Gläubiger eintragen.'); $('v105Name')?.focus(); return false; }
-    if(!grund){ toast('Bitte Grund eintragen.'); $('v105Reason')?.focus(); return false; }
-    if(!Number.isFinite(betrag) || betrag <= 0){ toast('Bitte Betrag korrekt eintragen.'); $('v105Amount')?.focus(); return false; }
-
-    const category=String($('v105Category')?.value || 'Sonstiges').trim() || 'Sonstiges';
-    const contact={
-      representative:String($('v105ContactName')?.value || '').trim(),
-      address:String($('v105ContactAddress')?.value || '').trim(),
-      email:String($('v105ContactEmail')?.value || '').trim(),
-      phone:String($('v105ContactPhone')?.value || '').trim()
-    };
-
-    d.name=name;
-    d.grund=grund;
-    d.reason=grund;
-    d.betrag=betrag;
-    d.amount=betrag;
-    d.datum=$('v105Date')?.value || '';
-    d.date=d.datum;
-    d.aktenzeichen=String($('v105Case')?.value || '').trim();
-    d.caseNumber=d.aktenzeichen;
-    d.status=$('v105Status')?.value || 'offen';
-    d.category=category;
-    d.kategorie=category;
-    d.contactDetails=contact;
-    d.contactPerson=[contact.representative, contact.address, contact.email, contact.phone].filter(Boolean).join(' | ');
-
-    if(!Array.isArray(d.editHistory)) d.editHistory=[];
-    d.editHistory.push({at:new Date().toISOString(), text:'Schuldendaten bearbeitet'});
-
-    saveDebts(list);
-    try{ if(typeof render==='function') render(); }catch(e){ console.error(e); }
-    closeEditor();
-    toast('Änderungen gespeichert ✅');
-    return true;
-  }
-
-  function makeBtn(i){
-    const b=document.createElement('button');
-    b.type='button';
-    b.className='v115EditBtn';
-    b.setAttribute('data-v115-edit','1');
-    b.setAttribute('data-index',String(i));
-    b.innerHTML='✎ Bearbeiten';
-    const handler=function(e){
-      e.preventDefault();
-      e.stopPropagation();
-      openEditor(Number(b.getAttribute('data-index')));
-    };
-    b.addEventListener('click',handler,true);
-    b.addEventListener('touchend',handler,{capture:true,passive:false});
-    return b;
-  }
-
-  function clearOldEditButtons(){
-    document.querySelectorAll('[data-v105-edit],[data-v106-mobile-edit],[data-v107-edit],[data-v108-edit],[data-v109-edit],[data-v110-edit],.v106MobileEditTop,.v107EditLine,.v108EditInline,.v109EditActionBtn,.v110EditBeforeStatus').forEach(el=>{
-      if(!el.matches('[data-v115-edit]')) el.remove();
-    });
-  }
-
-  function insertOneButton(container, i){
-    if(!container || i == null || i < 0) return;
-
-    container.querySelectorAll('[data-v115-edit]').forEach((b,idx)=>{
-      if(idx>0) b.remove();
-    });
-
-    let btn=container.querySelector('[data-v115-edit]');
-    if(!btn){
-      btn=makeBtn(i);
-      const statusBtn=[...container.querySelectorAll('button')].find(b=>String(b.textContent||'').toLowerCase().includes('status'));
-      if(statusBtn && statusBtn.parentNode===container){
-        container.insertBefore(btn,statusBtn);
-      }else{
-        container.insertBefore(btn,container.firstChild||null);
-      }
-    }
-    btn.setAttribute('data-index',String(i));
-  }
-
-  function apply(){
-    clearOldEditButtons();
-    const vis=visibleIndices();
-
-    document.querySelectorAll('#tbody tr').forEach((row,pos)=>{
-      const i=vis[pos];
-      const box=row.querySelector('.actionRow,.tableActions') || row.querySelector('td:last-child');
-      insertOneButton(box,i);
-    });
-
-    document.querySelectorAll('#mobileList .mobileCard').forEach((card,pos)=>{
-      const i=vis[pos];
-      const box=card.querySelector('.mobileRow,.mobileActionMain,.mobileTinyActions');
-      insertOneButton(box,i);
-    });
-
-    document.querySelectorAll('[data-v115-edit]').forEach(btn=>{
-      btn.style.setProperty('display','inline-flex','important');
-      btn.style.setProperty('visibility','visible','important');
-      btn.style.setProperty('opacity','1','important');
-      btn.style.setProperty('pointer-events','auto','important');
-    });
-
-    document.querySelectorAll('.v59MenuVersion').forEach(el=>el.textContent=VERSION);
-    ['v98OnlyVersion','v76OnlyVersion','v101OnlyVersion'].forEach(id=>{
-      const el=$(id);
-      if(el) el.textContent=VERSION;
-    });
-  }
-
-  function bindSave(){
-    const saveBtn=$('v105EditSave');
-    if(saveBtn && saveBtn.dataset.v115Save!=='1'){
-      saveBtn.dataset.v115Save='1';
-      saveBtn.onclick=function(e){e.preventDefault();e.stopPropagation();return saveEditor();};
-      saveBtn.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();return saveEditor();},true);
-      saveBtn.addEventListener('touchend',function(e){e.preventDefault();e.stopPropagation();return saveEditor();},{capture:true,passive:false});
-    }
-
-    ['v105EditCancel','v105EditClose'].forEach(id=>{
-      const b=$(id);
-      if(b && b.dataset.v115Close!=='1'){
-        b.dataset.v115Close='1';
-        b.onclick=function(e){e.preventDefault();e.stopPropagation();closeEditor();};
-      }
-    });
-  }
-
-  const oldRender=window.render;
-  if(typeof oldRender==='function' && !oldRender.__v115SingleEdit){
-    const wrapped=function(){
-      const r=oldRender.apply(this,arguments);
-      setTimeout(()=>{bindSave();apply();},80);
-      setTimeout(apply,300);
-      return r;
-    };
-    wrapped.__v115SingleEdit=true;
-    window.render=wrapped;
-    try{ render=wrapped; }catch(e){}
-  }
-
-  function observe(){
-    ['tbody','mobileList'].forEach(id=>{
-      const el=$(id);
-      if(!el || el.dataset.v115Observer==='1') return;
-      el.dataset.v115Observer='1';
-      new MutationObserver(()=>setTimeout(apply,60)).observe(el,{childList:true,subtree:true});
-    });
-  }
-
-  document.addEventListener('DOMContentLoaded',()=>{bindSave();observe();apply();setTimeout(apply,500);});
-  window.addEventListener('load',()=>{bindSave();observe();apply();setTimeout(apply,800);});
-  window.addEventListener('resize',()=>setTimeout(apply,120));
-  $('search')?.addEventListener('input',()=>setTimeout(apply,120));
-  setInterval(()=>{bindSave();observe();apply();},1200);
-  bindSave();
-  apply();
-})();
-</script>
+<script id="v115-single-edit-button-js-disabled">/* disabled in v117: replaced by one stable edit implementation */</script>
 
 
 <style id="v116-stable-action-buttons-style">
@@ -12182,26 +10577,120 @@ body.v105EditOpen #fabAdd{display:none!important}
 }
 </style>
 
-<script id="v116-stable-action-buttons-js">
+<script id="v116-stable-action-buttons-js-disabled">/* disabled in v117: replaced by one stable edit implementation */</script>
+
+
+<style id="v117-one-stable-edit-style">
+/* v117: alte Bearbeiten-Button-Varianten endgültig ausblenden */
+[data-v105-edit],
+[data-v106-mobile-edit],
+[data-v107-edit],
+[data-v108-edit],
+[data-v109-edit],
+[data-v110-edit],
+[data-v115-edit],
+[data-v116-edit],
+.v106MobileEditTop,
+.v107EditLine,
+.v108EditInline,
+.v109EditActionBtn,
+.v110EditBeforeStatus,
+.v115EditBtn,
+.v116EditStableBtn{
+  display:none !important;
+  visibility:hidden !important;
+  opacity:0 !important;
+  pointer-events:none !important;
+  width:0 !important;
+  height:0 !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  max-width:0 !important;
+  max-height:0 !important;
+  padding:0 !important;
+  margin:0 !important;
+  overflow:hidden !important;
+}
+
+.v117EditBtn{
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:7px !important;
+  min-height:38px !important;
+  padding:0 12px !important;
+  border-radius:12px !important;
+  font-size:13px !important;
+  font-weight:900 !important;
+  background:#12233a !important;
+  color:#eaf2ff !important;
+  border:1px solid rgba(255,255,255,.09) !important;
+  box-shadow:none !important;
+  transform:none !important;
+  transition:none !important;
+  flex:0 0 auto !important;
+  width:auto !important;
+  white-space:nowrap !important;
+}
+
+.v117EditBtn:hover,
+.v117EditBtn:active,
+.v117EditBtn:focus{
+  transform:none !important;
+}
+
+.actionRow,
+.tableActions{
+  display:flex !important;
+  flex-wrap:wrap !important;
+  align-items:center !important;
+  gap:8px !important;
+}
+
+.mobileRow,
+.mobileActionMain{
+  gap:8px !important;
+}
+
+@media(max-width:1180px){
+  .mobileRow,
+  .mobileActionMain{
+    display:grid !important;
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  }
+  .mobileRow .v117EditBtn,
+  .mobileActionMain .v117EditBtn{
+    width:100% !important;
+    min-height:42px !important;
+    display:flex !important;
+  }
+}
+
+@media(min-width:769px) and (max-width:1180px){
+  .mobileRow,
+  .mobileActionMain{
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  }
+}
+</style>
+
+<script id="v117-one-stable-edit-js">
 (function(){
-  const VERSION='v116';
+  const VERSION='v117';
   let currentEditIndex=-1;
-  let applyTimer=null;
 
   function $(id){return document.getElementById(id);}
-
-  function getDebts(){
-    try{if(Array.isArray(debts))return debts;}catch(e){}
-    try{if(Array.isArray(window.debts))return window.debts;}catch(e){}
+  function debtsArr(){
+    try{ if(Array.isArray(debts)) return debts; }catch(e){}
+    try{ if(Array.isArray(window.debts)) return window.debts; }catch(e){}
     try{
       const raw=localStorage.getItem('godmode_debts');
-      const p=raw?JSON.parse(raw):[];
-      return Array.isArray(p)?p:[];
-    }catch(e){return []}
+      const parsed=raw ? JSON.parse(raw) : [];
+      return Array.isArray(parsed) ? parsed : [];
+    }catch(e){ return []; }
   }
-
   function visibleIndices(){
-    const list=getDebts();
+    const list=debtsArr();
     const s=String($('search')?.value||'').toLowerCase();
     const out=[];
     list.forEach((d,i)=>{
@@ -12210,28 +10699,34 @@ body.v105EditOpen #fabAdd{display:none!important}
     });
     return out;
   }
-
+  function saveAll(list){
+    try{ if(typeof save==='function') save(); else localStorage.setItem('godmode_debts',JSON.stringify(list)); }
+    catch(e){ localStorage.setItem('godmode_debts',JSON.stringify(list)); }
+  }
+  function toast(msg){
+    try{ if(typeof showToast==='function') return showToast(msg); }catch(e){}
+    alert(msg);
+  }
   function parseAmount(v){
     const n=parseFloat(String(v||'').replace(/\./g,'').replace(',','.'));
     return Number.isFinite(n)?n:NaN;
   }
-  function setVal(id,v){const el=$(id); if(el) el.value=v==null?'':String(v);}
-  function toast(msg){try{if(typeof showToast==='function')return showToast(msg);}catch(e){} alert(msg);}
+  function setVal(id,v){ const el=$(id); if(el) el.value=v==null?'':String(v); }
 
-  function saveDebts(list){
-    try{ if(typeof save==='function') save(); else localStorage.setItem('godmode_debts',JSON.stringify(list)); }
-    catch(e){ localStorage.setItem('godmode_debts',JSON.stringify(list)); }
+  function cleanupOldButtons(root){
+    (root||document).querySelectorAll('[data-v105-edit],[data-v106-mobile-edit],[data-v107-edit],[data-v108-edit],[data-v109-edit],[data-v110-edit],[data-v115-edit],[data-v116-edit],.v106MobileEditTop,.v107EditLine,.v108EditInline,.v109EditActionBtn,.v110EditBeforeStatus,.v115EditBtn,.v116EditStableBtn').forEach(el=>el.remove());
   }
 
   function openEditor(i){
-    const list=getDebts();
+    const list=debtsArr();
     const d=list[i];
     const overlay=$('v105EditOverlay');
-    if(!d || !overlay){toast('Bearbeiten-Fenster nicht gefunden.'); return;}
+    if(!d || !overlay){ toast('Bearbeiten-Fenster nicht gefunden.'); return; }
+
     currentEditIndex=i;
     overlay.setAttribute('data-edit-index',String(i));
 
-    const c=(d.contactDetails && typeof d.contactDetails==='object')?d.contactDetails:{};
+    const c=(d.contactDetails && typeof d.contactDetails==='object') ? d.contactDetails : {};
     setVal('v105Name',d.name||'');
     setVal('v105Reason',d.grund||d.reason||'');
     setVal('v105Amount',String(Math.round((Number(d.betrag??d.amount??0))*100)/100));
@@ -12247,7 +10742,6 @@ body.v105EditOpen #fabAdd{display:none!important}
     overlay.classList.add('show');
     overlay.setAttribute('aria-hidden','false');
     document.body.classList.add('modalOpen','v105EditOpen');
-    setTimeout(()=>$('v105Name')?.focus(),60);
   }
 
   function closeEditor(){
@@ -12265,23 +10759,23 @@ body.v105EditOpen #fabAdd{display:none!important}
 
   function readIndex(){
     const n=Number($('v105EditOverlay')?.getAttribute('data-edit-index'));
-    if(Number.isInteger(n)&&n>=0)return n;
-    if(Number.isInteger(currentEditIndex)&&currentEditIndex>=0)return currentEditIndex;
+    if(Number.isInteger(n)&&n>=0) return n;
+    if(Number.isInteger(currentEditIndex)&&currentEditIndex>=0) return currentEditIndex;
     return -1;
   }
 
   function saveEditor(){
+    const list=debtsArr();
     const i=readIndex();
-    const list=getDebts();
     const d=list[i];
-    if(i<0 || !d){toast('Bearbeiten konnte nicht gespeichert werden: Eintrag nicht gefunden.'); return false;}
+    if(i<0 || !d){ toast('Bearbeiten konnte nicht gespeichert werden: Eintrag nicht gefunden.'); return false; }
 
     const name=String($('v105Name')?.value||'').trim();
     const grund=String($('v105Reason')?.value||'').trim();
     const betrag=parseAmount($('v105Amount')?.value);
-    if(!name){toast('Bitte Name / Gläubiger eintragen.'); $('v105Name')?.focus(); return false;}
-    if(!grund){toast('Bitte Grund eintragen.'); $('v105Reason')?.focus(); return false;}
-    if(!Number.isFinite(betrag)||betrag<=0){toast('Bitte Betrag korrekt eintragen.'); $('v105Amount')?.focus(); return false;}
+    if(!name){ toast('Bitte Name / Gläubiger eintragen.'); $('v105Name')?.focus(); return false; }
+    if(!grund){ toast('Bitte Grund eintragen.'); $('v105Reason')?.focus(); return false; }
+    if(!Number.isFinite(betrag)||betrag<=0){ toast('Bitte Betrag korrekt eintragen.'); $('v105Amount')?.focus(); return false; }
 
     const category=String($('v105Category')?.value||'Sonstiges').trim()||'Sonstiges';
     const contact={
@@ -12291,126 +10785,123 @@ body.v105EditOpen #fabAdd{display:none!important}
       phone:String($('v105ContactPhone')?.value||'').trim()
     };
 
-    d.name=name; d.grund=grund; d.reason=grund; d.betrag=betrag; d.amount=betrag;
-    d.datum=$('v105Date')?.value||''; d.date=d.datum;
-    d.aktenzeichen=String($('v105Case')?.value||'').trim(); d.caseNumber=d.aktenzeichen;
-    d.status=$('v105Status')?.value||'offen'; d.category=category; d.kategorie=category;
-    d.contactDetails=contact; d.contactPerson=[contact.representative,contact.address,contact.email,contact.phone].filter(Boolean).join(' | ');
+    d.name=name;
+    d.grund=grund;
+    d.reason=grund;
+    d.betrag=betrag;
+    d.amount=betrag;
+    d.datum=$('v105Date')?.value||'';
+    d.date=d.datum;
+    d.aktenzeichen=String($('v105Case')?.value||'').trim();
+    d.caseNumber=d.aktenzeichen;
+    d.status=$('v105Status')?.value||'offen';
+    d.category=category;
+    d.kategorie=category;
+    d.contactDetails=contact;
+    d.contactPerson=[contact.representative,contact.address,contact.email,contact.phone].filter(Boolean).join(' | ');
     if(!Array.isArray(d.editHistory)) d.editHistory=[];
-    d.editHistory.push({at:new Date().toISOString(), text:'Schuldendaten bearbeitet'});
+    d.editHistory.push({at:new Date().toISOString(),text:'Schuldendaten bearbeitet'});
 
-    saveDebts(list);
-    try{ if(typeof render==='function') render(); }catch(e){console.error(e)}
+    saveAll(list);
+    try{ if(typeof render==='function') render(); }catch(e){}
     closeEditor();
     toast('Änderungen gespeichert ✅');
     return true;
   }
 
-  function makeBtn(i){
+  function makeButton(i){
     const b=document.createElement('button');
     b.type='button';
-    b.className='v116EditStableBtn';
-    b.setAttribute('data-v116-edit','1');
+    b.className='v117EditBtn';
+    b.setAttribute('data-v117-edit','1');
     b.setAttribute('data-index',String(i));
-    b.innerHTML='✎ Bearbeiten';
-    const handler=function(e){
+    b.textContent='✎ Bearbeiten';
+    b.addEventListener('click',function(e){
       e.preventDefault();
       e.stopPropagation();
       openEditor(Number(b.getAttribute('data-index')));
-    };
-    b.addEventListener('click',handler,true);
-    b.addEventListener('touchend',handler,{capture:true,passive:false});
+    },true);
+    b.addEventListener('touchend',function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      openEditor(Number(b.getAttribute('data-index')));
+    },{capture:true,passive:false});
     return b;
   }
 
-  function hideOldButtons(container){
-    container.querySelectorAll('[data-v105-edit],[data-v106-mobile-edit],[data-v107-edit],[data-v108-edit],[data-v109-edit],[data-v110-edit],.v106MobileEditTop,.v107EditLine,.v108EditInline,.v109EditActionBtn,.v110EditBeforeStatus').forEach(el=>{
-      if(!el.hasAttribute('data-v116-edit')){
-        el.style.setProperty('display','none','important');
-        el.style.setProperty('visibility','hidden','important');
-        el.style.setProperty('pointer-events','none','important');
-      }
-    });
-  }
+  function placeButton(box,i){
+    if(!box || i==null || i<0) return;
+    cleanupOldButtons(box);
 
-  function ensureOne(container,i){
-    if(!container || i==null || i<0) return;
-    hideOldButtons(container);
-
-    const existing=[...container.querySelectorAll('[data-v116-edit]')];
-    let btn=existing[0];
-    existing.slice(1).forEach(x=>x.remove());
+    let btn=box.querySelector('[data-v117-edit]');
+    box.querySelectorAll('[data-v117-edit]').forEach((b,idx)=>{ if(idx>0) b.remove(); });
 
     if(!btn){
-      btn=makeBtn(i);
-      const statusBtn=[...container.querySelectorAll('button')].find(b=>String(b.textContent||'').toLowerCase().includes('status'));
-      if(statusBtn && statusBtn.parentNode===container) container.insertBefore(btn,statusBtn);
-      else container.insertBefore(btn,container.firstChild||null);
-    }else{
-      btn.setAttribute('data-index',String(i));
+      btn=makeButton(i);
+      const statusBtn=[...box.querySelectorAll('button')].find(b=>String(b.textContent||'').toLowerCase().includes('status'));
+      if(statusBtn && statusBtn.parentElement===box){
+        box.insertBefore(btn,statusBtn);
+      }else{
+        box.insertBefore(btn,box.firstChild);
+      }
     }
+    btn.setAttribute('data-index',String(i));
   }
 
-  function applyStable(){
+  function applyOnce(){
+    cleanupOldButtons(document);
     const vis=visibleIndices();
 
     document.querySelectorAll('#tbody tr').forEach((row,pos)=>{
       const box=row.querySelector('.actionRow,.tableActions') || row.querySelector('td:last-child');
-      ensureOne(box,vis[pos]);
+      placeButton(box,vis[pos]);
     });
 
     document.querySelectorAll('#mobileList .mobileCard').forEach((card,pos)=>{
       const box=card.querySelector('.mobileRow,.mobileActionMain,.mobileTinyActions');
-      ensureOne(box,vis[pos]);
+      placeButton(box,vis[pos]);
     });
 
     document.querySelectorAll('.v59MenuVersion').forEach(el=>el.textContent=VERSION);
-    ['v98OnlyVersion','v76OnlyVersion','v101OnlyVersion'].forEach(id=>{const el=$(id); if(el)el.textContent=VERSION;});
-  }
-
-  function scheduleApply(){
-    clearTimeout(applyTimer);
-    applyTimer=setTimeout(applyStable,80);
+    ['v98OnlyVersion','v76OnlyVersion','v101OnlyVersion'].forEach(id=>{ const el=$(id); if(el) el.textContent=VERSION; });
   }
 
   function bindSave(){
     const saveBtn=$('v105EditSave');
-    if(saveBtn && saveBtn.dataset.v116Save!=='1'){
-      saveBtn.dataset.v116Save='1';
-      saveBtn.onclick=function(e){e.preventDefault();e.stopPropagation();return saveEditor();};
-      saveBtn.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();return saveEditor();},true);
-      saveBtn.addEventListener('touchend',function(e){e.preventDefault();e.stopPropagation();return saveEditor();},{capture:true,passive:false});
+    if(saveBtn && saveBtn.dataset.v117Save!=='1'){
+      saveBtn.dataset.v117Save='1';
+      saveBtn.onclick=function(e){ e.preventDefault(); e.stopPropagation(); return saveEditor(); };
     }
     ['v105EditCancel','v105EditClose'].forEach(id=>{
       const b=$(id);
-      if(b && b.dataset.v116Close!=='1'){
-        b.dataset.v116Close='1';
-        b.onclick=function(e){e.preventDefault();e.stopPropagation();closeEditor();};
+      if(b && b.dataset.v117Close!=='1'){
+        b.dataset.v117Close='1';
+        b.onclick=function(e){ e.preventDefault(); e.stopPropagation(); closeEditor(); };
       }
     });
   }
 
   const oldRender=window.render;
-  if(typeof oldRender==='function' && !oldRender.__v116StableActions){
+  if(typeof oldRender==='function' && !oldRender.__v117OneStableEdit){
     const wrapped=function(){
       const r=oldRender.apply(this,arguments);
-      scheduleApply();
+      setTimeout(applyOnce,60);
       return r;
     };
-    wrapped.__v116StableActions=true;
+    wrapped.__v117OneStableEdit=true;
     window.render=wrapped;
     try{ render=wrapped; }catch(e){}
   }
 
   function init(){
     bindSave();
-    applyStable();
+    applyOnce();
   }
 
-  document.addEventListener('DOMContentLoaded',()=>{init();setTimeout(init,500)});
-  window.addEventListener('load',()=>{init();setTimeout(init,700)});
-  window.addEventListener('resize',scheduleApply);
-  $('search')?.addEventListener('input',scheduleApply);
+  document.addEventListener('DOMContentLoaded',()=>{init();setTimeout(init,400);});
+  window.addEventListener('load',()=>{init();setTimeout(init,600);});
+  window.addEventListener('resize',()=>setTimeout(applyOnce,120));
+  $('search')?.addEventListener('input',()=>setTimeout(applyOnce,120));
   init();
 })();
 </script>

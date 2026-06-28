@@ -1,3 +1,3 @@
-Schulden Manager v116
+Schulden Manager v117
 
-Fix: Aktionsbuttons springen nicht mehr. Bearbeiten wird stabil einmal pro Eintrag gesetzt, ohne dauerndes Entfernen/Neu-Einfügen.
+Fix: Alte Bearbeiten-Skripte deaktiviert. Es gibt nur noch eine stabile Bearbeiten-Logik ohne Intervall/Muta­tions-Loop, damit die Buttons nicht mehr von rechts nach links springen.
