@@ -1,3 +1,3 @@
-Schulden Manager v123
+Schulden Manager v124
 
-Fix: Bearbeiten wird fest in der Aktionsleiste gerendert, nicht mehr nachträglich per Beobachter eingefügt. Button-Flackern beim Scrollen wurde beruhigt.
+Fix: Bearbeiten-Button direkt in der sichtbaren Aktionsleiste Akte/Abbau/Status. Keine nachträgliche Scroll-/Observer-Logik.

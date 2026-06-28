@@ -3726,7 +3726,7 @@ function render(){
       "<td>" +
         "<div class='actionRow'>" +
           "<button class='btn-edit btn-edit-fixed' type='button'>✎ Bearbeiten</button>" +
-          "<button class='btn-status' type='button'>Status</button>" +
+          "<button class='btn-edit-fixed' type='button'>✎ Bearbeiten</button><button class='btn-status' type='button'>Status</button>" +
           "<button class='btn-delete' type='button'>Löschen</button>" +
           "<button class='btn-pay' type='button'>Abbauen</button>" +
           "<button class='btn-history' type='button'>Historie</button>" +
@@ -3762,7 +3762,7 @@ function render(){
       "</div>" +
       "<div class='mobileRow' style='margin-top:14px;'>" +
         "<button class='actionBtn btn-edit btn-edit-fixed' type='button'><span class='ico'>✎</span><span class='lbl'>Bearbeiten</span></button>" +
-        "<button class='actionBtn btn-status' type='button'><span class='ico'>↺</span><span class='lbl'>Status</span></button>" +
+        "<button class='actionBtn btn-edit-fixed' type='button'><span class='ico'>✎</span><span class='lbl'>Bearbeiten</span></button><button class='actionBtn btn-status' type='button'><span class='ico'>↺</span><span class='lbl'>Status</span></button>" +
         "<button class='actionBtn btn-delete' type='button'><span class='ico'>✕</span><span class='lbl'>Löschen</span></button>" +
         "<button class='actionBtn btn-pay' type='button'><span class='ico'>€</span><span class='lbl'>Abbau</span></button>" +
         "<button class='actionBtn btn-history' type='button'><span class='ico'>◷</span><span class='lbl'>Historie</span></button>" +
@@ -4105,7 +4105,7 @@ if ('serviceWorker' in navigator) {
           '<button class="miniBtn primary" type="button">Info</button>' +
           '<button class="miniBtn" type="button">Abbau</button>' +
           '<button class="miniBtn" type="button">Ansprechpartner</button>' +
-          '<button class="miniBtn editBtn btn-edit-fixed" type="button">✎ Bearbeiten</button><button class="miniBtn btn-correspondence" type="button">📎 Daten</button>' +
+          '<button class="miniBtn editBtn btn-edit-fixed" type="button">✎ Bearbeiten</button><button class="miniBtn editBtn btn-edit-fixed" type="button">✎ Bearbeiten</button><button class="miniBtn btn-correspondence" type="button">📎 Daten</button>' +
           '<button class="miniBtn" type="button">Status</button>' +
           '<button class="miniBtn" type="button">Historie</button>' +
           '<button class="miniBtn" type="button">Löschen</button>' +
@@ -4130,7 +4130,7 @@ if ('serviceWorker' in navigator) {
           '<button class="miniBtn" type="button">Info</button>' +
           '<button class="miniBtn" type="button">Abbau</button>' +
           '<button class="miniBtn" type="button">Kontakt</button>' +
-          '<button class="miniBtn editBtn btn-edit-fixed" type="button">✎ Bearbeiten</button><button class="miniBtn btn-correspondence" type="button">📎 Daten</button>' +
+          '<button class="miniBtn editBtn btn-edit-fixed" type="button">✎ Bearbeiten</button><button class="miniBtn editBtn btn-edit-fixed" type="button">✎ Bearbeiten</button><button class="miniBtn btn-correspondence" type="button">📎 Daten</button>' +
           '<button class="miniBtn" type="button">Status</button>' +
           '<button class="miniBtn" type="button">Historie</button>' +
           '<button class="miniBtn" type="button">Löschen</button>' +
@@ -4408,7 +4408,7 @@ if ('serviceWorker' in navigator) {
         '<td><span class="statusBadge ' + statusCss(d.status) + '">' + escapeHTML2(prettyStatus(d.status)) + '</span></td>' +
         '<td><div class="tableActions">' +
           '<button class="miniBtn infoBtn" type="button">Info</button>' +
-          '<button class="miniBtn editBtn btn-edit-fixed" type="button">✎ Bearbeiten</button><button class="miniBtn payBtn" type="button">Abbau</button>' +
+          '<button class="miniBtn editBtn btn-edit-fixed" type="button">✎ Bearbeiten</button><button class="miniBtn editBtn btn-edit-fixed" type="button">✎ Bearbeiten</button><button class="miniBtn payBtn" type="button">Abbau</button>' +
           '<button class="miniBtn contactBtn" type="button">Ansprechpartner</button>' +
           '<div class="tableUtilityActions">' +
             '<button class="tinyBtn" type="button" title="Status">↺</button>' +
@@ -4772,7 +4772,7 @@ if ('serviceWorker' in navigator) {
         "</div>" +
         "<div class='mobileRow'>" +
           "<button class='actionBtn btn-edit btn-edit-fixed' type='button'><span class='ico'>✎</span><span class='lbl'>Bearbeiten</span></button>" +
-        "<button class='actionBtn btn-status' type='button'><span class='ico'>↺</span><span class='lbl'>Status</span></button>" +
+        "<button class='actionBtn btn-edit-fixed' type='button'><span class='ico'>✎</span><span class='lbl'>Bearbeiten</span></button><button class='actionBtn btn-status' type='button'><span class='ico'>↺</span><span class='lbl'>Status</span></button>" +
           "<button class='actionBtn btn-delete' type='button'><span class='ico'>✕</span><span class='lbl'>Löschen</span></button>" +
           "<button class='actionBtn btn-pay' type='button'><span class='ico'>€</span><span class='lbl'>Abbau</span></button>" +
           "<button class='actionBtn btn-history' type='button'><span class='ico'>◷</span><span class='lbl'>Historie</span></button>" +
@@ -4967,7 +4967,7 @@ if ('serviceWorker' in navigator) {
         "</div>" +
         "<div class='mobileRow'>" +
           "<button class='actionBtn btn-edit btn-edit-fixed' type='button'><span class='ico'>✎</span><span class='lbl'>Bearbeiten</span></button>" +
-        "<button class='actionBtn btn-status' type='button'><span class='ico'>↺</span><span class='lbl'>Status</span></button>" +
+        "<button class='actionBtn btn-edit-fixed' type='button'><span class='ico'>✎</span><span class='lbl'>Bearbeiten</span></button><button class='actionBtn btn-status' type='button'><span class='ico'>↺</span><span class='lbl'>Status</span></button>" +
           "<button class='actionBtn btn-delete' type='button'><span class='ico'>✕</span><span class='lbl'>Löschen</span></button>" +
           "<button class='actionBtn btn-pay' type='button'><span class='ico'>€</span><span class='lbl'>Abbau</span></button>" +
           "<button class='actionBtn btn-history' type='button'><span class='ico'>◷</span><span class='lbl'>Historie</span></button>" +
@@ -5107,7 +5107,7 @@ if ('serviceWorker' in navigator) {
         "</div>" +
         "<div class='mobileRow'>" +
           "<button class='actionBtn btn-edit btn-edit-fixed' type='button'><span class='ico'>✎</span><span class='lbl'>Bearbeiten</span></button>" +
-        "<button class='actionBtn btn-status' type='button'><span class='ico'>↺</span><span class='lbl'>Status</span></button>" +
+        "<button class='actionBtn btn-edit-fixed' type='button'><span class='ico'>✎</span><span class='lbl'>Bearbeiten</span></button><button class='actionBtn btn-status' type='button'><span class='ico'>↺</span><span class='lbl'>Status</span></button>" +
           "<button class='actionBtn btn-delete' type='button'><span class='ico'>✕</span><span class='lbl'>Löschen</span></button>" +
           "<button class='actionBtn btn-pay' type='button'><span class='ico'>€</span><span class='lbl'>Abbau</span></button>" +
           "<button class='actionBtn btn-history' type='button'><span class='ico'>◷</span><span class='lbl'>Historie</span></button>" +
@@ -11003,9 +11003,74 @@ body.v105EditOpen #fabAdd{display:none!important}
 }
 </style>
 
-<script id="v123-fixed-edit-no-flicker-js">
+<script id="v123-fixed-edit-no-flicker-js-disabled">/* disabled in v124 */</script>
+
+
+<style id="v124-edit-visible-no-flicker-style">
+/* v124: Nur ein sichtbarer Bearbeiten-Button direkt in der echten Aktionsleiste */
+[data-v105-edit],[data-v106-mobile-edit],[data-v107-edit],[data-v108-edit],[data-v109-edit],[data-v110-edit],
+[data-v115-edit],[data-v116-edit],[data-v117-edit],[data-v118-edit],[data-v119-edit],[data-v122-edit],
+.v106MobileEditTop,.v107EditLine,.v108EditInline,.v109EditActionBtn,.v110EditBeforeStatus,.v115EditBtn,.v116EditStableBtn,.v117EditBtn,.v118EditBtn,.v119EditBtn,.v122EditBtn{
+  display:none!important;
+}
+
+.btn-edit-fixed,
+.editBtn.btn-edit-fixed,
+.tableActions .editBtn,
+.actionRow .btn-edit-fixed,
+.mobileRow .btn-edit-fixed,
+.mobileActionMain .btn-edit-fixed{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:7px!important;
+  min-height:38px!important;
+  padding:0 12px!important;
+  border-radius:12px!important;
+  font-size:13px!important;
+  font-weight:900!important;
+  background:#12233a!important;
+  color:#eaf2ff!important;
+  border:1px solid rgba(255,255,255,.09)!important;
+  box-shadow:none!important;
+  transform:none!important;
+  transition:none!important;
+  white-space:nowrap!important;
+  opacity:1!important;
+  visibility:visible!important;
+  pointer-events:auto!important;
+}
+
+.btn-edit-fixed:hover,
+.btn-edit-fixed:active,
+.btn-edit-fixed:focus{
+  transform:none!important;
+  background:#183154!important;
+}
+
+.actionRow button,
+.tableActions button,
+.mobileRow button,
+.mobileActionMain button,
+.mobileTinyActions button{
+  transform:none!important;
+  transition:none!important;
+  animation:none!important;
+}
+
+@media(max-width:1180px){
+  .mobileRow .btn-edit-fixed,
+  .mobileActionMain .btn-edit-fixed,
+  .mobileTinyActions .btn-edit-fixed{
+    width:100%!important;
+    min-height:42px!important;
+  }
+}
+</style>
+
+<script id="v124-edit-direct-binding-js">
 (function(){
-  const VERSION='v123';
+  const VERSION='v124';
   let currentEditIndex=-1;
 
   function $(id){return document.getElementById(id);}
@@ -11028,19 +11093,32 @@ body.v105EditOpen #fabAdd{display:none!important}
     });
     return out;
   }
-  function parseAmount(v){
-    const n=parseFloat(String(v||'').replace(/\./g,'').replace(',','.'));
-    return Number.isFinite(n)?n:NaN;
-  }
-  function saveAll(list){
-    try{ if(typeof save==='function') save(); else localStorage.setItem('godmode_debts',JSON.stringify(list)); }
-    catch(e){ localStorage.setItem('godmode_debts',JSON.stringify(list)); }
-  }
-  function toast(msg){
-    try{ if(typeof showToast==='function') return showToast(msg); }catch(e){}
-    alert(msg);
-  }
+  function toast(msg){try{ if(typeof showToast==='function') return showToast(msg); }catch(e){} alert(msg);}
   function setVal(id,v){const el=$(id); if(el) el.value=v==null?'':String(v);}
+  function parseAmount(v){const n=parseFloat(String(v||'').replace(/\./g,'').replace(',','.'));return Number.isFinite(n)?n:NaN;}
+  function saveAll(list){try{ if(typeof save==='function') save(); else localStorage.setItem('godmode_debts',JSON.stringify(list)); }catch(e){localStorage.setItem('godmode_debts',JSON.stringify(list));}}
+
+  function indexForButton(btn){
+    const vis=visibleIndices();
+    const tr=btn.closest('#tbody tr');
+    if(tr){
+      const rows=[...document.querySelectorAll('#tbody tr')];
+      const pos=rows.indexOf(tr);
+      if(vis[pos]!=null) return vis[pos];
+    }
+    const card=btn.closest('#mobileList .mobileCard');
+    if(card){
+      const cards=[...document.querySelectorAll('#mobileList .mobileCard')];
+      const pos=cards.indexOf(card);
+      if(vis[pos]!=null) return vis[pos];
+    }
+    const carrier=btn.closest('[data-index],[data-debt-index]');
+    if(carrier){
+      const n=Number(carrier.getAttribute('data-debt-index') || carrier.getAttribute('data-index'));
+      if(Number.isInteger(n)&&n>=0) return n;
+    }
+    return -1;
+  }
 
   function openEditor(i){
     const list=debtsArr();
@@ -11068,7 +11146,6 @@ body.v105EditOpen #fabAdd{display:none!important}
     overlay.setAttribute('aria-hidden','false');
     document.body.classList.add('modalOpen','v105EditOpen');
   }
-
   function closeEditor(){
     const overlay=$('v105EditOverlay');
     if(overlay){
@@ -11081,14 +11158,12 @@ body.v105EditOpen #fabAdd{display:none!important}
     const addOpen=$('addModal') && ($('addModal').getAttribute('aria-hidden')==='false' || $('addModal').style.display==='flex' || $('addModal').style.display==='block');
     if(!addOpen) document.body.classList.remove('modalOpen');
   }
-
   function readIndex(){
     const n=Number($('v105EditOverlay')?.getAttribute('data-edit-index'));
     if(Number.isInteger(n)&&n>=0) return n;
     if(Number.isInteger(currentEditIndex)&&currentEditIndex>=0) return currentEditIndex;
     return -1;
   }
-
   function saveEditor(){
     const list=debtsArr();
     const i=readIndex();
@@ -11127,32 +11202,10 @@ body.v105EditOpen #fabAdd{display:none!important}
     return true;
   }
 
-  function indexForButton(btn){
-    const vis=visibleIndices();
-    const tr=btn.closest('#tbody tr');
-    if(tr){
-      const rows=[...document.querySelectorAll('#tbody tr')];
-      const pos=rows.indexOf(tr);
-      if(vis[pos]!=null) return vis[pos];
-    }
-    const card=btn.closest('#mobileList .mobileCard');
-    if(card){
-      const cards=[...document.querySelectorAll('#mobileList .mobileCard')];
-      const pos=cards.indexOf(card);
-      if(vis[pos]!=null) return vis[pos];
-    }
-    const carrier=btn.closest('[data-debt-index],[data-index]');
-    if(carrier){
-      const n=Number(carrier.getAttribute('data-debt-index') || carrier.getAttribute('data-index'));
-      if(Number.isInteger(n)&&n>=0) return n;
-    }
-    return -1;
-  }
-
-  function bindEditButtons(){
-    document.querySelectorAll('.btn-edit-fixed').forEach(btn=>{
-      if(btn.dataset.v123Bound==='1') return;
-      btn.dataset.v123Bound='1';
+  function bindButtons(){
+    document.querySelectorAll('.btn-edit-fixed,.editBtn.btn-edit-fixed').forEach(btn=>{
+      if(btn.dataset.v124Bound==='1') return;
+      btn.dataset.v124Bound='1';
       const handler=function(e){
         e.preventDefault();
         e.stopPropagation();
@@ -11162,46 +11215,44 @@ body.v105EditOpen #fabAdd{display:none!important}
       btn.addEventListener('click',handler,true);
       btn.addEventListener('touchend',handler,{capture:true,passive:false});
     });
-
     document.querySelectorAll('.v59MenuVersion').forEach(el=>el.textContent=VERSION);
     ['v98OnlyVersion','v76OnlyVersion','v101OnlyVersion'].forEach(id=>{ const el=$(id); if(el) el.textContent=VERSION; });
   }
 
   function bindSave(){
     const saveBtn=$('v105EditSave');
-    if(saveBtn && saveBtn.dataset.v123Save!=='1'){
-      saveBtn.dataset.v123Save='1';
+    if(saveBtn && saveBtn.dataset.v124Save!=='1'){
+      saveBtn.dataset.v124Save='1';
       saveBtn.onclick=function(e){ e.preventDefault(); e.stopPropagation(); return saveEditor(); };
     }
     ['v105EditCancel','v105EditClose'].forEach(id=>{
       const b=$(id);
-      if(b && b.dataset.v123Close!=='1'){
-        b.dataset.v123Close='1';
+      if(b && b.dataset.v124Close!=='1'){
+        b.dataset.v124Close='1';
         b.onclick=function(e){ e.preventDefault(); e.stopPropagation(); closeEditor(); };
       }
     });
   }
 
   const oldRender=window.render;
-  if(typeof oldRender==='function' && !oldRender.__v123FixedEdit){
+  if(typeof oldRender==='function' && !oldRender.__v124EditBind){
     const wrapped=function(){
       const r=oldRender.apply(this,arguments);
-      setTimeout(()=>{bindEditButtons();bindSave();},80);
+      setTimeout(()=>{bindButtons();bindSave();},80);
       return r;
     };
-    wrapped.__v123FixedEdit=true;
+    wrapped.__v124EditBind=true;
     window.render=wrapped;
     try{ render=wrapped; }catch(e){}
   }
 
   function init(){
-    bindEditButtons();
+    bindButtons();
     bindSave();
   }
-
   document.addEventListener('DOMContentLoaded',()=>{init();setTimeout(init,500);});
   window.addEventListener('load',()=>{init();setTimeout(init,700);});
-  $('search')?.addEventListener('input',()=>setTimeout(bindEditButtons,100));
+  $('search')?.addEventListener('input',()=>setTimeout(bindButtons,100));
   init();
 })();
 </script>
