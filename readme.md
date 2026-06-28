@@ -1,3 +1,3 @@
-Schulden Manager v114
+Schulden Manager v115
 
-Vergleich: Prozentwerte können pro Gläubiger einzeln eingestellt werden; Gesamtvergleich und Ersparnis werden aus allen Einzelwerten berechnet.
+Fix: Pro Schuld gibt es nur noch einen Bearbeiten-Button direkt bei den Aktionen. Doppelte/große Bearbeiten-Buttons werden entfernt.

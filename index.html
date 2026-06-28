@@ -11735,5 +11735,357 @@ body.v105EditOpen #fabAdd{display:none!important}
 })();
 </script>
 
+
+<style id="v115-single-edit-button-style">
+/* v115: Nur ein sauberer Bearbeiten-Button pro Schuld */
+[data-v105-edit],
+[data-v106-mobile-edit],
+[data-v107-edit],
+[data-v108-edit],
+[data-v109-edit],
+[data-v110-edit],
+.v106MobileEditTop,
+.v107EditLine,
+.v108EditInline,
+.v109EditActionBtn,
+.v110EditBeforeStatus{
+  display:none !important;
+  visibility:hidden !important;
+  opacity:0 !important;
+  pointer-events:none !important;
+  width:0 !important;
+  min-width:0 !important;
+  max-width:0 !important;
+  height:0 !important;
+  min-height:0 !important;
+  padding:0 !important;
+  margin:0 !important;
+  overflow:hidden !important;
+}
+
+.v115EditBtn{
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:7px !important;
+  min-height:38px !important;
+  padding:0 12px !important;
+  border-radius:12px !important;
+  font-size:13px !important;
+  font-weight:900 !important;
+  background:#12233a !important;
+  color:#eaf2ff !important;
+  border:1px solid rgba(255,255,255,.09) !important;
+  box-shadow:none !important;
+  width:auto !important;
+  max-width:none !important;
+  opacity:1 !important;
+  visibility:visible !important;
+  pointer-events:auto !important;
+}
+
+.v115EditBtn:hover,
+.v115EditBtn:active{
+  transform:none !important;
+  background:#183154 !important;
+}
+
+.actionRow,
+.tableActions{
+  align-items:center !important;
+  gap:8px !important;
+}
+
+@media(max-width:1180px){
+  .mobileRow .v115EditBtn,
+  .mobileActionMain .v115EditBtn,
+  .mobileTinyActions .v115EditBtn{
+    width:100% !important;
+    min-height:42px !important;
+    display:flex !important;
+  }
+}
+</style>
+
+<script id="v115-single-edit-button-js">
+(function(){
+  const VERSION='v115';
+  let currentEditIndex = -1;
+
+  function $(id){ return document.getElementById(id); }
+
+  function getDebts(){
+    try{ if(Array.isArray(debts)) return debts; }catch(e){}
+    try{ if(Array.isArray(window.debts)) return window.debts; }catch(e){}
+    try{
+      const raw=localStorage.getItem('godmode_debts');
+      const p=raw ? JSON.parse(raw) : [];
+      return Array.isArray(p) ? p : [];
+    }catch(e){ return []; }
+  }
+
+  function visibleIndices(){
+    const list=getDebts();
+    const s=String($('search')?.value||'').toLowerCase();
+    const out=[];
+    list.forEach((d,i)=>{
+      try{
+        if(s && !JSON.stringify(d||{}).toLowerCase().includes(s)) return;
+      }catch(e){}
+      out.push(i);
+    });
+    return out;
+  }
+
+  function saveDebts(list){
+    try{
+      if(typeof save === 'function') save();
+      else localStorage.setItem('godmode_debts', JSON.stringify(list));
+    }catch(e){
+      localStorage.setItem('godmode_debts', JSON.stringify(list));
+    }
+  }
+
+  function toast(msg){
+    try{ if(typeof showToast==='function') return showToast(msg); }catch(e){}
+    try{ alert(msg); }catch(e){}
+  }
+
+  function parseAmount(v){
+    const n=parseFloat(String(v||'').replace(/\./g,'').replace(',','.'));
+    return Number.isFinite(n) ? n : NaN;
+  }
+
+  function setVal(id,v){
+    const el=$(id);
+    if(el) el.value = v == null ? '' : String(v);
+  }
+
+  function openEditor(i){
+    const list=getDebts();
+    const d=list[i];
+    const overlay=$('v105EditOverlay');
+    if(!d || !overlay){
+      toast('Bearbeiten-Fenster nicht gefunden.');
+      return;
+    }
+
+    currentEditIndex=i;
+    overlay.setAttribute('data-edit-index', String(i));
+
+    const c=(d.contactDetails && typeof d.contactDetails==='object') ? d.contactDetails : {};
+    setVal('v105Name', d.name || '');
+    setVal('v105Reason', d.grund || d.reason || '');
+    setVal('v105Amount', String(Math.round((Number(d.betrag ?? d.amount ?? 0))*100)/100));
+    setVal('v105Date', d.datum || d.date || '');
+    setVal('v105Case', d.aktenzeichen || d.caseNumber || '');
+    setVal('v105Category', d.category || d.kategorie || 'Sonstiges');
+    setVal('v105Status', d.status || 'offen');
+    setVal('v105ContactName', c.representative || d.contactPerson || '');
+    setVal('v105ContactPhone', c.phone || '');
+    setVal('v105ContactEmail', c.email || '');
+    setVal('v105ContactAddress', c.address || '');
+
+    overlay.classList.add('show');
+    overlay.setAttribute('aria-hidden','false');
+    document.body.classList.add('modalOpen','v105EditOpen');
+    setTimeout(()=>$('v105Name')?.focus(),60);
+  }
+
+  function closeEditor(){
+    const overlay=$('v105EditOverlay');
+    if(overlay){
+      overlay.classList.remove('show');
+      overlay.setAttribute('aria-hidden','true');
+      overlay.removeAttribute('data-edit-index');
+    }
+    currentEditIndex=-1;
+    document.body.classList.remove('v105EditOpen');
+    const addOpen = $('addModal') && ($('addModal').getAttribute('aria-hidden') === 'false' || $('addModal').style.display === 'flex' || $('addModal').style.display === 'block');
+    if(!addOpen) document.body.classList.remove('modalOpen');
+  }
+
+  function readIndex(){
+    const overlay=$('v105EditOverlay');
+    const n=Number(overlay?.getAttribute('data-edit-index'));
+    if(Number.isInteger(n) && n>=0) return n;
+    if(Number.isInteger(currentEditIndex) && currentEditIndex>=0) return currentEditIndex;
+    return -1;
+  }
+
+  function saveEditor(){
+    const i=readIndex();
+    const list=getDebts();
+    const d=list[i];
+
+    if(i<0 || !d){
+      toast('Bearbeiten konnte nicht gespeichert werden: Eintrag nicht gefunden.');
+      return false;
+    }
+
+    const name=String($('v105Name')?.value || '').trim();
+    const grund=String($('v105Reason')?.value || '').trim();
+    const betrag=parseAmount($('v105Amount')?.value);
+
+    if(!name){ toast('Bitte Name / Gläubiger eintragen.'); $('v105Name')?.focus(); return false; }
+    if(!grund){ toast('Bitte Grund eintragen.'); $('v105Reason')?.focus(); return false; }
+    if(!Number.isFinite(betrag) || betrag <= 0){ toast('Bitte Betrag korrekt eintragen.'); $('v105Amount')?.focus(); return false; }
+
+    const category=String($('v105Category')?.value || 'Sonstiges').trim() || 'Sonstiges';
+    const contact={
+      representative:String($('v105ContactName')?.value || '').trim(),
+      address:String($('v105ContactAddress')?.value || '').trim(),
+      email:String($('v105ContactEmail')?.value || '').trim(),
+      phone:String($('v105ContactPhone')?.value || '').trim()
+    };
+
+    d.name=name;
+    d.grund=grund;
+    d.reason=grund;
+    d.betrag=betrag;
+    d.amount=betrag;
+    d.datum=$('v105Date')?.value || '';
+    d.date=d.datum;
+    d.aktenzeichen=String($('v105Case')?.value || '').trim();
+    d.caseNumber=d.aktenzeichen;
+    d.status=$('v105Status')?.value || 'offen';
+    d.category=category;
+    d.kategorie=category;
+    d.contactDetails=contact;
+    d.contactPerson=[contact.representative, contact.address, contact.email, contact.phone].filter(Boolean).join(' | ');
+
+    if(!Array.isArray(d.editHistory)) d.editHistory=[];
+    d.editHistory.push({at:new Date().toISOString(), text:'Schuldendaten bearbeitet'});
+
+    saveDebts(list);
+    try{ if(typeof render==='function') render(); }catch(e){ console.error(e); }
+    closeEditor();
+    toast('Änderungen gespeichert ✅');
+    return true;
+  }
+
+  function makeBtn(i){
+    const b=document.createElement('button');
+    b.type='button';
+    b.className='v115EditBtn';
+    b.setAttribute('data-v115-edit','1');
+    b.setAttribute('data-index',String(i));
+    b.innerHTML='✎ Bearbeiten';
+    const handler=function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      openEditor(Number(b.getAttribute('data-index')));
+    };
+    b.addEventListener('click',handler,true);
+    b.addEventListener('touchend',handler,{capture:true,passive:false});
+    return b;
+  }
+
+  function clearOldEditButtons(){
+    document.querySelectorAll('[data-v105-edit],[data-v106-mobile-edit],[data-v107-edit],[data-v108-edit],[data-v109-edit],[data-v110-edit],.v106MobileEditTop,.v107EditLine,.v108EditInline,.v109EditActionBtn,.v110EditBeforeStatus').forEach(el=>{
+      if(!el.matches('[data-v115-edit]')) el.remove();
+    });
+  }
+
+  function insertOneButton(container, i){
+    if(!container || i == null || i < 0) return;
+
+    container.querySelectorAll('[data-v115-edit]').forEach((b,idx)=>{
+      if(idx>0) b.remove();
+    });
+
+    let btn=container.querySelector('[data-v115-edit]');
+    if(!btn){
+      btn=makeBtn(i);
+      const statusBtn=[...container.querySelectorAll('button')].find(b=>String(b.textContent||'').toLowerCase().includes('status'));
+      if(statusBtn && statusBtn.parentNode===container){
+        container.insertBefore(btn,statusBtn);
+      }else{
+        container.insertBefore(btn,container.firstChild||null);
+      }
+    }
+    btn.setAttribute('data-index',String(i));
+  }
+
+  function apply(){
+    clearOldEditButtons();
+    const vis=visibleIndices();
+
+    document.querySelectorAll('#tbody tr').forEach((row,pos)=>{
+      const i=vis[pos];
+      const box=row.querySelector('.actionRow,.tableActions') || row.querySelector('td:last-child');
+      insertOneButton(box,i);
+    });
+
+    document.querySelectorAll('#mobileList .mobileCard').forEach((card,pos)=>{
+      const i=vis[pos];
+      const box=card.querySelector('.mobileRow,.mobileActionMain,.mobileTinyActions');
+      insertOneButton(box,i);
+    });
+
+    document.querySelectorAll('[data-v115-edit]').forEach(btn=>{
+      btn.style.setProperty('display','inline-flex','important');
+      btn.style.setProperty('visibility','visible','important');
+      btn.style.setProperty('opacity','1','important');
+      btn.style.setProperty('pointer-events','auto','important');
+    });
+
+    document.querySelectorAll('.v59MenuVersion').forEach(el=>el.textContent=VERSION);
+    ['v98OnlyVersion','v76OnlyVersion','v101OnlyVersion'].forEach(id=>{
+      const el=$(id);
+      if(el) el.textContent=VERSION;
+    });
+  }
+
+  function bindSave(){
+    const saveBtn=$('v105EditSave');
+    if(saveBtn && saveBtn.dataset.v115Save!=='1'){
+      saveBtn.dataset.v115Save='1';
+      saveBtn.onclick=function(e){e.preventDefault();e.stopPropagation();return saveEditor();};
+      saveBtn.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();return saveEditor();},true);
+      saveBtn.addEventListener('touchend',function(e){e.preventDefault();e.stopPropagation();return saveEditor();},{capture:true,passive:false});
+    }
+
+    ['v105EditCancel','v105EditClose'].forEach(id=>{
+      const b=$(id);
+      if(b && b.dataset.v115Close!=='1'){
+        b.dataset.v115Close='1';
+        b.onclick=function(e){e.preventDefault();e.stopPropagation();closeEditor();};
+      }
+    });
+  }
+
+  const oldRender=window.render;
+  if(typeof oldRender==='function' && !oldRender.__v115SingleEdit){
+    const wrapped=function(){
+      const r=oldRender.apply(this,arguments);
+      setTimeout(()=>{bindSave();apply();},80);
+      setTimeout(apply,300);
+      return r;
+    };
+    wrapped.__v115SingleEdit=true;
+    window.render=wrapped;
+    try{ render=wrapped; }catch(e){}
+  }
+
+  function observe(){
+    ['tbody','mobileList'].forEach(id=>{
+      const el=$(id);
+      if(!el || el.dataset.v115Observer==='1') return;
+      el.dataset.v115Observer='1';
+      new MutationObserver(()=>setTimeout(apply,60)).observe(el,{childList:true,subtree:true});
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded',()=>{bindSave();observe();apply();setTimeout(apply,500);});
+  window.addEventListener('load',()=>{bindSave();observe();apply();setTimeout(apply,800);});
+  window.addEventListener('resize',()=>setTimeout(apply,120));
+  $('search')?.addEventListener('input',()=>setTimeout(apply,120));
+  setInterval(()=>{bindSave();observe();apply();},1200);
+  bindSave();
+  apply();
+})();
+</script>
+
 </body>
 </html>
