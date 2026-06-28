@@ -1,3 +1,3 @@
-Schulden Manager v125
+Schulden Manager v126
 
-Fix: Bearbeiten-Button direkt in der echten Handy-/Tablet-Aktionsleiste (v19Actions) eingefügt und mit dem Bearbeiten-Overlay verbunden.
+Fix: Bearbeiten-Button ist wieder auf Desktop sichtbar. Handy-/Tablet-Bearbeiten aus v125 bleibt erhalten.

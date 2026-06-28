@@ -4408,7 +4408,7 @@ if ('serviceWorker' in navigator) {
         '<td><span class="statusBadge ' + statusCss(d.status) + '">' + escapeHTML2(prettyStatus(d.status)) + '</span></td>' +
         '<td><div class="tableActions">' +
           '<button class="miniBtn infoBtn" type="button">Info</button>' +
-          '<button class="miniBtn editBtn btn-edit-fixed" type="button">✎ Bearbeiten</button><button class="miniBtn editBtn btn-edit-fixed" type="button">✎ Bearbeiten</button><button class="miniBtn payBtn" type="button">Abbau</button>' +
+          '<button class="miniBtn editBtn btn-edit-fixed" type="button">✎ Bearbeiten</button><button class="miniBtn editBtn btn-edit-fixed" type="button">✎ Bearbeiten</button><button class="miniBtn desktopEditBtn" type="button">✎ Bearbeiten</button><button class="miniBtn payBtn" type="button">Abbau</button>' +
           '<button class="miniBtn contactBtn" type="button">Ansprechpartner</button>' +
           '<div class="tableUtilityActions">' +
             '<button class="tinyBtn" type="button" title="Status">↺</button>' +
@@ -11439,6 +11439,285 @@ body.v105EditOpen #fabAdd{display:none!important}
   window.addEventListener('load', ()=>{ bindSave(); setVersion(); });
   bindSave();
   setVersion();
+})();
+</script>
+
+
+<style id="v126-desktop-edit-style">
+/* v126: Bearbeiten wieder auf Desktop + Handy bleibt erhalten */
+.desktopEditBtn,
+.btn-edit-desktop{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:7px!important;
+  min-height:38px!important;
+  padding:0 12px!important;
+  border-radius:12px!important;
+  font-size:13px!important;
+  font-weight:900!important;
+  background:#12233a!important;
+  color:#eaf2ff!important;
+  border:1px solid rgba(255,255,255,.09)!important;
+  box-shadow:none!important;
+  transform:none!important;
+  transition:none!important;
+  white-space:nowrap!important;
+}
+.desktopEditBtn:hover,
+.btn-edit-desktop:hover{
+  background:#183154!important;
+  transform:none!important;
+}
+.tableActions .desktopEditBtn{
+  min-height:40px!important;
+}
+</style>
+
+<script id="v126-desktop-edit-js">
+(function(){
+  const VERSION='v126';
+  let currentEditIndex=-1;
+
+  function $(id){ return document.getElementById(id); }
+
+  function getDebts(){
+    try{ if(Array.isArray(debts)) return debts; }catch(e){}
+    try{ if(Array.isArray(window.debts)) return window.debts; }catch(e){}
+    try{
+      const raw = localStorage.getItem('godmode_debts');
+      const parsed = raw ? JSON.parse(raw) : [];
+      return Array.isArray(parsed) ? parsed : [];
+    }catch(e){ return []; }
+  }
+
+  function visibleIndices(){
+    const list=getDebts();
+    const s=String($('search')?.value||'').toLowerCase();
+    const out=[];
+    list.forEach((d,i)=>{
+      try{ if(s && !JSON.stringify(d||{}).toLowerCase().includes(s)) return; }catch(e){}
+      out.push(i);
+    });
+    return out;
+  }
+
+  function saveAll(list){
+    try{
+      if(typeof save === 'function') save();
+      else localStorage.setItem('godmode_debts', JSON.stringify(list));
+    }catch(e){
+      localStorage.setItem('godmode_debts', JSON.stringify(list));
+    }
+  }
+
+  function toast(msg){
+    try{ if(typeof showToast === 'function') return showToast(msg); }catch(e){}
+    alert(msg);
+  }
+
+  function setVal(id,v){
+    const el=$(id);
+    if(el) el.value = v == null ? '' : String(v);
+  }
+
+  function parseAmount(v){
+    const n=parseFloat(String(v||'').replace(/\./g,'').replace(',','.'));
+    return Number.isFinite(n) ? n : NaN;
+  }
+
+  function indexFromButton(btn){
+    const vis=visibleIndices();
+    const tr=btn.closest('#tbody tr');
+    if(tr){
+      const rows=[...document.querySelectorAll('#tbody tr')];
+      const pos=rows.indexOf(tr);
+      if(vis[pos]!=null) return vis[pos];
+    }
+    const card=btn.closest('#mobileList .mobileCard,.v19MobileRow');
+    if(card){
+      const cards=[...document.querySelectorAll('#mobileList .mobileCard,#mobileList .v19MobileRow')];
+      const pos=cards.indexOf(card);
+      if(vis[pos]!=null) return vis[pos];
+      const n=Number(card.getAttribute('data-index'));
+      if(Number.isInteger(n) && n>=0) return n;
+    }
+    const carrier=btn.closest('[data-index],[data-debt-index]');
+    if(carrier){
+      const n=Number(carrier.getAttribute('data-debt-index') || carrier.getAttribute('data-index'));
+      if(Number.isInteger(n) && n>=0) return n;
+    }
+    return -1;
+  }
+
+  function openEditor(i){
+    // Use existing v125 mobile editor if available to keep one behavior everywhere.
+    if(typeof window.v125OpenDebtEditor === 'function'){
+      window.v125OpenDebtEditor(i);
+      currentEditIndex=i;
+      return;
+    }
+
+    const list=getDebts();
+    const d=list[i];
+    const overlay=$('v105EditOverlay');
+    if(!d || !overlay){ toast('Bearbeiten-Fenster nicht gefunden.'); return; }
+
+    currentEditIndex=i;
+    overlay.setAttribute('data-edit-index',String(i));
+
+    const c=(d.contactDetails && typeof d.contactDetails==='object') ? d.contactDetails : {};
+    setVal('v105Name', d.name || '');
+    setVal('v105Reason', d.grund || d.reason || '');
+    setVal('v105Amount', String(Math.round((Number(d.betrag ?? d.amount ?? 0))*100)/100));
+    setVal('v105Date', d.datum || d.date || '');
+    setVal('v105Case', d.aktenzeichen || d.caseNumber || '');
+    setVal('v105Category', d.category || d.kategorie || 'Sonstiges');
+    setVal('v105Status', d.status || 'offen');
+    setVal('v105ContactName', c.representative || d.contactPerson || '');
+    setVal('v105ContactPhone', c.phone || '');
+    setVal('v105ContactEmail', c.email || '');
+    setVal('v105ContactAddress', c.address || '');
+
+    overlay.classList.add('show');
+    overlay.setAttribute('aria-hidden','false');
+    document.body.classList.add('modalOpen','v105EditOpen');
+  }
+
+  function closeEditor(){
+    const overlay=$('v105EditOverlay');
+    if(overlay){
+      overlay.classList.remove('show');
+      overlay.setAttribute('aria-hidden','true');
+      overlay.removeAttribute('data-edit-index');
+    }
+    currentEditIndex=-1;
+    document.body.classList.remove('v105EditOpen');
+    const addOpen=$('addModal') && ($('addModal').getAttribute('aria-hidden')==='false' || $('addModal').style.display==='flex' || $('addModal').style.display==='block');
+    if(!addOpen) document.body.classList.remove('modalOpen');
+  }
+
+  function readIndex(){
+    const n=Number($('v105EditOverlay')?.getAttribute('data-edit-index'));
+    if(Number.isInteger(n) && n>=0) return n;
+    if(Number.isInteger(currentEditIndex) && currentEditIndex>=0) return currentEditIndex;
+    return -1;
+  }
+
+  function saveEditor(){
+    const list=getDebts();
+    const i=readIndex();
+    const d=list[i];
+    if(i<0 || !d){ toast('Bearbeiten konnte nicht gespeichert werden: Eintrag nicht gefunden.'); return false; }
+
+    const name=String($('v105Name')?.value || '').trim();
+    const grund=String($('v105Reason')?.value || '').trim();
+    const betrag=parseAmount($('v105Amount')?.value);
+
+    if(!name){ toast('Bitte Name / Gläubiger eintragen.'); $('v105Name')?.focus(); return false; }
+    if(!grund){ toast('Bitte Grund eintragen.'); $('v105Reason')?.focus(); return false; }
+    if(!Number.isFinite(betrag) || betrag <= 0){ toast('Bitte Betrag korrekt eintragen.'); $('v105Amount')?.focus(); return false; }
+
+    const category=String($('v105Category')?.value || 'Sonstiges').trim() || 'Sonstiges';
+    const contact={
+      representative:String($('v105ContactName')?.value || '').trim(),
+      address:String($('v105ContactAddress')?.value || '').trim(),
+      email:String($('v105ContactEmail')?.value || '').trim(),
+      phone:String($('v105ContactPhone')?.value || '').trim()
+    };
+
+    d.name=name; d.grund=grund; d.reason=grund; d.betrag=betrag; d.amount=betrag;
+    d.datum=$('v105Date')?.value || ''; d.date=d.datum;
+    d.aktenzeichen=String($('v105Case')?.value || '').trim(); d.caseNumber=d.aktenzeichen;
+    d.status=$('v105Status')?.value || 'offen';
+    d.category=category; d.kategorie=category;
+    d.contactDetails=contact;
+    d.contactPerson=[contact.representative, contact.address, contact.email, contact.phone].filter(Boolean).join(' | ');
+
+    if(!Array.isArray(d.editHistory)) d.editHistory=[];
+    d.editHistory.push({at:new Date().toISOString(), text:'Schuldendaten bearbeitet'});
+
+    saveAll(list);
+    try{ if(typeof render === 'function') render(); }catch(e){}
+    closeEditor();
+    toast('Änderungen gespeichert ✅');
+    return true;
+  }
+
+  function addDesktopFallbackButtons(){
+    // If the string patch misses a desktop render, add a single button only to desktop table rows.
+    document.querySelectorAll('#tbody tr').forEach((row,pos)=>{
+      const box=row.querySelector('.tableActions,.actionRow') || row.querySelector('td:last-child');
+      if(!box || box.querySelector('.desktopEditBtn,.btn-edit-desktop')) return;
+      const btn=document.createElement('button');
+      btn.type='button';
+      btn.className='miniBtn desktopEditBtn';
+      btn.textContent='✎ Bearbeiten';
+      const status=[...box.querySelectorAll('button')].find(b=>String(b.textContent||'').toLowerCase().includes('status'));
+      if(status && status.parentElement===box) box.insertBefore(btn,status);
+      else box.insertBefore(btn,box.firstChild);
+    });
+  }
+
+  function bindButtons(){
+    addDesktopFallbackButtons();
+
+    document.querySelectorAll('.desktopEditBtn,.btn-edit-desktop').forEach(btn=>{
+      if(btn.dataset.v126Bound==='1') return;
+      btn.dataset.v126Bound='1';
+      const handler=function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        const i=indexFromButton(btn);
+        if(i>=0) openEditor(i);
+      };
+      btn.addEventListener('click',handler,true);
+      btn.addEventListener('touchend',handler,{capture:true,passive:false});
+    });
+
+    document.querySelectorAll('.v59MenuVersion').forEach(el=>el.textContent=VERSION);
+    ['v98OnlyVersion','v76OnlyVersion','v101OnlyVersion'].forEach(id=>{
+      const el=$(id);
+      if(el) el.textContent=VERSION;
+    });
+  }
+
+  function bindSave(){
+    const saveBtn=$('v105EditSave');
+    if(saveBtn && saveBtn.dataset.v126Save!=='1'){
+      saveBtn.dataset.v126Save='1';
+      saveBtn.onclick=function(e){ e.preventDefault(); e.stopPropagation(); return saveEditor(); };
+    }
+    ['v105EditCancel','v105EditClose'].forEach(id=>{
+      const b=$(id);
+      if(b && b.dataset.v126Close!=='1'){
+        b.dataset.v126Close='1';
+        b.onclick=function(e){ e.preventDefault(); e.stopPropagation(); closeEditor(); };
+      }
+    });
+  }
+
+  const oldRender=window.render;
+  if(typeof oldRender==='function' && !oldRender.__v126DesktopEdit){
+    const wrapped=function(){
+      const r=oldRender.apply(this,arguments);
+      setTimeout(()=>{bindButtons();bindSave();},80);
+      return r;
+    };
+    wrapped.__v126DesktopEdit=true;
+    window.render=wrapped;
+    try{ render=wrapped; }catch(e){}
+  }
+
+  function init(){
+    bindButtons();
+    bindSave();
+  }
+
+  document.addEventListener('DOMContentLoaded',()=>{init();setTimeout(init,500);});
+  window.addEventListener('load',()=>{init();setTimeout(init,700);});
+  $('search')?.addEventListener('input',()=>setTimeout(bindButtons,120));
+  init();
 })();
 </script>
 
