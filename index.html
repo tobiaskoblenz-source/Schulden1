@@ -2871,9 +2871,9 @@ body.force-mobile-view .dashboardShell{
         <em id="paidShare">0 % der Gesamtsumme</em>
       </div>
       <div class="stat statCardPurple">
-        <span class="statLabel">Anzahl Personen</span>
+        <span class="statLabel">Gesamt Gläubiger</span>
         <span id="personsCount" class="statValue">0</span>
-        <em>Schuldner insgesamt</em>
+        <em>Einzigartige Gläubiger</em>
       </div>
     </section>
 
@@ -11328,6 +11328,224 @@ body.v105EditOpen #fabAdd{display:none!important}
   window.addEventListener('load',()=>{init();setTimeout(init,600);});
   setInterval(init,1000);
   init();
+})();
+</script>
+
+
+<style id="v112-creditor-count-vergleich-placeholder-style">
+/* v112: Gesamt-Gläubiger-Anzahl + Menüpunkt Vergleich als Platzhalter */
+#v112VergleichSection{
+  display:none;
+  margin-top:18px;
+}
+#v112VergleichSection.show{
+  display:block!important;
+}
+.v112VergleichPlaceholder{
+  background:linear-gradient(180deg,rgba(12,21,35,.98),rgba(8,17,29,.98));
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:26px;
+  padding:24px;
+  box-shadow:0 22px 70px rgba(0,0,0,.22);
+}
+.v112VergleichPlaceholder h2{
+  margin:0 0 10px;
+  color:#fff;
+  font-size:28px;
+}
+.v112VergleichPlaceholder p{
+  margin:0;
+  color:#9eb1cf;
+  font-size:15px;
+  line-height:1.55;
+}
+.v112VergleichPlaceholder .v112HintBox{
+  margin-top:16px;
+  padding:16px;
+  border-radius:18px;
+  background:#101d2f;
+  border:1px solid rgba(255,255,255,.07);
+  color:#dce9ff;
+}
+.v112VergleichPlaceholder button{
+  margin-top:18px;
+}
+@media (max-width:1180px){
+  #v112VergleichSection{
+    margin-bottom:100px;
+  }
+}
+</style>
+
+<section id="v112VergleichSection" class="card">
+  <div class="v112VergleichPlaceholder">
+    <h2>Vergleich</h2>
+    <p>Dieser Bereich ist vorbereitet. Was hier genau rein soll, legen wir als Nächstes fest.</p>
+    <div class="v112HintBox">
+      Möglich wären z. B. Vergleichsbetrag, Quote, Ersparnis, Status „angeboten/angenommen/abgelehnt“ und Notizen pro Gläubiger.
+    </div>
+    <button id="v112CloseVergleich" class="secondary" type="button">Zurück zur Übersicht</button>
+  </div>
+</section>
+
+<script id="v112-creditor-count-vergleich-placeholder-js">
+(function(){
+  const VERSION='v112';
+
+  function $(id){ return document.getElementById(id); }
+
+  function getDebts(){
+    try{ if(Array.isArray(debts)) return debts; }catch(e){}
+    try{ if(Array.isArray(window.debts)) return window.debts; }catch(e){}
+    try{
+      const raw=localStorage.getItem('godmode_debts');
+      const parsed=raw ? JSON.parse(raw) : [];
+      return Array.isArray(parsed) ? parsed : [];
+    }catch(e){ return []; }
+  }
+
+  function updateCreditorCount(){
+    const list=getDebts();
+    const names=new Set();
+    list.forEach(d=>{
+      const n=String((d && (d.name || d.glaeubiger || d.creditor)) || '').trim().toLowerCase();
+      if(n) names.add(n);
+    });
+    const el=$('personsCount');
+    if(el) el.textContent=String(names.size);
+
+    const label=el?.closest('.stat')?.querySelector('.statLabel');
+    if(label) label.textContent='Gesamt Gläubiger';
+    const hint=el?.closest('.stat')?.querySelector('em');
+    if(hint) hint.textContent='Einzigartige Gläubiger';
+  }
+
+  function ensureVergleichPosition(){
+    const sec=$('v112VergleichSection');
+    const target=$('debtListSection');
+    if(sec && target && sec.previousElementSibling !== target){
+      target.insertAdjacentElement('afterend', sec);
+    }
+  }
+
+  function openVergleich(){
+    ensureVergleichPosition();
+    const sec=$('v112VergleichSection');
+    if(sec){
+      sec.classList.add('show');
+      sec.scrollIntoView({behavior:'smooth', block:'start'});
+    }
+  }
+
+  function closeVergleich(){
+    const sec=$('v112VergleichSection');
+    if(sec) sec.classList.remove('show');
+    $('dashboardTop')?.scrollIntoView({behavior:'smooth', block:'start'});
+  }
+
+  function addMenuButton(){
+    const nav=document.querySelector('.sidebarNav');
+    if(nav && !nav.querySelector('[data-v112-vergleich]')){
+      const btn=document.createElement('button');
+      btn.className='sideNavBtn';
+      btn.type='button';
+      btn.setAttribute('data-v112-vergleich','1');
+      btn.innerHTML='<span class="navIco">⇄</span><span>Vergleich</span>';
+      btn.addEventListener('click', function(e){ e.preventDefault(); openVergleich(); });
+
+      const newBtn=nav.querySelector('[data-v59="new"], [data-scroll-target="newDebtSection"]');
+      if(newBtn && newBtn.nextSibling) nav.insertBefore(btn, newBtn.nextSibling);
+      else nav.appendChild(btn);
+    }
+
+    const top=document.querySelector('.heroTopActions');
+    if(top && !$('v112TopVergleichBtn')){
+      const b=document.createElement('button');
+      b.id='v112TopVergleichBtn';
+      b.className='secondary';
+      b.type='button';
+      b.textContent='⇄ Vergleich';
+      b.addEventListener('click', function(e){ e.preventDefault(); openVergleich(); });
+      top.appendChild(b);
+    }
+  }
+
+  function bind(){
+    ensureVergleichPosition();
+    updateCreditorCount();
+    addMenuButton();
+    $('v112CloseVergleich')?.addEventListener('click', closeVergleich);
+
+    document.querySelectorAll('.v59MenuVersion').forEach(el=>el.textContent=VERSION);
+    ['v98OnlyVersion','v76OnlyVersion','v101OnlyVersion'].forEach(id=>{
+      const el=$(id);
+      if(el) el.textContent=VERSION;
+    });
+  }
+
+  const oldRender=window.render;
+  if(typeof oldRender==='function' && !oldRender.__v112CredVergleichPlaceholder){
+    const wrapped=function(){
+      const r=oldRender.apply(this,arguments);
+      setTimeout(()=>{updateCreditorCount(); addMenuButton();},50);
+      return r;
+    };
+    wrapped.__v112CredVergleichPlaceholder=true;
+    window.render=wrapped;
+    try{ render=wrapped; }catch(e){}
+  }
+
+  document.addEventListener('DOMContentLoaded',()=>{bind();setTimeout(bind,400);setTimeout(bind,1200);});
+  window.addEventListener('load',()=>{bind();setTimeout(bind,600);});
+  setInterval(()=>{updateCreditorCount(); addMenuButton();},1500);
+  bind();
+})();
+</script>
+
+
+<style id="v113-vergleich-creditor-percent-style">
+#v112VergleichSection .v112VergleichPlaceholder{padding:0!important;background:transparent!important;border:0!important;box-shadow:none!important}
+.v113CompareWrap{background:linear-gradient(180deg,rgba(12,21,35,.98),rgba(8,17,29,.98));border:1px solid rgba(255,255,255,.08);border-radius:26px;padding:22px;box-shadow:0 22px 70px rgba(0,0,0,.22)}
+.v113CompareHead{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:16px}
+.v113CompareHead h2{margin:0;color:#fff;font-size:28px}.v113CompareHead p{margin:6px 0 0;color:#9eb1cf;line-height:1.45;font-size:14px}
+.v113PercentBox{display:grid;grid-template-columns:1fr 220px;gap:12px;align-items:end;margin-bottom:16px;padding:16px;border-radius:20px;background:#101d2f;border:1px solid rgba(255,255,255,.07)}
+.v113PercentBox label{display:block;color:#dce9ff;font-size:13px;font-weight:900;margin-bottom:8px}
+.v113PercentControls{display:grid;grid-template-columns:1fr 86px;gap:10px;align-items:center}
+#v113PercentRange{width:100%}
+#v113PercentInput{width:100%;min-height:44px;border-radius:14px;text-align:center;font-weight:900;background:#132238!important;border:1px solid rgba(255,255,255,.09)!important;color:#eaf2ff!important}
+.v113SummaryGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:16px}
+.v113Metric{border-radius:18px;padding:14px;background:#101d2f;border:1px solid rgba(255,255,255,.07)}
+.v113Metric span{display:block;color:#93a8c6;font-size:12px;font-weight:800;margin-bottom:7px}.v113Metric strong{display:block;color:#fff;font-size:24px;line-height:1.1}
+.v113TableWrap{overflow:auto;border-radius:20px;border:1px solid rgba(255,255,255,.08)}
+.v113CompareTable{width:100%;border-collapse:separate;border-spacing:0;min-width:620px}.v113CompareTable th{text-align:left;color:#9fb4d4;background:#101d2f;padding:14px;font-size:12px;text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid rgba(255,255,255,.07)}
+.v113CompareTable td{padding:14px;color:#eaf2ff;border-bottom:1px solid rgba(255,255,255,.06);vertical-align:middle}.v113CompareTable tr:last-child td{border-bottom:0}.v113CompareTable td strong{color:#fff}
+.v113QuotePill{display:inline-flex;min-width:76px;justify-content:center;padding:7px 10px;border-radius:999px;background:rgba(79,140,255,.14);border:1px solid rgba(79,140,255,.22);color:#d8e6ff;font-weight:900}
+.v113Empty{padding:18px;border-radius:18px;background:#101d2f;border:1px solid rgba(255,255,255,.07);color:#9eb1cf}
+.v113Actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}.v113Actions button{min-height:46px;border-radius:14px}#v113RefreshVergleich{background:linear-gradient(135deg,#2563eb,#7c71ff)!important}
+@media(max-width:1180px){.v113CompareWrap{padding:16px}.v113CompareHead{flex-direction:column}.v113PercentBox{grid-template-columns:1fr}.v113SummaryGrid{grid-template-columns:1fr}}
+@media(max-width:520px){.v113PercentControls{grid-template-columns:1fr}}
+</style>
+
+<script id="v113-vergleich-creditor-percent-js">
+(function(){
+ const VERSION='v113';
+ function $(id){return document.getElementById(id);}
+ function getDebts(){try{if(Array.isArray(debts))return debts;}catch(e){} try{if(Array.isArray(window.debts))return window.debts;}catch(e){} try{const raw=localStorage.getItem('godmode_debts');const p=raw?JSON.parse(raw):[];return Array.isArray(p)?p:[]}catch(e){return[]}}
+ function eur(v){try{return new Intl.NumberFormat('de-DE',{style:'currency',currency:'EUR'}).format(Number(v)||0)}catch(e){return (Number(v)||0).toFixed(2).replace('.',',')+' €'}}
+ function esc(s){return String(s||'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'","&#039;")}
+ function openStatus(s){s=String(s||'offen').toLowerCase();return s!=='bezahlt'&&s!=='paid'}
+ function percent(){let p=Number($('v113PercentInput')?.value||$('v113PercentRange')?.value||10);if(!Number.isFinite(p))p=10;return Math.max(1,Math.min(100,Math.round(p)))}
+ function setPercent(p){p=Math.max(1,Math.min(100,Math.round(Number(p)||10)));if($('v113PercentInput'))$('v113PercentInput').value=String(p);if($('v113PercentRange'))$('v113PercentRange').value=String(p)}
+ function group(){const m=new Map();getDebts().forEach(d=>{if(!d)return;const name=String(d.name||d.glaeubiger||d.creditor||'Ohne Name').trim()||'Ohne Name';const key=name.toLowerCase();const amount=Number(d.betrag??d.amount??0)||0;if(!m.has(key))m.set(key,{name,total:0,open:0,count:0});const x=m.get(key);x.total+=amount;if(openStatus(d.status))x.open+=amount;x.count+=1});return[...m.values()].sort((a,b)=>b.total-a.total||a.name.localeCompare(b.name))}
+ function layoutHtml(){return '<div class="v113CompareWrap"><div class="v113CompareHead"><div><h2>Vergleich</h2><p>Alle Gläubiger mit Gesamtsumme. Wähle eine Quote von 1–100 %, dann wird der mögliche Vergleichsbetrag berechnet.</p></div><button id="v112CloseVergleich" class="secondary" type="button">Zurück zur Übersicht</button></div><div class="v113PercentBox"><div><label for="v113PercentRange">Vergleichsquote auswählen</label><div class="v113PercentControls"><input id="v113PercentRange" type="range" min="1" max="100" value="10"><input id="v113PercentInput" type="number" min="1" max="100" value="10"></div></div><div class="v113Metric"><span>Gewählte Quote</span><strong id="v113ChosenPercent">10 %</strong></div></div><div class="v113SummaryGrid"><div class="v113Metric"><span>Gesamt-Schulden</span><strong id="v113TotalDebt">0,00 €</strong></div><div class="v113Metric"><span>Vergleich gesamt</span><strong id="v113TotalCompare">0,00 €</strong></div><div class="v113Metric"><span>Mögliche Ersparnis</span><strong id="v113TotalSaving">0,00 €</strong></div></div><div id="v113CompareTableHost"></div><div class="v113Actions"><button id="v113RefreshVergleich" type="button">Neu berechnen</button></div></div>'}
+ function ensure(){const sec=$('v112VergleichSection');if(!sec)return;const host=sec.querySelector('.v112VergleichPlaceholder');if(host&&host.dataset.v113Built!=='1'){host.dataset.v113Built='1';host.innerHTML=layoutHtml();bindControls()}}
+ function render(){ensure();const data=group();const p=percent();setPercent(p);const total=data.reduce((s,x)=>s+x.total,0);const comp=total*p/100;const saving=Math.max(0,total-comp);if($('v113ChosenPercent'))$('v113ChosenPercent').textContent=p+' %';if($('v113TotalDebt'))$('v113TotalDebt').textContent=eur(total);if($('v113TotalCompare'))$('v113TotalCompare').textContent=eur(comp);if($('v113TotalSaving'))$('v113TotalSaving').textContent=eur(saving);const host=$('v113CompareTableHost');if(!host)return;if(!data.length){host.innerHTML='<div class="v113Empty">Noch keine Gläubiger vorhanden.</div>';return}host.innerHTML='<div class="v113TableWrap"><table class="v113CompareTable"><thead><tr><th>Gläubiger</th><th>Anzahl</th><th>Gesamtsumme</th><th>Quote</th><th>Vergleichsbetrag</th><th>Ersparnis</th></tr></thead><tbody>'+data.map(x=>{const v=x.total*p/100;const save=Math.max(0,x.total-v);return '<tr><td><strong>'+esc(x.name)+'</strong></td><td>'+x.count+'</td><td><strong>'+eur(x.total)+'</strong></td><td><span class="v113QuotePill">'+p+' %</span></td><td><strong>'+eur(v)+'</strong></td><td>'+eur(save)+'</td></tr>'}).join('')+'</tbody></table></div>'}
+ function bindControls(){const r=$('v113PercentRange'),i=$('v113PercentInput');if(r&&r.dataset.v113!=='1'){r.dataset.v113='1';r.addEventListener('input',function(){setPercent(this.value);render()})}if(i&&i.dataset.v113!=='1'){i.dataset.v113='1';i.addEventListener('input',function(){setPercent(this.value);render()})}const ref=$('v113RefreshVergleich');if(ref&&ref.dataset.v113!=='1'){ref.dataset.v113='1';ref.addEventListener('click',render)}const close=$('v112CloseVergleich');if(close&&close.dataset.v113!=='1'){close.dataset.v113='1';close.addEventListener('click',function(){const sec=$('v112VergleichSection');if(sec)sec.classList.remove('show');$('dashboardTop')?.scrollIntoView({behavior:'smooth',block:'start'})})}}
+ function hookBtns(){document.querySelectorAll('[data-v112-vergleich],#v112TopVergleichBtn').forEach(btn=>{if(btn.dataset.v113Hook==='1')return;btn.dataset.v113Hook='1';btn.addEventListener('click',function(){setTimeout(render,120);setTimeout(render,450)},true)})}
+ function setVersion(){document.querySelectorAll('.v59MenuVersion').forEach(el=>el.textContent=VERSION);['v98OnlyVersion','v76OnlyVersion','v101OnlyVersion'].forEach(id=>{const el=$(id);if(el)el.textContent=VERSION})}
+ function init(){ensure();bindControls();hookBtns();render();setVersion()}
+ const old=window.render;if(typeof old==='function'&&!old.__v113Vergleich){const wrapped=function(){const r=old.apply(this,arguments);setTimeout(render,80);return r};wrapped.__v113Vergleich=true;window.render=wrapped;try{renderApp=wrapped}catch(e){}}
+ document.addEventListener('DOMContentLoaded',()=>{init();setTimeout(init,500)});window.addEventListener('load',()=>{init();setTimeout(init,800)});setInterval(()=>{hookBtns();setVersion()},1500);init();
 })();
 </script>
 

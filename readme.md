@@ -1,3 +1,3 @@
-Schulden Manager v110
+Schulden Manager v113
 
-Fix: Bearbeiten wird jetzt vor Status in alle Aktionsleisten eingefügt, auch in alternativen Handy-Seiten mit Daten/QR.
+Vergleich: Alle Gläubiger mit Gesamtsumme, Quote 1–100 %, Vergleichsbetrag und Ersparnis.
