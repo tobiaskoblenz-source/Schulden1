@@ -1,3 +1,3 @@
-Schulden Manager v118
+Schulden Manager v119
 
-Fix: Bearbeiten-Button wieder sichtbar. Er wird in jede sichtbare Aktionsgruppe mit Status gesetzt, ohne die alte Spring-Logik.
+Fix: Bearbeiten-Button bleibt dauerhaft sichtbar. Ein Beobachter setzt ihn nach jedem späteren Rendern sofort wieder in die Aktionsgruppe, ohne die komplette Leiste umzubauen.
