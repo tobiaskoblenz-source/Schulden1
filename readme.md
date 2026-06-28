@@ -1,3 +1,3 @@
-Schulden Manager v119
+Schulden Manager v120
 
-Fix: Bearbeiten-Button bleibt dauerhaft sichtbar. Ein Beobachter setzt ihn nach jedem späteren Rendern sofort wieder in die Aktionsgruppe, ohne die komplette Leiste umzubauen.
+Layout-Fix: Wenn die Schulden-Akte rechts geöffnet ist, wird links nichts mehr abgeschnitten. Die rechte Akte-Spalte ist schmaler, die linke Hauptfläche flexibler, und die Tabelle kann bei Bedarf horizontal scrollen.
