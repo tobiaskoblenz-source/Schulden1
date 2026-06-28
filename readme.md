@@ -1,3 +1,3 @@
-Schulden Manager v115
+Schulden Manager v116
 
-Fix: Pro Schuld gibt es nur noch einen Bearbeiten-Button direkt bei den Aktionen. Doppelte/große Bearbeiten-Buttons werden entfernt.
+Fix: Aktionsbuttons springen nicht mehr. Bearbeiten wird stabil einmal pro Eintrag gesetzt, ohne dauerndes Entfernen/Neu-Einfügen.

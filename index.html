@@ -12087,5 +12087,333 @@ body.v105EditOpen #fabAdd{display:none!important}
 })();
 </script>
 
+
+<style id="v116-stable-action-buttons-style">
+/* v116: Aktionsbuttons stabilisieren – kein Springen */
+.actionRow,
+.tableActions,
+.mobileRow,
+.mobileActionMain{
+  display:flex !important;
+  flex-wrap:wrap !important;
+  align-items:center !important;
+  gap:8px !important;
+  min-height:46px !important;
+  contain:layout !important;
+}
+
+.actionRow button,
+.tableActions button,
+.mobileRow button,
+.mobileActionMain button{
+  transform:none !important;
+  transition:background .12s ease, border-color .12s ease, color .12s ease !important;
+}
+
+.actionRow button:hover,
+.tableActions button:hover,
+.mobileRow button:hover,
+.mobileActionMain button:hover{
+  transform:none !important;
+}
+
+.v115EditBtn,
+.v116EditStableBtn{
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:7px !important;
+  min-height:38px !important;
+  padding:0 12px !important;
+  border-radius:12px !important;
+  font-size:13px !important;
+  font-weight:900 !important;
+  background:#12233a !important;
+  color:#eaf2ff !important;
+  border:1px solid rgba(255,255,255,.09) !important;
+  box-shadow:none !important;
+  width:auto !important;
+  max-width:none !important;
+  opacity:1 !important;
+  visibility:visible !important;
+  pointer-events:auto !important;
+  flex:0 0 auto !important;
+  order:0 !important;
+}
+
+/* alte/duplizierte Bearbeiten-Buttons unsichtbar lassen, aber Layout nicht mehr ständig neu bauen */
+[data-v105-edit]:not([data-v116-edit]),
+[data-v106-mobile-edit]:not([data-v116-edit]),
+[data-v107-edit]:not([data-v116-edit]),
+[data-v108-edit]:not([data-v116-edit]),
+[data-v109-edit]:not([data-v116-edit]),
+[data-v110-edit]:not([data-v116-edit]),
+.v106MobileEditTop,
+.v107EditLine,
+.v108EditInline,
+.v109EditActionBtn,
+.v110EditBeforeStatus{
+  display:none !important;
+}
+
+@media(max-width:1180px){
+  .mobileRow,
+  .mobileActionMain{
+    display:grid !important;
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+    gap:8px !important;
+    align-items:stretch !important;
+  }
+  .mobileRow button,
+  .mobileActionMain button,
+  .mobileRow .v116EditStableBtn,
+  .mobileActionMain .v116EditStableBtn{
+    width:100% !important;
+    min-width:0 !important;
+    min-height:42px !important;
+  }
+}
+
+@media(min-width:769px) and (max-width:1180px){
+  .mobileRow,
+  .mobileActionMain{
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  }
+}
+</style>
+
+<script id="v116-stable-action-buttons-js">
+(function(){
+  const VERSION='v116';
+  let currentEditIndex=-1;
+  let applyTimer=null;
+
+  function $(id){return document.getElementById(id);}
+
+  function getDebts(){
+    try{if(Array.isArray(debts))return debts;}catch(e){}
+    try{if(Array.isArray(window.debts))return window.debts;}catch(e){}
+    try{
+      const raw=localStorage.getItem('godmode_debts');
+      const p=raw?JSON.parse(raw):[];
+      return Array.isArray(p)?p:[];
+    }catch(e){return []}
+  }
+
+  function visibleIndices(){
+    const list=getDebts();
+    const s=String($('search')?.value||'').toLowerCase();
+    const out=[];
+    list.forEach((d,i)=>{
+      try{ if(s && !JSON.stringify(d||{}).toLowerCase().includes(s)) return; }catch(e){}
+      out.push(i);
+    });
+    return out;
+  }
+
+  function parseAmount(v){
+    const n=parseFloat(String(v||'').replace(/\./g,'').replace(',','.'));
+    return Number.isFinite(n)?n:NaN;
+  }
+  function setVal(id,v){const el=$(id); if(el) el.value=v==null?'':String(v);}
+  function toast(msg){try{if(typeof showToast==='function')return showToast(msg);}catch(e){} alert(msg);}
+
+  function saveDebts(list){
+    try{ if(typeof save==='function') save(); else localStorage.setItem('godmode_debts',JSON.stringify(list)); }
+    catch(e){ localStorage.setItem('godmode_debts',JSON.stringify(list)); }
+  }
+
+  function openEditor(i){
+    const list=getDebts();
+    const d=list[i];
+    const overlay=$('v105EditOverlay');
+    if(!d || !overlay){toast('Bearbeiten-Fenster nicht gefunden.'); return;}
+    currentEditIndex=i;
+    overlay.setAttribute('data-edit-index',String(i));
+
+    const c=(d.contactDetails && typeof d.contactDetails==='object')?d.contactDetails:{};
+    setVal('v105Name',d.name||'');
+    setVal('v105Reason',d.grund||d.reason||'');
+    setVal('v105Amount',String(Math.round((Number(d.betrag??d.amount??0))*100)/100));
+    setVal('v105Date',d.datum||d.date||'');
+    setVal('v105Case',d.aktenzeichen||d.caseNumber||'');
+    setVal('v105Category',d.category||d.kategorie||'Sonstiges');
+    setVal('v105Status',d.status||'offen');
+    setVal('v105ContactName',c.representative||d.contactPerson||'');
+    setVal('v105ContactPhone',c.phone||'');
+    setVal('v105ContactEmail',c.email||'');
+    setVal('v105ContactAddress',c.address||'');
+
+    overlay.classList.add('show');
+    overlay.setAttribute('aria-hidden','false');
+    document.body.classList.add('modalOpen','v105EditOpen');
+    setTimeout(()=>$('v105Name')?.focus(),60);
+  }
+
+  function closeEditor(){
+    const overlay=$('v105EditOverlay');
+    if(overlay){
+      overlay.classList.remove('show');
+      overlay.setAttribute('aria-hidden','true');
+      overlay.removeAttribute('data-edit-index');
+    }
+    currentEditIndex=-1;
+    document.body.classList.remove('v105EditOpen');
+    const addOpen=$('addModal') && ($('addModal').getAttribute('aria-hidden')==='false' || $('addModal').style.display==='flex' || $('addModal').style.display==='block');
+    if(!addOpen) document.body.classList.remove('modalOpen');
+  }
+
+  function readIndex(){
+    const n=Number($('v105EditOverlay')?.getAttribute('data-edit-index'));
+    if(Number.isInteger(n)&&n>=0)return n;
+    if(Number.isInteger(currentEditIndex)&&currentEditIndex>=0)return currentEditIndex;
+    return -1;
+  }
+
+  function saveEditor(){
+    const i=readIndex();
+    const list=getDebts();
+    const d=list[i];
+    if(i<0 || !d){toast('Bearbeiten konnte nicht gespeichert werden: Eintrag nicht gefunden.'); return false;}
+
+    const name=String($('v105Name')?.value||'').trim();
+    const grund=String($('v105Reason')?.value||'').trim();
+    const betrag=parseAmount($('v105Amount')?.value);
+    if(!name){toast('Bitte Name / Gläubiger eintragen.'); $('v105Name')?.focus(); return false;}
+    if(!grund){toast('Bitte Grund eintragen.'); $('v105Reason')?.focus(); return false;}
+    if(!Number.isFinite(betrag)||betrag<=0){toast('Bitte Betrag korrekt eintragen.'); $('v105Amount')?.focus(); return false;}
+
+    const category=String($('v105Category')?.value||'Sonstiges').trim()||'Sonstiges';
+    const contact={
+      representative:String($('v105ContactName')?.value||'').trim(),
+      address:String($('v105ContactAddress')?.value||'').trim(),
+      email:String($('v105ContactEmail')?.value||'').trim(),
+      phone:String($('v105ContactPhone')?.value||'').trim()
+    };
+
+    d.name=name; d.grund=grund; d.reason=grund; d.betrag=betrag; d.amount=betrag;
+    d.datum=$('v105Date')?.value||''; d.date=d.datum;
+    d.aktenzeichen=String($('v105Case')?.value||'').trim(); d.caseNumber=d.aktenzeichen;
+    d.status=$('v105Status')?.value||'offen'; d.category=category; d.kategorie=category;
+    d.contactDetails=contact; d.contactPerson=[contact.representative,contact.address,contact.email,contact.phone].filter(Boolean).join(' | ');
+    if(!Array.isArray(d.editHistory)) d.editHistory=[];
+    d.editHistory.push({at:new Date().toISOString(), text:'Schuldendaten bearbeitet'});
+
+    saveDebts(list);
+    try{ if(typeof render==='function') render(); }catch(e){console.error(e)}
+    closeEditor();
+    toast('Änderungen gespeichert ✅');
+    return true;
+  }
+
+  function makeBtn(i){
+    const b=document.createElement('button');
+    b.type='button';
+    b.className='v116EditStableBtn';
+    b.setAttribute('data-v116-edit','1');
+    b.setAttribute('data-index',String(i));
+    b.innerHTML='✎ Bearbeiten';
+    const handler=function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      openEditor(Number(b.getAttribute('data-index')));
+    };
+    b.addEventListener('click',handler,true);
+    b.addEventListener('touchend',handler,{capture:true,passive:false});
+    return b;
+  }
+
+  function hideOldButtons(container){
+    container.querySelectorAll('[data-v105-edit],[data-v106-mobile-edit],[data-v107-edit],[data-v108-edit],[data-v109-edit],[data-v110-edit],.v106MobileEditTop,.v107EditLine,.v108EditInline,.v109EditActionBtn,.v110EditBeforeStatus').forEach(el=>{
+      if(!el.hasAttribute('data-v116-edit')){
+        el.style.setProperty('display','none','important');
+        el.style.setProperty('visibility','hidden','important');
+        el.style.setProperty('pointer-events','none','important');
+      }
+    });
+  }
+
+  function ensureOne(container,i){
+    if(!container || i==null || i<0) return;
+    hideOldButtons(container);
+
+    const existing=[...container.querySelectorAll('[data-v116-edit]')];
+    let btn=existing[0];
+    existing.slice(1).forEach(x=>x.remove());
+
+    if(!btn){
+      btn=makeBtn(i);
+      const statusBtn=[...container.querySelectorAll('button')].find(b=>String(b.textContent||'').toLowerCase().includes('status'));
+      if(statusBtn && statusBtn.parentNode===container) container.insertBefore(btn,statusBtn);
+      else container.insertBefore(btn,container.firstChild||null);
+    }else{
+      btn.setAttribute('data-index',String(i));
+    }
+  }
+
+  function applyStable(){
+    const vis=visibleIndices();
+
+    document.querySelectorAll('#tbody tr').forEach((row,pos)=>{
+      const box=row.querySelector('.actionRow,.tableActions') || row.querySelector('td:last-child');
+      ensureOne(box,vis[pos]);
+    });
+
+    document.querySelectorAll('#mobileList .mobileCard').forEach((card,pos)=>{
+      const box=card.querySelector('.mobileRow,.mobileActionMain,.mobileTinyActions');
+      ensureOne(box,vis[pos]);
+    });
+
+    document.querySelectorAll('.v59MenuVersion').forEach(el=>el.textContent=VERSION);
+    ['v98OnlyVersion','v76OnlyVersion','v101OnlyVersion'].forEach(id=>{const el=$(id); if(el)el.textContent=VERSION;});
+  }
+
+  function scheduleApply(){
+    clearTimeout(applyTimer);
+    applyTimer=setTimeout(applyStable,80);
+  }
+
+  function bindSave(){
+    const saveBtn=$('v105EditSave');
+    if(saveBtn && saveBtn.dataset.v116Save!=='1'){
+      saveBtn.dataset.v116Save='1';
+      saveBtn.onclick=function(e){e.preventDefault();e.stopPropagation();return saveEditor();};
+      saveBtn.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();return saveEditor();},true);
+      saveBtn.addEventListener('touchend',function(e){e.preventDefault();e.stopPropagation();return saveEditor();},{capture:true,passive:false});
+    }
+    ['v105EditCancel','v105EditClose'].forEach(id=>{
+      const b=$(id);
+      if(b && b.dataset.v116Close!=='1'){
+        b.dataset.v116Close='1';
+        b.onclick=function(e){e.preventDefault();e.stopPropagation();closeEditor();};
+      }
+    });
+  }
+
+  const oldRender=window.render;
+  if(typeof oldRender==='function' && !oldRender.__v116StableActions){
+    const wrapped=function(){
+      const r=oldRender.apply(this,arguments);
+      scheduleApply();
+      return r;
+    };
+    wrapped.__v116StableActions=true;
+    window.render=wrapped;
+    try{ render=wrapped; }catch(e){}
+  }
+
+  function init(){
+    bindSave();
+    applyStable();
+  }
+
+  document.addEventListener('DOMContentLoaded',()=>{init();setTimeout(init,500)});
+  window.addEventListener('load',()=>{init();setTimeout(init,700)});
+  window.addEventListener('resize',scheduleApply);
+  $('search')?.addEventListener('input',scheduleApply);
+  init();
+})();
+</script>
+
 </body>
 </html>
