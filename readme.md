@@ -1,3 +1,3 @@
-Schulden Manager v113
+Schulden Manager v114
 
-Vergleich: Alle Gläubiger mit Gesamtsumme, Quote 1–100 %, Vergleichsbetrag und Ersparnis.
+Vergleich: Prozentwerte können pro Gläubiger einzeln eingestellt werden; Gesamtvergleich und Ersparnis werden aus allen Einzelwerten berechnet.

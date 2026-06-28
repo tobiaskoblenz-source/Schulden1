@@ -1,6 +1,6 @@
 {
-  "name": "schulden-v113",
-  "version": "113.0.0",
+  "name": "schulden-v114",
+  "version": "114.0.0",
   "private": true,
   "description": "Schulden Manager PWA mit Gläubiger-Verwaltung und QR-Bögen",
   "scripts": {

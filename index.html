@@ -11549,5 +11549,191 @@ body.v105EditOpen #fabAdd{display:none!important}
 })();
 </script>
 
+
+<style id="v114-vergleich-individual-style">
+/* v114: Vergleich pro Gläubiger einzeln */
+.v114RowPercent{
+  width:86px!important;
+  min-height:38px!important;
+  border-radius:12px!important;
+  text-align:center!important;
+  font-weight:900!important;
+  background:#132238!important;
+  border:1px solid rgba(255,255,255,.09)!important;
+  color:#eaf2ff!important;
+  padding:0 8px!important;
+}
+.v114GlobalBox{
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:10px;
+  align-items:end;
+}
+#v114ApplyAll{
+  min-height:44px!important;
+  border-radius:14px!important;
+  background:linear-gradient(135deg,#2563eb,#7c71ff)!important;
+  color:#fff!important;
+}
+.v114SmallHint{
+  display:block;
+  margin-top:7px;
+  color:#93a8c6;
+  font-size:12px;
+  line-height:1.35;
+}
+.v113CompareTable th:nth-child(4),
+.v113CompareTable td:nth-child(4){
+  min-width:130px;
+}
+@media(max-width:720px){
+  .v114GlobalBox{grid-template-columns:1fr}
+  #v114ApplyAll{width:100%}
+}
+</style>
+
+<script id="v114-vergleich-individual-js">
+(function(){
+  const VERSION='v114';
+  const STORE='godmode_vergleich_percent_by_creditor_v114';
+
+  function $(id){return document.getElementById(id);}
+  function getDebts(){try{if(Array.isArray(debts))return debts;}catch(e){} try{if(Array.isArray(window.debts))return window.debts;}catch(e){} try{const raw=localStorage.getItem('godmode_debts');const p=raw?JSON.parse(raw):[];return Array.isArray(p)?p:[]}catch(e){return[]}}
+  function eur(v){try{return new Intl.NumberFormat('de-DE',{style:'currency',currency:'EUR'}).format(Number(v)||0)}catch(e){return (Number(v)||0).toFixed(2).replace('.',',')+' €'}}
+  function esc(s){return String(s||'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'","&#039;")}
+  function openStatus(s){s=String(s||'offen').toLowerCase();return s!=='bezahlt'&&s!=='paid'}
+  function readPercents(){try{const p=JSON.parse(localStorage.getItem(STORE)||'{}');return p&&typeof p==='object'?p:{}}catch(e){return{}}}
+  function writePercents(p){localStorage.setItem(STORE,JSON.stringify(p||{}))}
+  function normPercent(v){let p=Number(v);if(!Number.isFinite(p))p=10;return Math.max(1,Math.min(100,Math.round(p)))}
+  function globalPercent(){return normPercent($('v113PercentInput')?.value||$('v113PercentRange')?.value||10)}
+  function setGlobalPercent(p){p=normPercent(p);if($('v113PercentInput'))$('v113PercentInput').value=String(p);if($('v113PercentRange'))$('v113PercentRange').value=String(p);if($('v113ChosenPercent'))$('v113ChosenPercent').textContent=p+' %'}
+  function keyForName(name){return String(name||'Ohne Name').trim().toLowerCase()||'ohne name'}
+  function group(){const m=new Map();getDebts().forEach(d=>{if(!d)return;const name=String(d.name||d.glaeubiger||d.creditor||'Ohne Name').trim()||'Ohne Name';const key=keyForName(name);const amount=Number(d.betrag??d.amount??0)||0;if(!m.has(key))m.set(key,{key,name,total:0,open:0,count:0});const x=m.get(key);x.total+=amount;if(openStatus(d.status))x.open+=amount;x.count+=1});return[...m.values()].sort((a,b)=>b.total-a.total||a.name.localeCompare(b.name))}
+
+  function upgradeHeaderText(){
+    const p=document.querySelector('#v112VergleichSection .v113CompareHead p');
+    if(p) p.textContent='Alle Gläubiger mit Gesamtsumme. Du kannst pro Gläubiger einzeln eine Quote von 1–100 % eintragen.';
+    const label=document.querySelector('#v112VergleichSection label[for="v113PercentRange"]');
+    if(label) label.textContent='Globale Quote für alle setzen';
+    const controls=document.querySelector('#v112VergleichSection .v113PercentControls');
+    if(controls && !document.getElementById('v114ApplyAll')){
+      const wrap=document.createElement('div');
+      wrap.className='v114GlobalBox';
+      controls.parentNode.insertBefore(wrap, controls);
+      wrap.appendChild(controls);
+      const btn=document.createElement('button');
+      btn.id='v114ApplyAll';
+      btn.type='button';
+      btn.textContent='Auf alle anwenden';
+      wrap.appendChild(btn);
+      const hint=document.createElement('span');
+      hint.className='v114SmallHint';
+      hint.textContent='Damit überschreibst du die Prozentwerte aller Gläubiger mit der globalen Quote.';
+      wrap.parentNode.appendChild(hint);
+      btn.addEventListener('click', function(){
+        const p=globalPercent();
+        const map={};
+        group().forEach(x=>map[x.key]=p);
+        writePercents(map);
+        renderIndividual();
+      });
+    }
+  }
+
+  function ensureV113Layout(){
+    // v113 erzeugt die Grundstruktur. Falls sie noch nicht da ist, Klick/Render anstoßen.
+    if(!document.getElementById('v113CompareTableHost')){
+      const sec=$('v112VergleichSection');
+      const host=sec?.querySelector('.v112VergleichPlaceholder');
+      if(host && !host.querySelector('.v113CompareWrap')){
+        host.innerHTML='<div class="v113CompareWrap"><div class="v113CompareHead"><div><h2>Vergleich</h2><p>Alle Gläubiger mit Gesamtsumme.</p></div><button id="v112CloseVergleich" class="secondary" type="button">Zurück zur Übersicht</button></div><div class="v113PercentBox"><div><label for="v113PercentRange">Globale Quote für alle setzen</label><div class="v113PercentControls"><input id="v113PercentRange" type="range" min="1" max="100" value="10"><input id="v113PercentInput" type="number" min="1" max="100" value="10"></div></div><div class="v113Metric"><span>Globale Quote</span><strong id="v113ChosenPercent">10 %</strong></div></div><div class="v113SummaryGrid"><div class="v113Metric"><span>Gesamt-Schulden</span><strong id="v113TotalDebt">0,00 €</strong></div><div class="v113Metric"><span>Vergleich gesamt</span><strong id="v113TotalCompare">0,00 €</strong></div><div class="v113Metric"><span>Mögliche Ersparnis</span><strong id="v113TotalSaving">0,00 €</strong></div></div><div id="v113CompareTableHost"></div><div class="v113Actions"><button id="v113RefreshVergleich" type="button">Neu berechnen</button></div></div>';
+      }
+    }
+  }
+
+  function renderIndividual(){
+    ensureV113Layout();
+    upgradeHeaderText();
+
+    const data=group();
+    const saved=readPercents();
+    const g=globalPercent();
+    setGlobalPercent(g);
+
+    const total=data.reduce((s,x)=>s+x.total,0);
+    let compareTotal=0;
+
+    data.forEach(x=>{
+      const p=normPercent(saved[x.key]||g);
+      compareTotal += x.total*p/100;
+    });
+    const savingTotal=Math.max(0,total-compareTotal);
+
+    if($('v113TotalDebt'))$('v113TotalDebt').textContent=eur(total);
+    if($('v113TotalCompare'))$('v113TotalCompare').textContent=eur(compareTotal);
+    if($('v113TotalSaving'))$('v113TotalSaving').textContent=eur(savingTotal);
+
+    const host=$('v113CompareTableHost');
+    if(!host)return;
+    if(!data.length){host.innerHTML='<div class="v113Empty">Noch keine Gläubiger vorhanden.</div>';return}
+
+    host.innerHTML='<div class="v113TableWrap"><table class="v113CompareTable"><thead><tr><th>Gläubiger</th><th>Anzahl</th><th>Gesamtsumme</th><th>Quote einzeln</th><th>Vergleichsbetrag</th><th>Ersparnis</th></tr></thead><tbody>'+
+      data.map(x=>{
+        const p=normPercent(saved[x.key]||g);
+        const v=x.total*p/100;
+        const save=Math.max(0,x.total-v);
+        return '<tr data-v114-key="'+esc(x.key)+'"><td><strong>'+esc(x.name)+'</strong></td><td>'+x.count+'</td><td><strong>'+eur(x.total)+'</strong></td><td><input class="v114RowPercent" type="number" min="1" max="100" value="'+p+'" data-key="'+esc(x.key)+'"> %</td><td><strong>'+eur(v)+'</strong></td><td>'+eur(save)+'</td></tr>';
+      }).join('')+
+      '</tbody></table></div>';
+
+    host.querySelectorAll('.v114RowPercent').forEach(inp=>{
+      inp.addEventListener('input', function(){
+        const map=readPercents();
+        map[this.dataset.key]=normPercent(this.value);
+        writePercents(map);
+        // kleine Verzögerung, damit Tippen nicht springt
+        clearTimeout(renderIndividual._t);
+        renderIndividual._t=setTimeout(renderIndividual,250);
+      });
+    });
+  }
+
+  function bind(){
+    ensureV113Layout();
+    upgradeHeaderText();
+    const r=$('v113PercentRange'), i=$('v113PercentInput');
+    if(r && r.dataset.v114!=='1'){r.dataset.v114='1';r.addEventListener('input',function(){setGlobalPercent(this.value)})}
+    if(i && i.dataset.v114!=='1'){i.dataset.v114='1';i.addEventListener('input',function(){setGlobalPercent(this.value)})}
+    const ref=$('v113RefreshVergleich');
+    if(ref && ref.dataset.v114!=='1'){ref.dataset.v114='1';ref.addEventListener('click',renderIndividual)}
+    const close=$('v112CloseVergleich');
+    if(close && close.dataset.v114!=='1'){close.dataset.v114='1';close.addEventListener('click',function(){const sec=$('v112VergleichSection');if(sec)sec.classList.remove('show');$('dashboardTop')?.scrollIntoView({behavior:'smooth',block:'start'})})}
+    document.querySelectorAll('[data-v112-vergleich],#v112TopVergleichBtn').forEach(btn=>{
+      if(btn.dataset.v114Hook==='1')return;
+      btn.dataset.v114Hook='1';
+      btn.addEventListener('click',function(){setTimeout(renderIndividual,160);setTimeout(renderIndividual,600)},true);
+    });
+    document.querySelectorAll('.v59MenuVersion').forEach(el=>el.textContent=VERSION);
+  }
+
+  const oldRender=window.render;
+  if(typeof oldRender==='function' && !oldRender.__v114IndividualCompare){
+    const wrapped=function(){
+      const r=oldRender.apply(this,arguments);
+      setTimeout(function(){bind();renderIndividual()},100);
+      return r;
+    };
+    wrapped.__v114IndividualCompare=true;
+    window.render=wrapped;
+    try{ render=wrapped; }catch(e){}
+  }
+
+  document.addEventListener('DOMContentLoaded',()=>{bind();setTimeout(()=>{bind();renderIndividual()},600)});
+  window.addEventListener('load',()=>{bind();setTimeout(()=>{bind();renderIndividual()},900)});
+  setInterval(bind,1500);
+  setTimeout(()=>{bind();renderIndividual()},200);
+})();
+</script>
+
 </body>
 </html>
