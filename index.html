@@ -10674,9 +10674,90 @@ body.v105EditOpen #fabAdd{display:none!important}
 }
 </style>
 
-<script id="v117-one-stable-edit-js">
+<script id="v117-one-stable-edit-js-disabled">/* disabled in v118 */</script>
+
+
+<style id="v118-edit-visible-action-groups-style">
+/* v118: Ein Bearbeiten-Button in jeder sichtbaren Aktionsgruppe, ohne Springen */
+[data-v105-edit],
+[data-v106-mobile-edit],
+[data-v107-edit],
+[data-v108-edit],
+[data-v109-edit],
+[data-v110-edit],
+[data-v115-edit],
+[data-v116-edit],
+[data-v117-edit],
+.v106MobileEditTop,
+.v107EditLine,
+.v108EditInline,
+.v109EditActionBtn,
+.v110EditBeforeStatus,
+.v115EditBtn,
+.v116EditStableBtn,
+.v117EditBtn{
+  display:none !important;
+  visibility:hidden !important;
+  opacity:0 !important;
+  pointer-events:none !important;
+  width:0 !important;
+  height:0 !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  padding:0 !important;
+  margin:0 !important;
+  overflow:hidden !important;
+}
+
+.v118EditBtn{
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:7px !important;
+  min-height:38px !important;
+  padding:0 12px !important;
+  border-radius:12px !important;
+  font-size:13px !important;
+  font-weight:900 !important;
+  background:#12233a !important;
+  color:#eaf2ff !important;
+  border:1px solid rgba(255,255,255,.09) !important;
+  box-shadow:none !important;
+  transform:none !important;
+  transition:none !important;
+  white-space:nowrap !important;
+  flex:0 0 auto !important;
+}
+
+.v118EditBtn:hover,
+.v118EditBtn:active,
+.v118EditBtn:focus{
+  transform:none !important;
+  background:#183154 !important;
+}
+
+.actionRow,
+.tableActions,
+.mobileRow,
+.mobileActionMain,
+.mobileTinyActions{
+  gap:8px !important;
+}
+
+@media(max-width:1180px){
+  .mobileRow .v118EditBtn,
+  .mobileActionMain .v118EditBtn,
+  .mobileTinyActions .v118EditBtn{
+    width:100% !important;
+    min-height:42px !important;
+    display:flex !important;
+  }
+}
+</style>
+
+<script id="v118-edit-visible-action-groups-js">
 (function(){
-  const VERSION='v117';
+  const VERSION='v118';
   let currentEditIndex=-1;
 
   function $(id){return document.getElementById(id);}
@@ -10712,10 +10793,6 @@ body.v105EditOpen #fabAdd{display:none!important}
     return Number.isFinite(n)?n:NaN;
   }
   function setVal(id,v){ const el=$(id); if(el) el.value=v==null?'':String(v); }
-
-  function cleanupOldButtons(root){
-    (root||document).querySelectorAll('[data-v105-edit],[data-v106-mobile-edit],[data-v107-edit],[data-v108-edit],[data-v109-edit],[data-v110-edit],[data-v115-edit],[data-v116-edit],.v106MobileEditTop,.v107EditLine,.v108EditInline,.v109EditActionBtn,.v110EditBeforeStatus,.v115EditBtn,.v116EditStableBtn').forEach(el=>el.remove());
-  }
 
   function openEditor(i){
     const list=debtsArr();
@@ -10785,18 +10862,11 @@ body.v105EditOpen #fabAdd{display:none!important}
       phone:String($('v105ContactPhone')?.value||'').trim()
     };
 
-    d.name=name;
-    d.grund=grund;
-    d.reason=grund;
-    d.betrag=betrag;
-    d.amount=betrag;
-    d.datum=$('v105Date')?.value||'';
-    d.date=d.datum;
-    d.aktenzeichen=String($('v105Case')?.value||'').trim();
-    d.caseNumber=d.aktenzeichen;
+    d.name=name; d.grund=grund; d.reason=grund; d.betrag=betrag; d.amount=betrag;
+    d.datum=$('v105Date')?.value||''; d.date=d.datum;
+    d.aktenzeichen=String($('v105Case')?.value||'').trim(); d.caseNumber=d.aktenzeichen;
     d.status=$('v105Status')?.value||'offen';
-    d.category=category;
-    d.kategorie=category;
+    d.category=category; d.kategorie=category;
     d.contactDetails=contact;
     d.contactPerson=[contact.representative,contact.address,contact.email,contact.phone].filter(Boolean).join(' | ');
     if(!Array.isArray(d.editHistory)) d.editHistory=[];
@@ -10809,57 +10879,105 @@ body.v105EditOpen #fabAdd{display:none!important}
     return true;
   }
 
-  function makeButton(i){
+  function cleanupOld(root){
+    (root||document).querySelectorAll('[data-v105-edit],[data-v106-mobile-edit],[data-v107-edit],[data-v108-edit],[data-v109-edit],[data-v110-edit],[data-v115-edit],[data-v116-edit],[data-v117-edit],.v106MobileEditTop,.v107EditLine,.v108EditInline,.v109EditActionBtn,.v110EditBeforeStatus,.v115EditBtn,.v116EditStableBtn,.v117EditBtn').forEach(el=>el.remove());
+  }
+
+  function makeBtn(i){
     const b=document.createElement('button');
     b.type='button';
-    b.className='v117EditBtn';
-    b.setAttribute('data-v117-edit','1');
+    b.className='v118EditBtn';
+    b.setAttribute('data-v118-edit','1');
     b.setAttribute('data-index',String(i));
     b.textContent='✎ Bearbeiten';
-    b.addEventListener('click',function(e){
+    const handler=function(e){
       e.preventDefault();
       e.stopPropagation();
       openEditor(Number(b.getAttribute('data-index')));
-    },true);
-    b.addEventListener('touchend',function(e){
-      e.preventDefault();
-      e.stopPropagation();
-      openEditor(Number(b.getAttribute('data-index')));
-    },{capture:true,passive:false});
+    };
+    b.addEventListener('click',handler,true);
+    b.addEventListener('touchend',handler,{capture:true,passive:false});
     return b;
   }
 
-  function placeButton(box,i){
-    if(!box || i==null || i<0) return;
-    cleanupOldButtons(box);
+  function indexFromContext(box, fallbackPos){
+    const vis=visibleIndices();
 
-    let btn=box.querySelector('[data-v117-edit]');
-    box.querySelectorAll('[data-v117-edit]').forEach((b,idx)=>{ if(idx>0) b.remove(); });
+    const row=box.closest('#tbody tr');
+    if(row){
+      const rows=[...document.querySelectorAll('#tbody tr')];
+      const pos=rows.indexOf(row);
+      if(vis[pos]!=null) return vis[pos];
+    }
+
+    const card=box.closest('#mobileList .mobileCard');
+    if(card){
+      const cards=[...document.querySelectorAll('#mobileList .mobileCard')];
+      const pos=cards.indexOf(card);
+      if(vis[pos]!=null) return vis[pos];
+    }
+
+    const anyRow=box.closest('tr,.mobileCard,.debtCard,.debtItem,.debtRow,[data-debt-index],[data-index]');
+    if(anyRow){
+      const explicit=anyRow.getAttribute('data-debt-index') || anyRow.getAttribute('data-index');
+      if(explicit!=null){
+        const n=Number(explicit);
+        if(Number.isInteger(n)&&n>=0) return n;
+      }
+    }
+
+    if(vis[fallbackPos]!=null) return vis[fallbackPos];
+    return fallbackPos;
+  }
+
+  function isActionBox(el){
+    if(!el || el.nodeType!==1) return false;
+    if(el.classList.contains('actionRow') || el.classList.contains('tableActions') || el.classList.contains('mobileRow') || el.classList.contains('mobileActionMain') || el.classList.contains('mobileTinyActions')) return true;
+
+    const buttons=[...el.querySelectorAll(':scope > button')];
+    if(buttons.length < 2) return false;
+    const text=buttons.map(b=>String(b.textContent||'').toLowerCase()).join(' ');
+    return text.includes('status') && (text.includes('löschen') || text.includes('abbau') || text.includes('akte') || text.includes('daten') || text.includes('info') || text.includes('ansprech'));
+  }
+
+  function collectBoxes(){
+    const set=new Set();
+    document.querySelectorAll('.actionRow,.tableActions,.mobileRow,.mobileActionMain,.mobileTinyActions').forEach(el=>set.add(el));
+
+    document.querySelectorAll('button').forEach(btn=>{
+      const t=String(btn.textContent||'').toLowerCase();
+      if(!t.includes('status')) return;
+      let p=btn.parentElement;
+      for(let d=0;p && d<4;d++,p=p.parentElement){
+        if(isActionBox(p)){ set.add(p); break; }
+      }
+    });
+
+    return [...set].filter(el=>el && el.isConnected);
+  }
+
+  function placeInBox(box,i){
+    if(!box || i==null || i<0) return;
+    cleanupOld(box);
+
+    let btn=box.querySelector('[data-v118-edit]');
+    box.querySelectorAll('[data-v118-edit]').forEach((b,idx)=>{ if(idx>0) b.remove(); });
 
     if(!btn){
-      btn=makeButton(i);
-      const statusBtn=[...box.querySelectorAll('button')].find(b=>String(b.textContent||'').toLowerCase().includes('status'));
-      if(statusBtn && statusBtn.parentElement===box){
-        box.insertBefore(btn,statusBtn);
-      }else{
-        box.insertBefore(btn,box.firstChild);
-      }
+      btn=makeBtn(i);
+      const directStatus=[...box.children].find(el=>el.tagName==='BUTTON' && String(el.textContent||'').toLowerCase().includes('status'));
+      if(directStatus) box.insertBefore(btn,directStatus);
+      else box.insertBefore(btn,box.firstChild);
     }
     btn.setAttribute('data-index',String(i));
   }
 
-  function applyOnce(){
-    cleanupOldButtons(document);
-    const vis=visibleIndices();
-
-    document.querySelectorAll('#tbody tr').forEach((row,pos)=>{
-      const box=row.querySelector('.actionRow,.tableActions') || row.querySelector('td:last-child');
-      placeButton(box,vis[pos]);
-    });
-
-    document.querySelectorAll('#mobileList .mobileCard').forEach((card,pos)=>{
-      const box=card.querySelector('.mobileRow,.mobileActionMain,.mobileTinyActions');
-      placeButton(box,vis[pos]);
+  function apply(){
+    cleanupOld(document);
+    const boxes=collectBoxes();
+    boxes.forEach((box,pos)=>{
+      const i=indexFromContext(box,pos);
+      placeInBox(box,i);
     });
 
     document.querySelectorAll('.v59MenuVersion').forEach(el=>el.textContent=VERSION);
@@ -10868,40 +10986,40 @@ body.v105EditOpen #fabAdd{display:none!important}
 
   function bindSave(){
     const saveBtn=$('v105EditSave');
-    if(saveBtn && saveBtn.dataset.v117Save!=='1'){
-      saveBtn.dataset.v117Save='1';
+    if(saveBtn && saveBtn.dataset.v118Save!=='1'){
+      saveBtn.dataset.v118Save='1';
       saveBtn.onclick=function(e){ e.preventDefault(); e.stopPropagation(); return saveEditor(); };
     }
     ['v105EditCancel','v105EditClose'].forEach(id=>{
       const b=$(id);
-      if(b && b.dataset.v117Close!=='1'){
-        b.dataset.v117Close='1';
+      if(b && b.dataset.v118Close!=='1'){
+        b.dataset.v118Close='1';
         b.onclick=function(e){ e.preventDefault(); e.stopPropagation(); closeEditor(); };
       }
     });
   }
 
   const oldRender=window.render;
-  if(typeof oldRender==='function' && !oldRender.__v117OneStableEdit){
+  if(typeof oldRender==='function' && !oldRender.__v118StableEdit){
     const wrapped=function(){
       const r=oldRender.apply(this,arguments);
-      setTimeout(applyOnce,60);
+      setTimeout(apply,80);
       return r;
     };
-    wrapped.__v117OneStableEdit=true;
+    wrapped.__v118StableEdit=true;
     window.render=wrapped;
     try{ render=wrapped; }catch(e){}
   }
 
   function init(){
     bindSave();
-    applyOnce();
+    apply();
   }
 
-  document.addEventListener('DOMContentLoaded',()=>{init();setTimeout(init,400);});
+  document.addEventListener('DOMContentLoaded',()=>{init();setTimeout(init,400);setTimeout(init,1000);});
   window.addEventListener('load',()=>{init();setTimeout(init,600);});
-  window.addEventListener('resize',()=>setTimeout(applyOnce,120));
-  $('search')?.addEventListener('input',()=>setTimeout(applyOnce,120));
+  window.addEventListener('resize',()=>setTimeout(apply,120));
+  $('search')?.addEventListener('input',()=>setTimeout(apply,120));
   init();
 })();
 </script>

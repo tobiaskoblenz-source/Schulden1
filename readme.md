@@ -1,3 +1,3 @@
-Schulden Manager v117
+Schulden Manager v118
 
-Fix: Alte Bearbeiten-Skripte deaktiviert. Es gibt nur noch eine stabile Bearbeiten-Logik ohne Intervall/Muta­tions-Loop, damit die Buttons nicht mehr von rechts nach links springen.
+Fix: Bearbeiten-Button wieder sichtbar. Er wird in jede sichtbare Aktionsgruppe mit Status gesetzt, ohne die alte Spring-Logik.
