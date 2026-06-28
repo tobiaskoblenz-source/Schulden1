@@ -1,3 +1,3 @@
-Schulden Manager v121
+Schulden Manager v122
 
-Rollback: Die Layout-Änderung aus v120 wurde rückgängig gemacht. Handy-/Tablet-Seite ist wieder wie in v119.
+Fix: Bearbeiten-Button flackert beim Scrollen nicht mehr. Die alte Beobachter-Logik wurde deaktiviert; Bearbeiten wird nur nach normalem Rendern gesetzt.

@@ -10822,13 +10822,120 @@ body.v105EditOpen #fabAdd{display:none!important}
 }
 </style>
 
-<script id="v119-edit-persistent-js">
+<script id="v119-edit-persistent-js-disabled-v122">/* disabled in v122: stable no-scroll-flicker edit button */</script>
+
+
+<script id="v121-revert-v120-js">
 (function(){
-  const VERSION='v119';
+  const VERSION='v121';
+  function setVersion(){
+    try{
+      document.querySelectorAll('.v59MenuVersion').forEach(el=>el.textContent=VERSION);
+      ['v98OnlyVersion','v76OnlyVersion','v101OnlyVersion'].forEach(id=>{
+        const el=document.getElementById(id);
+        if(el) el.textContent=VERSION;
+      });
+    }catch(e){}
+  }
+  document.addEventListener('DOMContentLoaded',setVersion);
+  window.addEventListener('load',setVersion);
+  setVersion();
+})();
+</script>
+
+
+<style id="v122-edit-no-scroll-flicker-style">
+/* v122: Bearbeiten-Button ohne Scroll-Flackern */
+[data-v105-edit],
+[data-v106-mobile-edit],
+[data-v107-edit],
+[data-v108-edit],
+[data-v109-edit],
+[data-v110-edit],
+[data-v115-edit],
+[data-v116-edit],
+[data-v117-edit],
+[data-v118-edit],
+[data-v119-edit],
+.v106MobileEditTop,
+.v107EditLine,
+.v108EditInline,
+.v109EditActionBtn,
+.v110EditBeforeStatus,
+.v115EditBtn,
+.v116EditStableBtn,
+.v117EditBtn,
+.v118EditBtn,
+.v119EditBtn{
+  display:none !important;
+}
+
+.v122EditBtn{
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:7px !important;
+  min-height:38px !important;
+  padding:0 12px !important;
+  border-radius:12px !important;
+  font-size:13px !important;
+  font-weight:900 !important;
+  background:#12233a !important;
+  color:#eaf2ff !important;
+  border:1px solid rgba(255,255,255,.09) !important;
+  box-shadow:none !important;
+  transform:none !important;
+  transition:none !important;
+  white-space:nowrap !important;
+  flex:0 0 auto !important;
+  opacity:1 !important;
+  visibility:visible !important;
+  pointer-events:auto !important;
+  backface-visibility:hidden !important;
+  will-change:auto !important;
+}
+
+.v122EditBtn:hover,
+.v122EditBtn:active,
+.v122EditBtn:focus{
+  transform:none !important;
+  background:#183154 !important;
+}
+
+.actionRow,
+.tableActions,
+.mobileRow,
+.mobileActionMain,
+.mobileTinyActions{
+  gap:8px !important;
+}
+
+.actionRow button,
+.tableActions button,
+.mobileRow button,
+.mobileActionMain button,
+.mobileTinyActions button{
+  transform:none !important;
+  transition:none !important;
+}
+
+@media(max-width:1180px){
+  .mobileRow .v122EditBtn,
+  .mobileActionMain .v122EditBtn,
+  .mobileTinyActions .v122EditBtn{
+    width:100% !important;
+    min-height:42px !important;
+  }
+}
+</style>
+
+<script id="v122-edit-no-scroll-flicker-js">
+(function(){
+  const VERSION='v122';
   let currentEditIndex=-1;
-  let repairing=false;
 
   function $(id){return document.getElementById(id);}
+
   function debtsArr(){
     try{ if(Array.isArray(debts)) return debts; }catch(e){}
     try{ if(Array.isArray(window.debts)) return window.debts; }catch(e){}
@@ -10838,6 +10945,7 @@ body.v105EditOpen #fabAdd{display:none!important}
       return Array.isArray(parsed) ? parsed : [];
     }catch(e){ return []; }
   }
+
   function visibleIndices(){
     const list=debtsArr();
     const s=String($('search')?.value||'').toLowerCase();
@@ -10848,18 +10956,22 @@ body.v105EditOpen #fabAdd{display:none!important}
     });
     return out;
   }
+
   function saveAll(list){
     try{ if(typeof save==='function') save(); else localStorage.setItem('godmode_debts',JSON.stringify(list)); }
     catch(e){ localStorage.setItem('godmode_debts',JSON.stringify(list)); }
   }
+
   function toast(msg){
     try{ if(typeof showToast==='function') return showToast(msg); }catch(e){}
     alert(msg);
   }
+
   function parseAmount(v){
     const n=parseFloat(String(v||'').replace(/\./g,'').replace(',','.'));
     return Number.isFinite(n)?n:NaN;
   }
+
   function setVal(id,v){ const el=$(id); if(el) el.value=v==null?'':String(v); }
 
   function openEditor(i){
@@ -10888,6 +11000,7 @@ body.v105EditOpen #fabAdd{display:none!important}
     overlay.setAttribute('aria-hidden','false');
     document.body.classList.add('modalOpen','v105EditOpen');
   }
+
   function closeEditor(){
     const overlay=$('v105EditOverlay');
     if(overlay){
@@ -10900,12 +11013,14 @@ body.v105EditOpen #fabAdd{display:none!important}
     const addOpen=$('addModal') && ($('addModal').getAttribute('aria-hidden')==='false' || $('addModal').style.display==='flex' || $('addModal').style.display==='block');
     if(!addOpen) document.body.classList.remove('modalOpen');
   }
+
   function readIndex(){
     const n=Number($('v105EditOverlay')?.getAttribute('data-edit-index'));
     if(Number.isInteger(n)&&n>=0) return n;
     if(Number.isInteger(currentEditIndex)&&currentEditIndex>=0) return currentEditIndex;
     return -1;
   }
+
   function saveEditor(){
     const list=debtsArr();
     const i=readIndex();
@@ -10945,14 +11060,14 @@ body.v105EditOpen #fabAdd{display:none!important}
   }
 
   function removeOldButtons(root){
-    (root||document).querySelectorAll('[data-v105-edit],[data-v106-mobile-edit],[data-v107-edit],[data-v108-edit],[data-v109-edit],[data-v110-edit],[data-v115-edit],[data-v116-edit],[data-v117-edit],[data-v118-edit],.v106MobileEditTop,.v107EditLine,.v108EditInline,.v109EditActionBtn,.v110EditBeforeStatus,.v115EditBtn,.v116EditStableBtn,.v117EditBtn,.v118EditBtn').forEach(el=>el.remove());
+    (root||document).querySelectorAll('[data-v105-edit],[data-v106-mobile-edit],[data-v107-edit],[data-v108-edit],[data-v109-edit],[data-v110-edit],[data-v115-edit],[data-v116-edit],[data-v117-edit],[data-v118-edit],[data-v119-edit],.v106MobileEditTop,.v107EditLine,.v108EditInline,.v109EditActionBtn,.v110EditBeforeStatus,.v115EditBtn,.v116EditStableBtn,.v117EditBtn,.v118EditBtn,.v119EditBtn').forEach(el=>el.remove());
   }
 
   function makeBtn(i){
     const b=document.createElement('button');
     b.type='button';
-    b.className='v119EditBtn';
-    b.setAttribute('data-v119-edit','1');
+    b.className='v122EditBtn';
+    b.setAttribute('data-v122-edit','1');
     b.setAttribute('data-index',String(i));
     b.textContent='✎ Bearbeiten';
     b.addEventListener('click',function(e){
@@ -10990,31 +11105,35 @@ body.v105EditOpen #fabAdd{display:none!important}
 
   function indexForBox(box,fallback){
     const vis=visibleIndices();
+
     const tr=box.closest('#tbody tr');
     if(tr){
       const rows=[...document.querySelectorAll('#tbody tr')];
       const pos=rows.indexOf(tr);
       if(vis[pos]!=null) return vis[pos];
     }
+
     const card=box.closest('#mobileList .mobileCard');
     if(card){
       const cards=[...document.querySelectorAll('#mobileList .mobileCard')];
       const pos=cards.indexOf(card);
       if(vis[pos]!=null) return vis[pos];
     }
+
     const carrier=box.closest('[data-debt-index],[data-index]');
     if(carrier){
       const n=Number(carrier.getAttribute('data-debt-index') || carrier.getAttribute('data-index'));
       if(Number.isInteger(n)&&n>=0) return n;
     }
+
     if(vis[fallback]!=null) return vis[fallback];
     return fallback;
   }
 
   function placeButton(box,i){
     if(!box || i==null || i<0) return;
-    let btn=box.querySelector('[data-v119-edit]');
-    box.querySelectorAll('[data-v119-edit]').forEach((b,idx)=>{ if(idx>0) b.remove(); });
+    let btn=box.querySelector('[data-v122-edit]');
+    box.querySelectorAll('[data-v122-edit]').forEach((b,idx)=>{ if(idx>0) b.remove(); });
 
     if(!btn){
       btn=makeBtn(i);
@@ -11025,88 +11144,53 @@ body.v105EditOpen #fabAdd{display:none!important}
     btn.setAttribute('data-index',String(i));
   }
 
-  function repair(){
-    if(repairing) return;
-    repairing=true;
-    try{
-      removeOldButtons(document);
-      const boxes=collectActionBoxes();
-      boxes.forEach((box,pos)=>placeButton(box,indexForBox(box,pos)));
-      document.querySelectorAll('.v59MenuVersion').forEach(el=>el.textContent=VERSION);
-      ['v98OnlyVersion','v76OnlyVersion','v101OnlyVersion'].forEach(id=>{ const el=$(id); if(el) el.textContent=VERSION; });
-    }finally{
-      repairing=false;
-    }
+  function applyOnce(){
+    removeOldButtons(document);
+    collectActionBoxes().forEach((box,pos)=>placeButton(box,indexForBox(box,pos)));
+    document.querySelectorAll('.v59MenuVersion').forEach(el=>el.textContent=VERSION);
+    ['v98OnlyVersion','v76OnlyVersion','v101OnlyVersion'].forEach(id=>{ const el=$(id); if(el) el.textContent=VERSION; });
   }
 
   function bindSave(){
     const saveBtn=$('v105EditSave');
-    if(saveBtn && saveBtn.dataset.v119Save!=='1'){
-      saveBtn.dataset.v119Save='1';
+    if(saveBtn && saveBtn.dataset.v122Save!=='1'){
+      saveBtn.dataset.v122Save='1';
       saveBtn.onclick=function(e){ e.preventDefault(); e.stopPropagation(); return saveEditor(); };
-      saveBtn.addEventListener('touchend',function(e){ e.preventDefault(); e.stopPropagation(); return saveEditor(); },{capture:true,passive:false});
     }
     ['v105EditCancel','v105EditClose'].forEach(id=>{
       const b=$(id);
-      if(b && b.dataset.v119Close!=='1'){
-        b.dataset.v119Close='1';
+      if(b && b.dataset.v122Close!=='1'){
+        b.dataset.v122Close='1';
         b.onclick=function(e){ e.preventDefault(); e.stopPropagation(); closeEditor(); };
       }
     });
   }
 
   const oldRender=window.render;
-  if(typeof oldRender==='function' && !oldRender.__v119PersistentEdit){
+  if(typeof oldRender==='function' && !oldRender.__v122NoScrollFlicker){
     const wrapped=function(){
       const r=oldRender.apply(this,arguments);
-      setTimeout(repair,50);
-      setTimeout(repair,200);
+      setTimeout(applyOnce,60);
+      setTimeout(applyOnce,220);
       return r;
     };
-    wrapped.__v119PersistentEdit=true;
+    wrapped.__v122NoScrollFlicker=true;
     window.render=wrapped;
     try{ render=wrapped; }catch(e){}
   }
 
-  function observe(){
-    const roots=[document.getElementById('debtListSection'), document.getElementById('mobileList'), document.getElementById('tbody')].filter(Boolean);
-    roots.forEach(root=>{
-      if(root.dataset.v119Obs==='1') return;
-      root.dataset.v119Obs='1';
-      new MutationObserver(()=>setTimeout(repair,25)).observe(root,{childList:true,subtree:true});
-    });
-  }
-
   function init(){
     bindSave();
-    observe();
-    repair();
+    applyOnce();
   }
 
-  document.addEventListener('DOMContentLoaded',()=>{init();setTimeout(init,300);setTimeout(repair,900);});
-  window.addEventListener('load',()=>{init();setTimeout(repair,600);});
-  window.addEventListener('resize',()=>setTimeout(repair,100));
-  $('search')?.addEventListener('input',()=>setTimeout(repair,100));
+  document.addEventListener('DOMContentLoaded',()=>{init();setTimeout(init,400);});
+  window.addEventListener('load',()=>{init();setTimeout(init,700);});
+  window.addEventListener('resize',()=>setTimeout(applyOnce,120));
+  $('search')?.addEventListener('input',()=>setTimeout(applyOnce,120));
+
+  // Wichtig: kein MutationObserver, kein Scroll-Listener, kein dauerhaftes Intervall.
   init();
-})();
-</script>
-
-
-<script id="v121-revert-v120-js">
-(function(){
-  const VERSION='v121';
-  function setVersion(){
-    try{
-      document.querySelectorAll('.v59MenuVersion').forEach(el=>el.textContent=VERSION);
-      ['v98OnlyVersion','v76OnlyVersion','v101OnlyVersion'].forEach(id=>{
-        const el=document.getElementById(id);
-        if(el) el.textContent=VERSION;
-      });
-    }catch(e){}
-  }
-  document.addEventListener('DOMContentLoaded',setVersion);
-  window.addEventListener('load',setVersion);
-  setVersion();
 })();
 </script>
 
