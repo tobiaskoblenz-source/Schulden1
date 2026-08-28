@@ -4,7 +4,7 @@ function inject(body){
   const tags=[];
   if(!body.includes('/chatgpt-import.js')) tags.push('<script src="/chatgpt-import.js?v=4" defer></script>');
   if(!body.includes('/pdf-menu-v100.js')) tags.push('<script src="/pdf-menu-v100.js?v=2" defer></script>');
-  if(!body.includes('/pdf-counseling-v101.js')) tags.push('<script src="/pdf-counseling-v101.js?v=1" defer></script>');
+  if(!body.includes('/pdf-counseling-v101.js')) tags.push('<script src="/pdf-counseling-v101.js?v=2" defer></script>');
   if(!tags.length) return body;
   const block=tags.join('\n');
   return /<\/body>/i.test(body)?body.replace(/<\/body>/i,block+'\n</body>'):body+'\n'+block;
