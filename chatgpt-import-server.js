@@ -3,8 +3,7 @@ const originalCreateServer=http.createServer.bind(http);
 function inject(body){
   const tags=[];
   if(!body.includes('/chatgpt-import.js')) tags.push('<script src="/chatgpt-import.js?v=4" defer></script>');
-  if(!body.includes('/pdf-export-plus.js')) tags.push('<script src="/pdf-export-plus.js?v=4" defer></script>');
-  if(!body.includes('/pdf-menu-v99.js')) tags.push('<script src="/pdf-menu-v99.js?v=4" defer></script>');
+  if(!body.includes('/pdf-menu-v100.js')) tags.push('<script src="/pdf-menu-v100.js?v=1" defer></script>');
   if(!tags.length) return body;
   const block=tags.join('\n');
   return /<\/body>/i.test(body)?body.replace(/<\/body>/i,block+'\n</body>'):body+'\n'+block;
