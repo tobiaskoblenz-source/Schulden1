@@ -1,0 +1,44 @@
+const http = require('http');
+
+const previousCreateServer = http.createServer.bind(http);
+
+function injectV131(body){
+  if(typeof body !== 'string') return body;
+  if(body.includes('/insolvency-upgrade-v131.js')) return body;
+  const tag = '<script src="/insolvency-upgrade-v131.js?v=131" defer></script>';
+  if(/<\/body>/i.test(body)) return body.replace(/<\/body>/i, tag + '\n</body>');
+  return body + '\n' + tag;
+}
+
+http.createServer = function(listener){
+  return previousCreateServer(async function(req,res){
+    try{
+      const url = new URL(req.url,'http://localhost');
+      if(req.method === 'GET' && (url.pathname === '/' || url.pathname === '/index.html')){
+        const originalWrite = res.write.bind(res);
+        const originalEnd = res.end.bind(res);
+        const chunks = [];
+        res.write = function(chunk,enc,cb){
+          if(chunk) chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk,enc));
+          if(typeof cb === 'function') cb();
+          return true;
+        };
+        res.end = function(chunk,enc,cb){
+          if(chunk) chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk,enc));
+          try{
+            let body = Buffer.concat(chunks).toString('utf8');
+            body = injectV131(body);
+            try{ res.removeHeader('Content-Length'); }catch(e){}
+            return originalEnd(body,'utf8',cb);
+          }catch(e){
+            return originalEnd(Buffer.concat(chunks),cb);
+          }
+        };
+        return listener(req,res);
+      }
+      return listener(req,res);
+    }catch(e){
+      return listener(req,res);
+    }
+  });
+};
