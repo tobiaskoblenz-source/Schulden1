@@ -1,10 +1,10 @@
 {
-  "name": "schulden-v130",
-  "version": "130.0.0",
+  "name": "schulden-v131",
+  "version": "131.0.0",
   "private": true,
-  "description": "Schulden Manager PWA mit Gläubiger-Verwaltung und QR-Bögen",
+  "description": "Schulden Manager PWA mit Gläubiger-Verwaltung, Paperless, ChatGPT-Import und Insolvenz-Arbeitsbereich",
   "scripts": {
-    "start": "node -r ./paperless-import-server.js -r ./paperless-cleanup-server.js -r ./chatgpt-import-server.js server.js"
+    "start": "node -r ./paperless-import-server.js -r ./paperless-cleanup-server.js -r ./chatgpt-import-server.js -r ./insolvency-upgrade-server-v131.js server.js"
   },
   "engines": {
     "node": ">=20"
