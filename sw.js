@@ -1,4 +1,4 @@
-const VERSION = 'v130-mobile-new-button';
+const VERSION = 'v131-pdf-listen-cachefix';
 const CACHE_STATIC = `schulden-manager-static-${VERSION}`;
 const CACHE_RUNTIME = `schulden-manager-runtime-${VERSION}`;
 const APP_SHELL = [
@@ -63,7 +63,11 @@ self.addEventListener('fetch', (event) => {
   }
 
   if (url.origin === location.origin) {
-    const noStoreFiles = ['/', '/index.html', '/sw.js', '/manifest.webmanifest'];
+    const noStoreFiles = [
+      '/', '/index.html', '/sw.js', '/manifest.webmanifest',
+      '/chatgpt-import.js', '/paperless-import.js', '/paperless-cleanup.js',
+      '/pdf-export-plus.js', '/pdf-menu-v99.js'
+    ];
     if(noStoreFiles.includes(url.pathname)){
       event.respondWith(networkFirst(request));
       return;
