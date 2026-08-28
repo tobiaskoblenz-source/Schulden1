@@ -4,7 +4,7 @@
   "private": true,
   "description": "Schulden Manager PWA mit Gläubiger-Verwaltung und QR-Bögen",
   "scripts": {
-    "start": "node -r ./paperless-import-server.js server.js"
+    "start": "node -r ./paperless-import-server.js -r ./paperless-cleanup-server.js server.js"
   },
   "engines": {
     "node": ">=20"
