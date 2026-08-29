@@ -9,6 +9,7 @@ function injectInsolvencyUpgrade(body){
   if(!body.includes('/insolvency-pdf-v135.js')) tags.push('<script src="/insolvency-pdf-v135.js?v=135" defer></script>');
   if(!body.includes('/insolvency-quickedit-v136.js')) tags.push('<script src="/insolvency-quickedit-v136.js?v=138" defer></script>');
   if(!body.includes('/google-drive-backup-v139.js')) tags.push('<script src="/google-drive-backup-v139.js?v=139" defer></script>');
+  if(!body.includes('/creditor-sync-v140.js')) tags.push('<script src="/creditor-sync-v140.js?v=140" defer></script>');
   if(!tags.length) return body;
   const block = tags.join('\n');
   if(/<\/body>/i.test(body)) return body.replace(/<\/body>/i, block + '\n</body>');
