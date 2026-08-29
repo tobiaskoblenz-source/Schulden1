@@ -11,7 +11,8 @@ function injectInsolvencyUpgrade(body){
   if(!body.includes('/google-drive-backup-v139.js')) tags.push('<script src="/google-drive-backup-v139.js?v=139" defer></script>');
   if(!body.includes('/creditor-sync-v140.js')) tags.push('<script src="/creditor-sync-v140.js?v=140" defer></script>');
   if(!body.includes('/dashboard-check-v141.js')) tags.push('<script src="/dashboard-check-v141.js?v=141" defer></script>');
-  if(!body.includes('/ui-fix-v145.js')) tags.push('<script src="/ui-fix-v145.js?v=145" defer></script>');
+  if(!body.includes('/missing-workflow-v146.js')) tags.push('<script src="/missing-workflow-v146.js?v=146" defer></script>');
+  if(!body.includes('/ui-fix-v146.js')) tags.push('<script src="/ui-fix-v146.js?v=146" defer></script>');
   if(!tags.length) return body;
   const block = tags.join('\n');
   if(/<\/body>/i.test(body)) return body.replace(/<\/body>/i, block + '\n</body>');
