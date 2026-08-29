@@ -1,7 +1,7 @@
 (function(){
 'use strict';
 
-const VERSION='v133';
+const VERSION='v134';
 const CREDITOR_KEY='schulden_creditors_v37';
 const META_KEY='schulden_v131_meta';
 
@@ -120,15 +120,17 @@ function exportBetterPDF(){
 
   const types={};
   for(const d of list){ const t=creditorType(d); types[t]=(types[t]||0)+Number(d.betrag||0); }
-  const typeRows=Object.entries(types).sort((a,b)=>b[1]-a[1]).map(([k,v])=>[k,money(v),((v/total)*100).toLocaleString('de-DE',{maximumFractionDigits:1})+' %']);
+  const typeRows=Object.entries(types).sort((a,b)=>b[1]-a[1]).map(([k,v])=>[k,money(v),total?((v/total)*100).toLocaleString('de-DE',{maximumFractionDigits:1})+' %':'0 %']);
   const largest=[...list].sort((a,b)=>Number(b.betrag||0)-Number(a.betrag||0)).slice(0,6).map(d=>[d.name||'–',creditorType(d),money(d.betrag)]);
   const y=(doc.lastAutoTable?.finalY||53)+7;
   doc.setFont('helvetica','bold'); doc.setFontSize(11); doc.setTextColor(30); doc.text('Gläubigerarten',14,y);
   doc.autoTable({startY:y+3,margin:{left:14,right:154},head:[['Art','Summe','Anteil']],body:typeRows,styles:{fontSize:7.5,cellPadding:1.7},headStyles:{fontStyle:'bold'}});
+  const leftBottom=doc.lastAutoTable?.finalY||95;
   doc.setFont('helvetica','bold'); doc.setFontSize(11); doc.text('Größte Forderungen',154,y);
   doc.autoTable({startY:y+3,margin:{left:154,right:14},head:[['Gläubiger','Art','Betrag']],body:largest,styles:{fontSize:7.5,cellPadding:1.7},headStyles:{fontStyle:'bold'}});
+  const rightBottom=doc.lastAutoTable?.finalY||95;
 
-  const low=Math.max(doc.lastAutoTable?.finalY||95,115);
+  const low=Math.max(leftBottom,rightBottom)+8;
   doc.setFont('helvetica','bold'); doc.setFontSize(11); doc.text('Noch zu vervollständigen',14,low);
   doc.autoTable({startY:low+3,head:[['Ohne Dokument','Ohne Aktenzeichen','Ohne Anschrift','Forderungsstand ungeprüft']],body:[[String(docsMissing),String(caseMissing),String(addressMissing),String(currentMissing)]],styles:{fontSize:9,cellPadding:2.4},headStyles:{fontStyle:'bold'}});
   doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.setTextColor(90);
@@ -160,22 +162,26 @@ function exportBetterPDF(){
   doc.autoTable({startY:20,head:[['Gläubiger','Dokument-ID','Dokument','Info']],body:docRows,styles:{fontSize:7,cellPadding:1.6,valign:'top'},margin:{bottom:16}});
 
   addFooters(doc);
-  doc.save('privatinsolvenz_unterlagen_v133.pdf');
+  doc.save('privatinsolvenz_unterlagen_v134.pdf');
 }
 
 function relabel(){
-  document.querySelectorAll('.v59MenuVersion').forEach(el=>el.textContent=VERSION);
-  document.querySelectorAll('.v132Modal h2').forEach(el=>{ if(/Insolvenz-Status/i.test(el.textContent||'')) el.textContent='Insolvenz-Status '+VERSION; });
+  document.querySelectorAll('.v59MenuVersion').forEach(el=>{ if(el.textContent!==VERSION) el.textContent=VERSION; });
+  document.querySelectorAll('.v132Modal h2').forEach(el=>{ const wanted='Insolvenz-Status '+VERSION; if(/Insolvenz-Status/i.test(el.textContent||'') && el.textContent!==wanted) el.textContent=wanted; });
 }
 
+// Kein MutationObserver mehr: der frühere globale Observer konnte durch seine eigenen
+// textContent-Änderungen immer neue DOM-Mutationen erzeugen und Firefox ausbremsen.
 document.addEventListener('click',function(e){
-  const btn=e.target?.closest?.('[data-v132-pdf]');
-  if(!btn) return;
-  e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
-  exportBetterPDF();
+  const pdfBtn=e.target?.closest?.('[data-v132-pdf]');
+  if(pdfBtn){
+    e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
+    exportBetterPDF();
+    return;
+  }
+  if(e.target?.closest?.('#v132Btn,[data-v132-tab]')) setTimeout(relabel,0);
 },true);
 
-new MutationObserver(relabel).observe(document.documentElement,{childList:true,subtree:true});
 if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',relabel,{once:true}); else relabel();
-window.v133ExportInsolvencyPDF=exportBetterPDF;
+window.v134ExportInsolvencyPDF=exportBetterPDF;
 })();
