@@ -2,10 +2,10 @@ const http = require('http');
 
 const previousCreateServer = http.createServer.bind(http);
 
-function injectV131(body){
+function injectInsolvencyUpgrade(body){
   if(typeof body !== 'string') return body;
-  if(body.includes('/insolvency-upgrade-v131.js')) return body;
-  const tag = '<script src="/insolvency-upgrade-v131.js?v=131" defer></script>';
+  if(body.includes('/insolvency-upgrade-v132.js')) return body;
+  const tag = '<script src="/insolvency-upgrade-v132.js?v=132" defer></script>';
   if(/<\/body>/i.test(body)) return body.replace(/<\/body>/i, tag + '\n</body>');
   return body + '\n' + tag;
 }
@@ -27,7 +27,7 @@ http.createServer = function(listener){
           if(chunk) chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk,enc));
           try{
             let body = Buffer.concat(chunks).toString('utf8');
-            body = injectV131(body);
+            body = injectInsolvencyUpgrade(body);
             try{ res.removeHeader('Content-Length'); }catch(e){}
             return originalEnd(body,'utf8',cb);
           }catch(e){
