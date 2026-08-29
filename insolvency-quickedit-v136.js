@@ -1,11 +1,22 @@
 (function(){
 'use strict';
 
-const VERSION='v136';
+const VERSION='v138';
 const DEBT_KEY='godmode_debts';
 const CREDITOR_KEY='schulden_creditors_v37';
 const META_KEY='schulden_v131_meta';
 const AUDIT_KEY='schulden_v131_audit';
+const AUTO_TASKS=new Set([
+  '',
+  'Aktenzeichen prüfen',
+  'Anschrift ergänzen',
+  'aktuellen Forderungsstand prüfen',
+  'Unterlagen / Nachweis zuordnen',
+  'Gläubiger / Beratung kontaktieren',
+  'Gläubiger / Schuldnerberatung kontaktieren',
+  'Antwort abwarten / nachfassen',
+  'Für Beratung vorbereitet'
+]);
 
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
@@ -71,6 +82,58 @@ function toast(msg){
 }
 function auditEvent(evt){ const a=auditAll();a.push({at:now(),...evt});localStorage.setItem(AUDIT_KEY,JSON.stringify(a.slice(-1500))); }
 
+function automaticTask(d,i){
+  const m=currentMeta(d,i),c=contact(d);
+  if(!caseNo(d)) return 'Aktenzeichen prüfen';
+  if(!c.address) return 'Anschrift ergänzen';
+  if(!m.currentClaim) return 'aktuellen Forderungsstand prüfen';
+  if(!documents(d)) return 'Unterlagen / Nachweis zuordnen';
+  if(!m.contacted) return 'Gläubiger / Beratung kontaktieren';
+  if(!m.reply) return 'Antwort abwarten / nachfassen';
+  return 'Für Beratung vorbereitet';
+}
+function displayTask(d,i){
+  const saved=String(currentMeta(d,i).nextTask||'').trim();
+  if(saved && !AUTO_TASKS.has(saved)) return saved;
+  return automaticTask(d,i);
+}
+function migrateAutomaticTasks(){
+  const list=debtsArr(),all=metaAll();let changed=false;
+  list.forEach((d,i)=>{
+    const k=keyFor(d,i),m=all[k]||{},saved=String(m.nextTask||'').trim();
+    if(AUTO_TASKS.has(saved)){
+      const next=automaticTask(d,i);
+      if(saved!==next){ all[k]={...m,nextTask:next,updatedAt:m.updatedAt||now()};changed=true; }
+    }
+  });
+  if(changed)localStorage.setItem(META_KEY,JSON.stringify(all));
+}
+function editorIndex(){
+  const n=Number(document.querySelector('.v136Editor')?.dataset?.v136Index);
+  return Number.isInteger(n)?n:-1;
+}
+function taskFromForm(i){
+  const d=debtsArr()[i];if(!d)return '';
+  const az=String($('v136Case')?.value||'').trim();
+  const address=String($('v136Address')?.value||'').trim();
+  const claim=Boolean($('v136Claim')?.checked);
+  const contacted=Boolean($('v136Contacted')?.checked);
+  const reply=Boolean($('v136Reply')?.checked);
+  if(!az)return 'Aktenzeichen prüfen';
+  if(!address)return 'Anschrift ergänzen';
+  if(!claim)return 'aktuellen Forderungsstand prüfen';
+  if(!documents(d))return 'Unterlagen / Nachweis zuordnen';
+  if(!contacted)return 'Gläubiger / Beratung kontaktieren';
+  if(!reply)return 'Antwort abwarten / nachfassen';
+  return 'Für Beratung vorbereitet';
+}
+function refreshEditorTask(force){
+  const field=$('v136Task'),i=editorIndex();if(!field||i<0)return;
+  const current=String(field.value||'').trim();
+  const isAuto=field.dataset.v138Auto==='1'||AUTO_TASKS.has(current);
+  if(force||isAuto){ field.value=taskFromForm(i);field.dataset.v138Auto='1'; }
+}
+
 function ensureStyle(){
   if($('v136Style')) return;
   const s=document.createElement('style');s.id='v136Style';s.textContent=`
@@ -89,15 +152,11 @@ function relabel(){
   document.querySelectorAll('.v132Modal h2').forEach(el=>{const w='Insolvenz-Status '+VERSION;if(/Insolvenz-Status/i.test(el.textContent||'')&&el.textContent!==w)el.textContent=w;});
   document.querySelectorAll('[data-v132-meta]').forEach(b=>{if(b.textContent!=='Vervollständigen')b.textContent='Vervollständigen';});
 }
-function displayTask(d,i){
-  const m=currentMeta(d,i);if(m.nextTask)return m.nextTask;
-  if(!documents(d))return 'Unterlagen / Nachweis zuordnen';if(!contact(d).address)return 'Anschrift ergänzen';if(!caseNo(d))return 'Aktenzeichen prüfen';if(!m.currentClaim)return 'aktuellen Forderungsstand prüfen';if(!m.contacted)return 'Gläubiger / Beratung kontaktieren';if(!m.reply)return 'Antwort abwarten / nachfassen';return 'Für Beratung vorbereitet';
-}
 function openEditor(i){
-  ensureStyle();
+  ensureStyle();migrateAutomaticTasks();
   const list=debtsArr(),d=list[i],host=$('v132Content');if(!d||!host)return;
-  const c=contact(d),m=currentMeta(d,i),miss=missing(d,i),docN=documents(d);
-  host.innerHTML=`<div class="v136Editor">
+  const c=contact(d),m=currentMeta(d,i),miss=missing(d,i),docN=documents(d),task=displayTask(d,i),savedTask=String(m.nextTask||'').trim();
+  host.innerHTML=`<div class="v136Editor" data-v136-index="${i}">
     <div class="v136EditorHead"><div><h3>${esc(d.name||'Gläubiger')}</h3><div class="v136Progress">Eintrag ${i+1} von ${list.length} · direkt für die Insolvenzunterlagen vervollständigen</div></div><span class="v136Pill ${miss.length?'warn':'ok'}">${miss.length?miss.length+' Punkte offen':'vollständig'}</span></div>
     <div class="v136Summary">${miss.length?miss.map(x=>`<span class="v136Pill warn">Fehlt: ${esc(x)}</span>`).join(''):'<span class="v136Pill ok">Alle organisatorischen Pflichtangaben vorhanden</span>'}</div>
     <div class="v136Grid">
@@ -110,7 +169,7 @@ function openEditor(i){
       <label>E-Mail<input id="v136Email" class="v136Input" type="email" value="${esc(c.email)}"></label>
       <label>Telefon<input id="v136Phone" class="v136Input" value="${esc(c.phone)}"></label>
       <label>Frist<input id="v136Due" class="v136Input" type="date" value="${esc(m.dueDate||'')}"></label>
-      <label class="wide">Nächste Aufgabe<input id="v136Task" class="v136Input" value="${esc(m.nextTask||displayTask(d,i))}"></label>
+      <label class="wide">Nächste Aufgabe<input id="v136Task" class="v136Input" value="${esc(task)}"></label>
     </div>
     <div class="v136Checks">
       <label class="v136Check"><input id="v136Claim" type="checkbox" ${m.currentClaim?'checked':''}>Forderungsstand geprüft</label>
@@ -122,6 +181,7 @@ function openEditor(i){
     <div class="v136DocInfo">📎 Vorhandene Dokumente: <b>${docN}</b>. Dokumente kannst du später über „Daten“ bzw. Paperless zuordnen; hier wird nur der aktuelle Stand angezeigt.</div>
     <div class="v136Actions"><button data-v136-save="${i}">💾 Speichern</button><button data-v136-save-next="${i}">💾 Speichern & nächster</button><button class="secondary" data-v136-cancel>Abbrechen</button></div>
   </div>`;
+  const taskField=$('v136Task');if(taskField)taskField.dataset.v138Auto=(!savedTask||AUTO_TASKS.has(savedTask))?'1':'0';
   host.scrollIntoView({block:'start',behavior:'smooth'});
 }
 function syncCreditor(d,oldCase,newCase,c){
@@ -141,6 +201,7 @@ function readForm(){
 }
 function saveEditor(i,next){
   const list=debtsArr(),d=list[i];if(!d)return;
+  refreshEditorTask(false);
   const f=readForm();if(!Number.isFinite(f.amount)||f.amount<0){alert('Bitte einen gültigen Forderungsbetrag eingeben.');return;}
   const old={betrag:d.betrag,aktenzeichen:caseNo(d),kundennummer:d.kundennummer||d.customerNumber||'',contact:contact(d),meta:currentMeta(d,i)};
   const oldCase=caseNo(d);
@@ -154,14 +215,14 @@ function saveEditor(i,next){
   if(next){
     let ni=-1;for(let step=1;step<=list.length;step++){const x=(i+step)%list.length;if(missing(list[x],x).length){ni=x;break;}}
     if(typeof window.v132InsolvenzOpen==='function')window.v132InsolvenzOpen('status');
-    setTimeout(()=>{relabel();if(ni>=0&&ni!==i)openEditor(ni);},20);
+    setTimeout(()=>{migrateAutomaticTasks();relabel();if(ni>=0&&ni!==i)openEditor(ni);},20);
   }else{
     if(typeof window.v132InsolvenzOpen==='function')window.v132InsolvenzOpen('status');
-    setTimeout(relabel,20);
+    setTimeout(()=>{migrateAutomaticTasks();relabel();},20);
   }
 }
 
-ensureStyle();
+ensureStyle();migrateAutomaticTasks();
 document.addEventListener('click',function(e){
   const edit=e.target?.closest?.('[data-v132-meta]');
   if(edit){e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();openEditor(Number(edit.dataset.v132Meta));return;}
@@ -169,10 +230,22 @@ document.addEventListener('click',function(e){
   if(save){e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();saveEditor(Number(save.dataset.v136Save),false);return;}
   const saveNext=e.target?.closest?.('[data-v136-save-next]');
   if(saveNext){e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();saveEditor(Number(saveNext.dataset.v136SaveNext),true);return;}
-  if(e.target?.closest?.('[data-v136-cancel]')){e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();if(typeof window.v132InsolvenzOpen==='function')window.v132InsolvenzOpen('status');setTimeout(relabel,20);return;}
-  if(e.target?.closest?.('#v132Btn,[data-v132-tab]'))setTimeout(relabel,20);
+  if(e.target?.closest?.('[data-v136-cancel]')){e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();if(typeof window.v132InsolvenzOpen==='function')window.v132InsolvenzOpen('status');setTimeout(()=>{migrateAutomaticTasks();relabel();},20);return;}
+  if(e.target?.closest?.('#v132Btn,[data-v132-tab]'))setTimeout(()=>{migrateAutomaticTasks();relabel();},20);
 },true);
 
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(relabel,30),{once:true});else setTimeout(relabel,30);
+document.addEventListener('input',function(e){
+  if(e.target?.id==='v136Task'){
+    if(e.isTrusted)e.target.dataset.v138Auto='0';
+    return;
+  }
+  if(['v136Case','v136Address'].includes(e.target?.id))refreshEditorTask(false);
+},true);
+document.addEventListener('change',function(e){
+  if(['v136Claim','v136Contacted','v136Reply'].includes(e.target?.id))refreshEditorTask(false);
+},true);
+
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{migrateAutomaticTasks();relabel();},30),{once:true});else setTimeout(()=>{migrateAutomaticTasks();relabel();},30);
 window.v136InsolvenzQuickEdit=openEditor;
+window.v138RefreshInsolvencyTask=function(){refreshEditorTask(false);};
 })();
