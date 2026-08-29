@@ -6,7 +6,7 @@ function injectInsolvencyUpgrade(body){
   if(typeof body !== 'string') return body;
   const tags = [];
   if(!body.includes('/insolvency-upgrade-v132.js')) tags.push('<script src="/insolvency-upgrade-v132.js?v=132" defer></script>');
-  if(!body.includes('/insolvency-pdf-v133.js')) tags.push('<script src="/insolvency-pdf-v133.js?v=133" defer></script>');
+  if(!body.includes('/insolvency-pdf-v133.js')) tags.push('<script src="/insolvency-pdf-v133.js?v=134" defer></script>');
   if(!tags.length) return body;
   const block = tags.join('\n');
   if(/<\/body>/i.test(body)) return body.replace(/<\/body>/i, block + '\n</body>');
