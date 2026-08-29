@@ -13,7 +13,8 @@ function injectInsolvencyUpgrade(body){
   if(!body.includes('/dashboard-check-v141.js')) tags.push('<script src="/dashboard-check-v141.js?v=141" defer></script>');
   if(!body.includes('/missing-workflow-v146.js')) tags.push('<script src="/missing-workflow-v146.js?v=146" defer></script>');
   if(!body.includes('/paperless-match-v147.js')) tags.push('<script src="/paperless-match-v147.js?v=147" defer></script>');
-  if(!body.includes('/ui-fix-v147.js')) tags.push('<script src="/ui-fix-v147.js?v=147" defer></script>');
+  if(!body.includes('/paperless-filter-v148.js')) tags.push('<script src="/paperless-filter-v148.js?v=148" defer></script>');
+  if(!body.includes('/ui-fix-v148.js')) tags.push('<script src="/ui-fix-v148.js?v=148" defer></script>');
   if(!tags.length) return body;
   const block = tags.join('\n');
   if(/<\/body>/i.test(body)) return body.replace(/<\/body>/i, block + '\n</body>');
