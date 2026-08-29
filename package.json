@@ -1,6 +1,6 @@
 {
-  "name": "schulden-v154",
-  "version": "154.0.0",
+  "name": "schulden-v155",
+  "version": "155.0.0",
   "private": true,
   "description": "Schulden Manager PWA mit Gläubiger-Verwaltung, Paperless, ChatGPT-Import und Insolvenz-Arbeitsbereich",
   "scripts": {
