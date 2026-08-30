@@ -8,7 +8,7 @@ function injectInsolvencyUpgrade(body){
   if(!body.includes('/insolvency-upgrade-v132.js')) tags.push('<script src="/insolvency-upgrade-v132.js?v=132" defer></script>');
   if(!body.includes('/insolvency-suite-v153.js')) tags.push('<script src="/insolvency-suite-v153.js?v=153" defer></script>');
   if(!body.includes('/deadline-compat-v160.js')) tags.push('<script src="/deadline-compat-v160.js?v=160" defer></script>');
-  if(!body.includes('/advisory-map-pdf-v162.js')) tags.push('<script src="/advisory-map-pdf-v162.js?v=162" defer></script>');
+  if(!body.includes('/advisory-map-pdf-v163.js')) tags.push('<script src="/advisory-map-pdf-v163.js?v=163" defer></script>');
   if(!body.includes('/lock-safety-v161.js')) tags.push('<script src="/lock-safety-v161.js?v=161" defer></script>');
   if(!body.includes('/paperless-inbox-filter-v159.js')) tags.push('<script src="/paperless-inbox-filter-v159.js?v=159" defer></script>');
   if(!body.includes('/paperless-inline-preview-v155.js')) tags.push('<script src="/paperless-inline-preview-v155.js?v=155" defer></script>');
@@ -22,7 +22,7 @@ function injectInsolvencyUpgrade(body){
   if(!body.includes('/paperless-filter-v148.js')) tags.push('<script src="/paperless-filter-v148.js?v=148" defer></script>');
   if(!body.includes('/paperless-preview-v149.js')) tags.push('<script src="/paperless-preview-v149.js?v=149" defer></script>');
   if(!body.includes('/chatgpt-direct-import-v151.js')) tags.push('<script src="/chatgpt-direct-import-v151.js?v=151" defer></script>');
-  if(!body.includes('/ui-fix-v162.js')) tags.push('<script src="/ui-fix-v162.js?v=162" defer></script>');
+  if(!body.includes('/ui-fix-v163.js')) tags.push('<script src="/ui-fix-v163.js?v=163" defer></script>');
   if(!tags.length) return body;
   const block = tags.join('\n');
   if(/<\/body>/i.test(body)) return body.replace(/<\/body>/i, block + '\n</body>');
