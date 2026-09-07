@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#07101c">
+<title>Schulden Manager – neue Oberfläche</title>
+<style>
+:root{
+  color-scheme:dark;
+  --bg:#050a12;
+  --bg2:#091321;
+  --glass:rgba(14,27,46,.72);
+  --glass-strong:rgba(17,32,54,.92);
+  --glass-soft:rgba(255,255,255,.045);
+  --line:rgba(255,255,255,.085);
+  --text:#f2f6ff;
+  --muted:#91a4c2;
+  --accent:#6f8cff;
+  --accent2:#8f6dff;
+  --success:#59f6a7;
+  --warning:#ffc86b;
+  --danger:#ff7f94;
+  --shadow:0 28px 70px rgba(0,0,0,.36);
+  --radius:26px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  min-height:100vh;
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  color:var(--text);
+  background:
+    radial-gradient(circle at 10% 0%,rgba(111,140,255,.18),transparent 30%),
+    radial-gradient(circle at 92% 12%,rgba(143,109,255,.14),transparent 26%),
+    radial-gradient(circle at 60% 100%,rgba(89,246,167,.07),transparent 32%),
+    linear-gradient(180deg,#07101c 0%,#050a12 58%,#04070d 100%);
+}
+button,input,select{font:inherit}
+button{cursor:pointer}
+.app{display:grid;grid-template-columns:252px minmax(0,1fr);min-height:100vh}
+.sidebar{
+  position:sticky;top:0;height:100vh;padding:22px 18px;
+  border-right:1px solid var(--line);
+  background:linear-gradient(180deg,rgba(7,16,28,.96),rgba(4,9,16,.92));
+  backdrop-filter:blur(28px);
+  z-index:20;
+}
+.brand{display:flex;align-items:center;gap:12px;padding:8px 10px 20px}
+.brandLogo{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(135deg,#627fff,#8d65ff);box-shadow:0 12px 28px rgba(111,140,255,.28);font-weight:950}
+.brand strong{display:block;font-size:15px;letter-spacing:-.01em}.brand span{display:block;color:var(--muted);font-size:11px;margin-top:2px}
+.previewPill{display:inline-flex;margin:0 10px 18px;padding:7px 10px;border-radius:999px;border:1px solid rgba(89,246,167,.16);background:rgba(89,246,167,.07);color:#a9ffd0;font-size:11px;font-weight:850;letter-spacing:.05em;text-transform:uppercase}
+.nav{display:grid;gap:7px}
+.nav button{
+  width:100%;min-height:50px;border:0;border-radius:16px;padding:0 14px;display:flex;align-items:center;gap:12px;
+  background:transparent;color:#bfd0e9;text-align:left;font-weight:750;
+}
+.nav button:hover{background:rgba(255,255,255,.045);color:#fff}
+.nav button.active{background:linear-gradient(135deg,rgba(111,140,255,.20),rgba(143,109,255,.10));border:1px solid rgba(123,146,255,.18);color:#fff}
+.nav .ico{width:30px;height:30px;border-radius:11px;display:grid;place-items:center;background:rgba(255,255,255,.05);font-size:15px}
+.nav button.active .ico{background:linear-gradient(135deg,#6f8cff,#8f6dff);box-shadow:0 8px 18px rgba(111,140,255,.22)}
+.sidebarFoot{position:absolute;left:18px;right:18px;bottom:18px;padding:13px;border:1px solid var(--line);border-radius:17px;background:rgba(255,255,255,.03);color:var(--muted);font-size:11px;line-height:1.45}
+.main{min-width:0;padding:26px 28px 90px}
+.page{display:none;max-width:1480px;margin:0 auto}.page.active{display:block}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px}
+.topbar h1{margin:0;font-size:clamp(26px,3vw,38px);letter-spacing:-.04em}.topbar p{margin:5px 0 0;color:var(--muted);font-size:14px}
+.topActions{display:flex;gap:9px;flex-wrap:wrap}
+.btn{min-height:42px;border:1px solid var(--line);border-radius:14px;padding:0 14px;background:rgba(255,255,255,.045);color:#e9f1ff;font-weight:800}
+.btn:hover{background:rgba(255,255,255,.075)}
+.btn.primary{background:linear-gradient(135deg,#607fff,#8968ff);border-color:transparent;color:#fff;box-shadow:0 12px 28px rgba(111,140,255,.22)}
+.glass{border:1px solid var(--line);background:linear-gradient(180deg,rgba(16,31,52,.76),rgba(9,19,33,.72));backdrop-filter:blur(20px);box-shadow:var(--shadow);border-radius:var(--radius)}
+.hero{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(320px,.7fr);gap:18px;padding:26px;margin-bottom:18px;overflow:hidden;position:relative}
+.hero:after{content:"";position:absolute;width:330px;height:330px;border-radius:50%;right:-110px;top:-180px;background:radial-gradient(circle,rgba(111,140,255,.22),transparent 68%);pointer-events:none}
+.heroText{position:relative;z-index:1}.heroEyebrow{display:inline-flex;padding:7px 10px;border-radius:999px;background:rgba(111,140,255,.10);border:1px solid rgba(111,140,255,.15);color:#cbd7ff;font-size:11px;font-weight:850;text-transform:uppercase;letter-spacing:.06em}.hero h2{margin:13px 0 8px;font-size:clamp(24px,3vw,35px);letter-spacing:-.04em}.hero p{margin:0;color:var(--muted);max-width:720px;line-height:1.6}
+.heroQuick{display:grid;gap:9px;align-content:center;position:relative;z-index:1}.quickLine{display:flex;justify-content:space-between;gap:12px;padding:12px 14px;border:1px solid var(--line);border-radius:15px;background:rgba(255,255,255,.035)}.quickLine span{color:var(--muted);font-size:12px}.quickLine strong{font-size:13px}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:18px}.stat{padding:18px;min-height:118px;position:relative;overflow:hidden}.stat span{display:block;color:var(--muted);font-size:12px;font-weight:750}.stat strong{display:block;margin-top:9px;font-size:clamp(23px,2.5vw,31px);letter-spacing:-.04em}.stat small{display:block;margin-top:6px;color:#7890b2}.stat:after{content:"";position:absolute;width:110px;height:110px;border-radius:50%;right:-44px;bottom:-54px;background:radial-gradient(circle,rgba(111,140,255,.12),transparent 70%)}
+.section{padding:21px;margin-bottom:18px}.sectionHead{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:15px}.sectionHead h3{margin:0;font-size:18px;letter-spacing:-.02em}.sectionHead p{margin:4px 0 0;color:var(--muted);font-size:12px}.sectionHead a{color:#cbd7ff;text-decoration:none;font-size:12px;font-weight:800}
+.searchRow{display:flex;gap:10px;margin-bottom:13px}.search{width:100%;min-height:44px;border:1px solid var(--line);border-radius:14px;padding:0 14px;background:rgba(2,8,16,.45);color:#fff;outline:none}.search:focus{border-color:rgba(111,140,255,.44);box-shadow:0 0 0 4px rgba(111,140,255,.08)}
+.tableWrap{overflow:auto;border:1px solid var(--line);border-radius:18px;background:rgba(2,8,16,.22)}table{width:100%;border-collapse:collapse;min-width:720px}th,td{text-align:left;padding:14px 15px;border-bottom:1px solid rgba(255,255,255,.055)}th{color:#8298b9;font-size:10px;text-transform:uppercase;letter-spacing:.08em;background:rgba(255,255,255,.025)}td{font-size:13px;color:#dbe6f7}tbody tr:hover{background:rgba(111,140,255,.045)}tbody tr:last-child td{border-bottom:0}.amount{font-weight:900;color:#fff}.muted{color:var(--muted)}
+.badge{display:inline-flex;align-items:center;gap:6px;padding:6px 9px;border-radius:999px;font-size:10px;font-weight:850;border:1px solid var(--line)}.badge.open{background:rgba(255,127,148,.09);color:#ffb4c1;border-color:rgba(255,127,148,.16)}.badge.closed{background:rgba(89,246,167,.08);color:#a9ffd0;border-color:rgba(89,246,167,.14)}
+.iconBtn{width:34px;height:34px;border-radius:11px;border:1px solid var(--line);background:rgba(255,255,255,.04);color:#fff}.iconBtn:hover{background:rgba(111,140,255,.12)}
+.empty{padding:32px 20px;text-align:center;color:var(--muted)}
+.creditorGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.creditorCard{padding:17px}.creditorTop{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.creditorAvatar{width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,rgba(111,140,255,.9),rgba(143,109,255,.9));display:grid;place-items:center;font-weight:950}.creditorCard h3{margin:12px 0 4px;font-size:16px}.creditorCard .total{font-size:23px;font-weight:950;margin:10px 0 12px}.miniFacts{display:grid;grid-template-columns:1fr 1fr;gap:8px}.miniFact{padding:10px;border:1px solid var(--line);border-radius:13px;background:rgba(255,255,255,.03)}.miniFact span{display:block;color:var(--muted);font-size:10px}.miniFact strong{display:block;margin-top:4px;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.cardActions{display:flex;gap:8px;margin-top:12px}.cardActions .btn{flex:1;min-height:38px;font-size:12px}
+.docGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}.docCard{padding:15px;display:grid;grid-template-columns:42px minmax(0,1fr) auto;gap:12px;align-items:center}.docIcon{width:42px;height:42px;border-radius:13px;display:grid;place-items:center;background:rgba(111,140,255,.11);border:1px solid rgba(111,140,255,.14)}.docCard strong{display:block;font-size:13px}.docCard span{display:block;color:var(--muted);font-size:11px;margin-top:4px}.sourcePill{font-size:9px;padding:5px 8px;border:1px solid var(--line);border-radius:999px;color:#b9c8df}
+.compareControls{display:grid;grid-template-columns:minmax(0,1fr) 140px;gap:12px;align-items:center;padding:17px;margin-bottom:14px}.compareControls label{font-size:12px;color:var(--muted)}input[type=range]{width:100%;accent-color:#788cff}.percentBox{min-height:54px;border:1px solid var(--line);border-radius:15px;background:rgba(255,255,255,.03);display:grid;place-items:center;font-size:22px;font-weight:950}
+.settingsGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}.settingCard{padding:19px}.settingHead{display:flex;align-items:flex-start;gap:12px;margin-bottom:15px}.settingIcon{width:38px;height:38px;border-radius:13px;display:grid;place-items:center;background:linear-gradient(135deg,rgba(111,140,255,.16),rgba(143,109,255,.09));border:1px solid rgba(111,140,255,.12)}.settingHead h3{margin:0;font-size:15px}.settingHead p{margin:4px 0 0;color:var(--muted);font-size:11px;line-height:1.45}.settingRows{display:grid;gap:8px}.settingRow{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:11px 12px;border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.025);border-radius:14px}.settingRow .left strong{display:block;font-size:12px}.settingRow .left span{display:block;color:var(--muted);font-size:10px;margin-top:3px}.settingRow .btn{min-height:35px;padding:0 11px;font-size:11px;white-space:nowrap}.statusDot{display:inline-flex;align-items:center;gap:6px;font-size:10px;color:var(--muted)}.statusDot:before{content:"";width:7px;height:7px;border-radius:50%;background:#66758c}.statusDot.ok:before{background:var(--success);box-shadow:0 0 0 4px rgba(89,246,167,.08)}.statusDot.warn:before{background:var(--warning)}
+.switch{width:42px;height:24px;border-radius:999px;background:#24344b;border:1px solid var(--line);position:relative}.switch:after{content:"";position:absolute;width:18px;height:18px;border-radius:50%;left:2px;top:2px;background:#8fa2bd;transition:.2s}.switch.on{background:rgba(89,246,167,.14);border-color:rgba(89,246,167,.18)}.switch.on:after{left:20px;background:#7dffc0}
+.drawerBack{position:fixed;inset:0;background:rgba(0,0,0,.58);backdrop-filter:blur(7px);display:none;z-index:80}.drawerBack.show{display:block}.drawer{position:fixed;top:0;right:0;width:min(560px,100%);height:100vh;overflow:auto;padding:20px;background:linear-gradient(180deg,#0b1728,#07101c);border-left:1px solid var(--line);box-shadow:-30px 0 70px rgba(0,0,0,.35);transform:translateX(102%);transition:.25s ease;z-index:90}.drawer.show{transform:translateX(0)}.drawerHead{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;margin-bottom:16px}.drawerHead h2{margin:0;font-size:24px}.drawerHead p{margin:5px 0 0;color:var(--muted);font-size:12px}.closeBtn{width:38px;height:38px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.04);color:#fff;font-size:20px}.drawerHero{padding:18px;margin-bottom:12px}.drawerHero .big{font-size:30px;font-weight:950;margin:9px 0 12px}.drawerFacts{display:grid;grid-template-columns:1fr 1fr;gap:9px}.drawerFact{padding:11px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.025)}.drawerFact span{display:block;color:var(--muted);font-size:10px}.drawerFact strong{display:block;margin-top:5px;font-size:12px;word-break:break-word}.debtEntry{padding:14px;margin-top:9px}.debtEntry h4{margin:0 0 8px}.debtEntry p{margin:4px 0;color:var(--muted);font-size:11px;line-height:1.45}
+.mobileNav{display:none}
+.toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(20px);opacity:0;padding:11px 14px;border:1px solid var(--line);border-radius:13px;background:#111f34;color:#eef5ff;font-size:12px;font-weight:750;z-index:120;transition:.2s}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+@media(max-width:1180px){.stats{grid-template-columns:repeat(2,1fr)}.creditorGrid{grid-template-columns:repeat(2,1fr)}.settingsGrid{grid-template-columns:1fr}.hero{grid-template-columns:1fr}.heroQuick{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:820px){.app{display:block}.sidebar{display:none}.main{padding:18px 14px 92px}.topbar{align-items:flex-start}.topActions{display:none}.stats{grid-template-columns:1fr 1fr}.creditorGrid,.docGrid{grid-template-columns:1fr}.hero{padding:19px}.heroQuick{grid-template-columns:1fr}.tableWrap{display:none}.settingsGrid{grid-template-columns:1fr}.mobileNav{position:fixed;display:grid;grid-template-columns:repeat(5,1fr);left:8px;right:8px;bottom:8px;padding:7px;border:1px solid var(--line);border-radius:20px;background:rgba(8,17,30,.92);backdrop-filter:blur(22px);z-index:60;box-shadow:0 16px 40px rgba(0,0,0,.35)}.mobileNav button{border:0;background:transparent;color:#8398b7;display:grid;place-items:center;gap:3px;min-height:49px;border-radius:13px;font-size:9px}.mobileNav button b{font-size:17px}.mobileNav button.active{background:rgba(111,140,255,.12);color:#fff}.drawerFacts{grid-template-columns:1fr}.settingRow{align-items:flex-start;flex-direction:column}.settingRow>.btn,.settingRow>.switch{align-self:flex-end}}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><div class="brandLogo">SM</div><div><strong>Schulden Manager</strong><span>Private Übersicht</span></div></div>
+    <div class="previewPill">Neue Oberfläche · Vorschau</div>
+    <nav class="nav" id="nav">
+      <button class="active" data-page="overview"><span class="ico">⌂</span><span>Übersicht</span></button>
+      <button data-page="creditors"><span class="ico">▣</span><span>Gläubiger</span></button>
+      <button data-page="documents"><span class="ico">⌘</span><span>Dokumente</span></button>
+      <button data-page="compare"><span class="ico">%</span><span>Vergleich</span></button>
+      <button data-page="settings"><span class="ico">⚙</span><span>Einstellungen</span></button>
+    </nav>
+    <div class="sidebarFoot">Diese Vorschau liest nur deine vorhandenen Schulden-Daten. Sie verändert oder löscht nichts.</div>
+  </aside>
+
+  <main class="main">
+    <section class="page active" id="page-overview">
+      <div class="topbar"><div><h1>Übersicht</h1><p>Nur das Wichtige auf einen Blick.</p></div><div class="topActions"><button class="btn" onclick="location.href='/'">Aktuelle App</button><button class="btn primary" data-page-go="creditors">Gläubiger öffnen</button></div></div>
+      <div class="hero glass">
+        <div class="heroText"><span class="heroEyebrow">Aufgeräumtes Dashboard</span><h2>Deine Schulden, ohne Technik im Weg.</h2><p>Auf der Startseite bleiben nur Gesamtstand, Gläubiger und offene Fälle. Verbindungen, Tests, Backups und andere Technik liegen gesammelt unter Einstellungen.</p></div>
+        <div class="heroQuick"><div class="quickLine"><span>Datensatz</span><strong id="syncWhen">wird geladen…</strong></div><div class="quickLine"><span>Paperless</span><strong id="paperlessQuick">prüfe…</strong></div><div class="quickLine"><span>Google Drive</span><strong id="driveQuick">prüfe…</strong></div></div>
+      </div>
+      <div class="stats">
+        <div class="stat glass"><span>Gesamtschulden</span><strong id="statTotal">0,00 €</strong><small>alle erfassten Forderungen</small></div>
+        <div class="stat glass"><span>Offen</span><strong id="statOpen">0,00 €</strong><small>noch nicht erledigt</small></div>
+        <div class="stat glass"><span>Gläubiger</span><strong id="statCreditors">0</strong><small>zusammengefasst nach Name</small></div>
+        <div class="stat glass"><span>Erledigt</span><strong id="statClosed">0</strong><small>abgeschlossene Einträge</small></div>
+      </div>
+      <div class="section glass"><div class="sectionHead"><div><h3>Gläubiger</h3><p>Reduzierte Liste: Name, Betrag, Status, Kategorie.</p></div><a href="#" data-page-go="creditors">Alle anzeigen →</a></div><div id="overviewTable"></div></div>
+    </section>
+
+    <section class="page" id="page-creditors">
+      <div class="topbar"><div><h1>Gläubiger</h1><p>Die Arbeitsansicht bleibt bewusst ruhig.</p></div><div class="topActions"><button class="btn primary" onclick="location.href='/'">+ Neue Schuld in aktueller App</button></div></div>
+      <div class="section glass"><div class="searchRow"><input class="search" id="creditorSearch" placeholder="Gläubiger, Aktenzeichen oder Kategorie suchen"></div><div id="creditorContent"></div></div>
+    </section>
+
+    <section class="page" id="page-documents">
+      <div class="topbar"><div><h1>Dokumente</h1><p>Paperless- und Daten-Verknüpfungen zentral statt zwischen den Einstellungen.</p></div></div>
+      <div class="stats"><div class="stat glass"><span>Verknüpfte Dokumente</span><strong id="docTotal">0</strong><small>Paperless + Dateien</small></div><div class="stat glass"><span>Paperless</span><strong id="docPaperless">0</strong><small>verknüpfte Einträge</small></div><div class="stat glass"><span>Dateien</span><strong id="docFiles">0</strong><small>Korrespondenz / Uploads</small></div><div class="stat glass"><span>Ohne Dokumente</span><strong id="docMissing">0</strong><small>Gläubiger ohne Verknüpfung</small></div></div>
+      <div class="section glass"><div class="sectionHead"><div><h3>Dokumentenübersicht</h3><p>Hier landen später Suche, Zuordnung und neue Scans.</p></div></div><div id="documentsContent"></div></div>
+    </section>
+
+    <section class="page" id="page-compare">
+      <div class="topbar"><div><h1>Vergleich</h1><p>Ein eigener Bereich – nicht mitten in der Schuldenliste.</p></div></div>
+      <div class="compareControls glass"><div><label for="quote">Globale Vergleichsquote</label><input id="quote" type="range" min="1" max="100" value="10"></div><div class="percentBox" id="quoteLabel">10 %</div></div>
+      <div class="stats"><div class="stat glass"><span>Gesamtschulden</span><strong id="cmpTotal">0,00 €</strong><small>Basis der Berechnung</small></div><div class="stat glass"><span>Vergleich gesamt</span><strong id="cmpOffer">0,00 €</strong><small>bei gewählter Quote</small></div><div class="stat glass"><span>Mögliche Ersparnis</span><strong id="cmpSave">0,00 €</strong><small>rechnerische Differenz</small></div><div class="stat glass"><span>Quote</span><strong id="cmpQuote">10 %</strong><small>global eingestellt</small></div></div>
+      <div class="section glass"><div class="sectionHead"><div><h3>Vergleich je Gläubiger</h3><p>Wie bisher berechnet, aber klar getrennt.</p></div></div><div id="compareTable"></div></div>
+    </section>
+
+    <section class="page" id="page-settings">
+      <div class="topbar"><div><h1>Einstellungen</h1><p>Alles Technische und alles, was man konfigurieren kann, an einem Ort.</p></div></div>
+      <div class="settingsGrid">
+        <div class="settingCard glass"><div class="settingHead"><div class="settingIcon">↔</div><div><h3>Verbindungen</h3><p>Paperless, Google Drive und später n8n.</p></div></div><div class="settingRows">
+          <div class="settingRow"><div class="left"><strong>Paperless</strong><span id="paperlessSettingText">Status wird geladen…</span></div><button class="btn" id="btnPaperlessTest">Verbindung testen</button></div>
+          <div class="settingRow"><div class="left"><strong>Paperless-Verbindung</strong><span>URL, API-Token, Tag und Zertifikat</span></div><button class="btn" onclick="location.href='/'">In aktueller App öffnen</button></div>
+          <div class="settingRow"><div class="left"><strong>Google Drive</strong><span id="driveSettingText">Status wird geprüft…</span></div><button class="btn" onclick="location.href='/'">Verbinden / verwalten</button></div>
+          <div class="settingRow"><div class="left"><strong>n8n Automatisierung</strong><span>Noch nicht eingerichtet</span></div><span class="statusDot warn">später</span></div>
+        </div></div>
+
+        <div class="settingCard glass"><div class="settingHead"><div class="settingIcon">📄</div><div><h3>Dokumente & Paperless</h3><p>Regeln für die automatische Dokumentverarbeitung.</p></div></div><div class="settingRows">
+          <div class="settingRow"><div class="left"><strong>Paperless-Tag</strong><span id="paperlessTagText">App</span></div><button class="btn" onclick="location.href='/'">Ändern</button></div>
+          <div class="settingRow"><div class="left"><strong>Automatische Zuordnung</strong><span>Dokumente anhand Gläubiger / Aktenzeichen zuordnen</span></div><div class="switch" title="Vorschau"></div></div>
+          <div class="settingRow"><div class="left"><strong>ASN verwenden</strong><span>ASN bei Dokumenten berücksichtigen</span></div><div class="switch on" title="Vorschau"></div></div>
+          <div class="settingRow"><div class="left"><strong>Paperless-Testwerkzeuge</strong><span>Tags laden, Diagnose und Roh-Test</span></div><button class="btn" onclick="location.href='/'">Öffnen</button></div>
+        </div></div>
+
+        <div class="settingCard glass"><div class="settingHead"><div class="settingIcon">☁</div><div><h3>Google Drive & Backup</h3><p>Speichern, Laden und Sicherung zusammengefasst.</p></div></div><div class="settingRows">
+          <div class="settingRow"><div class="left"><strong>Google Drive verbinden</strong><span>Freigabe und Zugriff verwalten</span></div><button class="btn" onclick="location.href='/'">Verbinden</button></div>
+          <div class="settingRow"><div class="left"><strong>In Drive speichern</strong><span>Aktuellen Stand sichern</span></div><button class="btn" onclick="location.href='/'">Speichern</button></div>
+          <div class="settingRow"><div class="left"><strong>Aus Drive laden</strong><span>Gesicherten Stand wiederherstellen</span></div><button class="btn" onclick="location.href='/'">Laden</button></div>
+          <div class="settingRow"><div class="left"><strong>Automatische Sicherung</strong><span>Nach Änderungen sichern</span></div><div class="switch on" title="Vorschau"></div></div>
+        </div></div>
+
+        <div class="settingCard glass"><div class="settingHead"><div class="settingIcon">🏷</div><div><h3>Kategorien & Status</h3><p>Listen verwalten, die in der App verwendet werden.</p></div></div><div class="settingRows">
+          <div class="settingRow"><div class="left"><strong>Gläubiger-Kategorien</strong><span>Kategorien anlegen, umbenennen oder löschen</span></div><button class="btn" onclick="location.href='/'">Bearbeiten</button></div>
+          <div class="settingRow"><div class="left"><strong>Status</strong><span>Offen, erledigt und weitere Statuswerte</span></div><button class="btn" disabled style="opacity:.45">Später</button></div>
+        </div></div>
+
+        <div class="settingCard glass"><div class="settingHead"><div class="settingIcon">%</div><div><h3>Vergleich</h3><p>Vorgaben für den Vergleichsrechner.</p></div></div><div class="settingRows">
+          <div class="settingRow"><div class="left"><strong>Standardquote</strong><span>Beim Öffnen des Vergleichs verwenden</span></div><strong>10 %</strong></div>
+          <div class="settingRow"><div class="left"><strong>Vergleich anzeigen</strong><span>Bereich in der Navigation ein-/ausblenden</span></div><div class="switch on" title="Vorschau"></div></div>
+        </div></div>
+
+        <div class="settingCard glass"><div class="settingHead"><div class="settingIcon">🛡</div><div><h3>Daten & Sicherheit</h3><p>Selten gebrauchte, aber wichtige Werkzeuge.</p></div></div><div class="settingRows">
+          <div class="settingRow"><div class="left"><strong>Backup / Wiederherstellen</strong><span>Lokale Sicherungsdatei exportieren oder einlesen</span></div><button class="btn" onclick="location.href='/'">Öffnen</button></div>
+          <div class="settingRow"><div class="left"><strong>Papierkorb</strong><span>Gelöschte Einträge ansehen und wiederherstellen</span></div><button class="btn" onclick="location.href='/'">Papierkorb</button></div>
+          <div class="settingRow"><div class="left"><strong>PDF Export</strong><span>Auswertungen und Unterlagen erstellen</span></div><button class="btn" onclick="location.href='/'">PDF</button></div>
+        </div></div>
+
+        <div class="settingCard glass"><div class="settingHead"><div class="settingIcon">◐</div><div><h3>Anzeige</h3><p>Nur Dark Mode – ohne unnötige Design-Schalter.</p></div></div><div class="settingRows">
+          <div class="settingRow"><div class="left"><strong>Dark Mode</strong><span>Fest aktiviert</span></div><div class="switch on"></div></div>
+          <div class="settingRow"><div class="left"><strong>Kompakte Gläubigerliste</strong><span>Weniger Informationen in der Hauptliste</span></div><div class="switch on" title="Vorschau"></div></div>
+        </div></div>
+
+        <div class="settingCard glass"><div class="settingHead"><div class="settingIcon">i</div><div><h3>System</h3><p>Status und technische Diagnose.</p></div></div><div class="settingRows">
+          <div class="settingRow"><div class="left"><strong>App-Version</strong><span>Neue Struktur – Vorschau</span></div><strong>v164</strong></div>
+          <div class="settingRow"><div class="left"><strong>Server-Synchronisierung</strong><span id="systemSyncText">wird geladen…</span></div><span class="statusDot" id="systemSyncDot">Status</span></div>
+          <div class="settingRow"><div class="left"><strong>Paperless-Server</strong><span id="systemPaperlessText">wird geladen…</span></div><span class="statusDot" id="systemPaperlessDot">Status</span></div>
+        </div></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<nav class="mobileNav" id="mobileNav">
+  <button class="active" data-page="overview"><b>⌂</b><span>Start</span></button>
+  <button data-page="creditors"><b>▣</b><span>Gläubiger</span></button>
+  <button data-page="documents"><b>⌘</b><span>Dokumente</span></button>
+  <button data-page="compare"><b>%</b><span>Vergleich</span></button>
+  <button data-page="settings"><b>⚙</b><span>Settings</span></button>
+</nav>
+<div class="drawerBack" id="drawerBack"></div>
+<aside class="drawer" id="drawer"><div id="drawerContent"></div></aside>
+<div class="toast" id="toast"></div>
+
+<script>
+const state={debts:[],sync:null,config:null,creditors:[],query:'',quote:10};
+const eur=new Intl.NumberFormat('de-DE',{style:'currency',currency:'EUR'});
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const amount=d=>Number(d?.betrag??d?.amount??d?.total??0)||0;
+const nameOf=d=>String(d?.name||d?.glaeubiger||d?.creditor||'Ohne Name').trim()||'Ohne Name';
+const categoryOf=d=>String(d?.category||d?.kategorie||d?.gruppe||'–').trim()||'–';
+const caseOf=d=>String(d?.aktenzeichen||d?.caseNumber||d?.referenceNumber||d?.kundennummer||d?.customerNumber||'–').trim()||'–';
+const reasonOf=d=>String(d?.grund||d?.reason||'–').trim()||'–';
+function isClosedStatus(v){return /bezahlt|erledigt|geschlossen|paid|done|settled|abgeschlossen/i.test(String(v||''));}
+function statusOf(d){return isClosedStatus(d?.status)?'Erledigt':String(d?.status||'Offen');}
+function initials(n){return n.split(/\s+/).filter(Boolean).slice(0,2).map(x=>x[0]?.toUpperCase()).join('')||'G';}
+function docsOf(d){
+  const p=Array.isArray(d?.paperlessLinks)?d.paperlessLinks.map(x=>({...x,__source:'Paperless'})):[];
+  const c=Array.isArray(d?.correspondence)?d.correspondence.map(x=>({...x,__source:'Datei'})):[];
+  return [...p,...c];
+}
+function groupCreditors(debts){
+  const map=new Map();
+  debts.forEach((d,i)=>{
+    const n=nameOf(d),k=n.toLocaleLowerCase('de-DE');
+    if(!map.has(k))map.set(k,{name:n,total:0,open:0,count:0,closedCount:0,categories:new Set(),debts:[],docs:[]});
+    const g=map.get(k);g.total+=amount(d);if(!isClosedStatus(d?.status))g.open+=amount(d);else g.closedCount++;g.count++;if(categoryOf(d)!=='–')g.categories.add(categoryOf(d));g.debts.push({...d,__index:i});g.docs.push(...docsOf(d).map(x=>({...x,__debtIndex:i,__creditor:n})));
+  });
+  return [...map.values()].sort((a,b)=>b.total-a.total||a.name.localeCompare(b.name,'de'));
+}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toast.timer);toast.timer=setTimeout(()=>t.classList.remove('show'),2200)}
+function showPage(page){
+  document.querySelectorAll('.page').forEach(x=>x.classList.toggle('active',x.id==='page-'+page));
+  document.querySelectorAll('[data-page]').forEach(x=>x.classList.toggle('active',x.dataset.page===page));
+  window.scrollTo({top:0,behavior:'smooth'});
+  if(page==='compare')renderCompare();if(page==='documents')renderDocuments();if(page==='settings')renderSettings();
+}
+document.addEventListener('click',e=>{const p=e.target.closest('[data-page]');if(p){showPage(p.dataset.page);return}const g=e.target.closest('[data-page-go]');if(g){e.preventDefault();showPage(g.dataset.pageGo);return}const open=e.target.closest('[data-open-creditor]');if(open){openCreditor(Number(open.dataset.openCreditor));return}});
+function tableFor(list,limit){
+  const rows=(limit?list.slice(0,limit):list).map((g,i)=>`<tr><td><strong>${esc(g.name)}</strong><div class="muted" style="font-size:10px;margin-top:4px">${g.count} Eintrag${g.count===1?'':'e'}</div></td><td class="amount">${eur.format(g.total)}</td><td><span class="badge ${g.open>0?'open':'closed'}">${g.open>0?'Offen':'Erledigt'}</span></td><td>${esc([...g.categories][0]||'–')}</td><td><button class="iconBtn" data-open-creditor="${state.creditors.indexOf(g)}" title="Öffnen">›</button></td></tr>`).join('');
+  return `<div class="tableWrap"><table><thead><tr><th>Gläubiger</th><th>Betrag</th><th>Status</th><th>Kategorie</th><th></th></tr></thead><tbody>${rows||'<tr><td colspan="5"><div class="empty">Keine Gläubiger gefunden.</div></td></tr>'}</tbody></table></div>`;
+}
+function renderOverview(){
+  const total=state.debts.reduce((s,d)=>s+amount(d),0),open=state.debts.filter(d=>!isClosedStatus(d?.status)).reduce((s,d)=>s+amount(d),0),closed=state.debts.filter(d=>isClosedStatus(d?.status)).length;
+  document.getElementById('statTotal').textContent=eur.format(total);document.getElementById('statOpen').textContent=eur.format(open);document.getElementById('statCreditors').textContent=state.creditors.length;document.getElementById('statClosed').textContent=closed;
+  document.getElementById('overviewTable').innerHTML=tableFor(state.creditors,8);
+  document.getElementById('syncWhen').textContent=state.sync?.updatedAt?new Date(state.sync.updatedAt).toLocaleString('de-DE'):'keine Serverzeit';
+}
+function creditorCards(list){return `<div class="creditorGrid">${list.map((g,i)=>{const idx=state.creditors.indexOf(g);return `<article class="creditorCard glass"><div class="creditorTop"><div class="creditorAvatar">${esc(initials(g.name))}</div><span class="badge ${g.open>0?'open':'closed'}">${g.open>0?'Offen':'Erledigt'}</span></div><h3>${esc(g.name)}</h3><div class="total">${eur.format(g.total)}</div><div class="miniFacts"><div class="miniFact"><span>Einträge</span><strong>${g.count}</strong></div><div class="miniFact"><span>Kategorie</span><strong>${esc([...g.categories][0]||'–')}</strong></div></div><div class="cardActions"><button class="btn" data-open-creditor="${idx}">Details öffnen</button></div></article>`}).join('')||'<div class="empty">Keine Gläubiger gefunden.</div>'}</div>`}
+function renderCreditors(){
+  const q=state.query.trim().toLocaleLowerCase('de-DE');let list=state.creditors;
+  if(q)list=list.filter(g=>[g.name,...g.categories,...g.debts.flatMap(d=>[caseOf(d),reasonOf(d)])].join(' ').toLocaleLowerCase('de-DE').includes(q));
+  document.getElementById('creditorContent').innerHTML=window.innerWidth<=820?creditorCards(list):tableFor(list);
+}
+function openCreditor(idx){
+  const g=state.creditors[idx];if(!g)return;const docs=g.docs.length;
+  const entries=g.debts.map(d=>`<div class="debtEntry glass"><h4>${esc(reasonOf(d))}</h4><p><b>Betrag:</b> ${eur.format(amount(d))} · <b>Status:</b> ${esc(statusOf(d))}</p><p><b>Aktenzeichen:</b> ${esc(caseOf(d))}</p><p><b>Kategorie:</b> ${esc(categoryOf(d))}</p></div>`).join('');
+  document.getElementById('drawerContent').innerHTML=`<div class="drawerHead"><div><h2>${esc(g.name)}</h2><p>${g.count} Schuldeneintrag${g.count===1?'':'e'} · ${docs} Dokument${docs===1?'':'e'}</p></div><button class="closeBtn" id="drawerClose">×</button></div><div class="drawerHero glass"><span class="badge ${g.open>0?'open':'closed'}">${g.open>0?'Offen':'Erledigt'}</span><div class="big">${eur.format(g.total)}</div><div class="drawerFacts"><div class="drawerFact"><span>Offener Anteil</span><strong>${eur.format(g.open)}</strong></div><div class="drawerFact"><span>Kategorie</span><strong>${esc([...g.categories].join(', ')||'–')}</strong></div><div class="drawerFact"><span>Dokumente</span><strong>${docs}</strong></div><div class="drawerFact"><span>Einträge</span><strong>${g.count}</strong></div></div></div><h3 style="font-size:14px;margin:18px 2px 8px">Einträge</h3>${entries}<div style="display:flex;gap:8px;margin-top:14px"><button class="btn primary" style="flex:1" onclick="location.href='/'">In aktueller App bearbeiten</button></div>`;
+  document.getElementById('drawerBack').classList.add('show');document.getElementById('drawer').classList.add('show');document.getElementById('drawerClose').onclick=closeDrawer;
+}
+function closeDrawer(){document.getElementById('drawerBack').classList.remove('show');document.getElementById('drawer').classList.remove('show')}
+document.getElementById('drawerBack').onclick=closeDrawer;
+document.getElementById('creditorSearch').addEventListener('input',e=>{state.query=e.target.value;renderCreditors()});
+function allDocs(){return state.creditors.flatMap(g=>g.docs)}
+function renderDocuments(){
+  const docs=allDocs(),p=docs.filter(x=>x.__source==='Paperless').length,f=docs.filter(x=>x.__source==='Datei').length,missing=state.creditors.filter(g=>!g.docs.length).length;
+  document.getElementById('docTotal').textContent=docs.length;document.getElementById('docPaperless').textContent=p;document.getElementById('docFiles').textContent=f;document.getElementById('docMissing').textContent=missing;
+  const html=docs.map(d=>`<div class="docCard glass"><div class="docIcon">${d.__source==='Paperless'?'P':'⌘'}</div><div><strong>${esc(d.title||d.name||d.driveName||('Dokument #'+(d.id||'')))}</strong><span>${esc(d.__creditor)} · ${esc(d.meta||d.date||d.created||'ohne Datum')}</span></div><div class="sourcePill">${esc(d.__source)}</div></div>`).join('');
+  document.getElementById('documentsContent').innerHTML=html?`<div class="docGrid">${html}</div>`:'<div class="empty">Noch keine verknüpften Dokumente gefunden.</div>';
+}
+function renderCompare(){
+  const q=state.quote/100,total=state.creditors.reduce((s,g)=>s+g.total,0),offer=total*q;document.getElementById('quoteLabel').textContent=state.quote+' %';document.getElementById('cmpQuote').textContent=state.quote+' %';document.getElementById('cmpTotal').textContent=eur.format(total);document.getElementById('cmpOffer').textContent=eur.format(offer);document.getElementById('cmpSave').textContent=eur.format(Math.max(0,total-offer));
+  const rows=state.creditors.map(g=>`<tr><td><strong>${esc(g.name)}</strong></td><td>${eur.format(g.total)}</td><td>${state.quote} %</td><td class="amount">${eur.format(g.total*q)}</td><td>${eur.format(Math.max(0,g.total-g.total*q))}</td></tr>`).join('');document.getElementById('compareTable').innerHTML=`<div class="tableWrap"><table><thead><tr><th>Gläubiger</th><th>Gesamtsumme</th><th>Quote</th><th>Vergleich</th><th>Ersparnis</th></tr></thead><tbody>${rows||'<tr><td colspan="5"><div class="empty">Keine Daten vorhanden.</div></td></tr>'}</tbody></table></div>`;
+}
+document.getElementById('quote').addEventListener('input',e=>{state.quote=Number(e.target.value)||10;renderCompare()});
+async function testPaperless(){const b=document.getElementById('btnPaperlessTest');const old=b.textContent;b.textContent='Teste…';b.disabled=true;try{const r=await fetch('/api/paperless/status',{cache:'no-store'});const data=await r.json();if(!r.ok||data.ok===false)throw new Error(data.error||'Verbindung fehlgeschlagen');toast('Paperless-Verbindung funktioniert ✓');document.getElementById('paperlessSettingText').textContent='Verbindung funktioniert';document.getElementById('systemPaperlessText').textContent='verbunden';document.getElementById('systemPaperlessDot').classList.add('ok')}catch(err){toast('Paperless-Test fehlgeschlagen');document.getElementById('paperlessSettingText').textContent='Test fehlgeschlagen: '+err.message}finally{b.textContent=old;b.disabled=false}}
+document.getElementById('btnPaperlessTest').onclick=testPaperless;
+function renderSettings(){
+  const cfg=state.config||{};const p=cfg.paperlessConfigured;document.getElementById('paperlessSettingText').textContent=p?'Über Railway verbunden':'Nicht über Railway konfiguriert';document.getElementById('paperlessTagText').textContent=cfg.paperlessTag||'App';document.getElementById('systemPaperlessText').textContent=p?'konfiguriert · Tag '+(cfg.paperlessTag||'App'):'nicht konfiguriert';document.getElementById('systemPaperlessDot').classList.toggle('ok',!!p);
+  const allowed=localStorage.getItem('schulden_google_drive_allowed_v36')==='1';document.getElementById('driveSettingText').textContent=allowed?'Freigabe im Browser gemerkt':'nicht verbunden / nicht gemerkt';document.getElementById('driveQuick').textContent=allowed?'bereit':'nicht verbunden';
+  const syncOk=!!state.sync;document.getElementById('systemSyncText').textContent=syncOk?(state.sync.updatedAt?'letzter Stand '+new Date(state.sync.updatedAt).toLocaleString('de-DE'):'Server erreichbar'):'nicht erreichbar';document.getElementById('systemSyncDot').classList.toggle('ok',syncOk);document.getElementById('systemSyncDot').textContent=syncOk?'OK':'Prüfen';
+}
+async function load(){
+  let debts=[];try{const r=await fetch('/api/sync',{cache:'no-store'});if(r.ok){state.sync=await r.json();if(Array.isArray(state.sync.debts))debts=state.sync.debts}}catch(e){}
+  if(!debts.length){try{const local=JSON.parse(localStorage.getItem('godmode_debts')||'[]');if(Array.isArray(local))debts=local}catch(e){}}
+  state.debts=debts;state.creditors=groupCreditors(debts);
+  try{const r=await fetch('/api/config',{cache:'no-store'});if(r.ok)state.config=await r.json()}catch(e){}
+  const p=state.config?.paperlessConfigured;document.getElementById('paperlessQuick').textContent=p?'verbunden':'nicht verbunden';renderOverview();renderCreditors();renderDocuments();renderCompare();renderSettings();
+}
+load();
+</script>
+</body>
+</html>
