@@ -7,7 +7,6 @@ function inject(body){
   if(!body.includes('/chatgpt-import-v150.js'))tags.push('<script src="/chatgpt-import-v150.js?v=166" defer></script>');
   if(!body.includes('/chatgpt-direct-import-v151.js'))tags.push('<script src="/chatgpt-direct-import-v151.js?v=166" defer></script>');
   if(!body.includes('/app-v166-extra.js'))tags.push('<script src="/app-v166-extra.js?v=166" defer></script>');
-  if(!body.includes('/app-v172-detail.js'))tags.push('<script src="/app-v172-detail.js?v=172" defer></script>');
   if(!tags.length)return body;
   const block=tags.join('\n');
   return /<\/body>/i.test(body)?body.replace(/<\/body>/i,block+'\n</body>'):body+'\n'+block;
