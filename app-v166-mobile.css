@@ -47,6 +47,26 @@ body{overflow-x:hidden}
   .miniFact strong{margin-top:2px;font-size:11px;line-height:1.15}
   .cardActions{margin-top:7px}
   .cardActions .btn{min-height:31px;border-radius:10px;font-size:11px;padding:0 10px}
+
+  /* Dokumente: nur optisch kompakter, keine Funktionsänderung */
+  #page-documents .topbar{margin-bottom:9px}
+  #page-documents .topbar p{display:none}
+  #page-documents .stats{gap:7px;margin-bottom:9px}
+  #page-documents .stat{min-height:70px;padding:9px 10px;border-radius:17px}
+  #page-documents .stat span{font-size:9px}
+  #page-documents .stat strong{font-size:20px;margin-top:4px}
+  #page-documents .section{padding:11px;border-radius:18px;margin-bottom:9px}
+  #page-documents .sectionHead{margin-bottom:8px}
+  #page-documents .sectionHead h3{font-size:14px}
+  #page-documents .sectionHead p{display:none}
+  #page-documents .mobileFeatureRow{grid-template-columns:1fr 1fr;gap:7px}
+  #page-documents .mobileFeatureRow .btn{min-height:38px;padding:0 8px;border-radius:11px;font-size:10.5px}
+  #page-documents .docGrid{gap:7px}
+  #page-documents .docCard{padding:9px 10px;grid-template-columns:34px minmax(0,1fr) auto;gap:9px;border-radius:15px}
+  #page-documents .docIcon{width:34px;height:34px;border-radius:10px;font-size:11px}
+  #page-documents .docCard strong{font-size:11.5px;line-height:1.2}
+  #page-documents .docCard span{font-size:9.5px;line-height:1.25;margin-top:2px}
+  #page-documents .sourcePill{font-size:8px;padding:4px 6px}
 }
 @media(max-width:420px){
   .stats{grid-template-columns:1fr 1fr}
@@ -59,4 +79,8 @@ body{overflow-x:hidden}
   .creditorCard .total{font-size:19px}
   .miniFact{min-height:40px;padding:5px 7px}
   .cardActions .btn{min-height:30px}
+  #page-documents .stat{min-height:66px;padding:8px 9px}
+  #page-documents .stat strong{font-size:18px}
+  #page-documents .docCard{padding:8px 9px;grid-template-columns:32px minmax(0,1fr) auto;gap:8px}
+  #page-documents .docIcon{width:32px;height:32px}
 }
