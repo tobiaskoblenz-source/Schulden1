@@ -1,4 +1,4 @@
-const VERSION = 'v132-pdf-beratung-vergleich';
+const VERSION = 'v164-clean-ui';
 const CACHE_STATIC = `schulden-manager-static-${VERSION}`;
 const CACHE_RUNTIME = `schulden-manager-runtime-${VERSION}`;
 const APP_SHELL = [
@@ -6,6 +6,10 @@ const APP_SHELL = [
   '/index.html',
   '/manifest.webmanifest',
   '/sw.js',
+  '/app-v164.css',
+  '/app-v164-core.js',
+  '/app-v164-actions.js',
+  '/app-v164-boot.js',
   '/assets/icons/icon-192.png',
   '/assets/icons/icon-512.png',
   '/assets/logo-schulden-manager.png'
@@ -65,6 +69,8 @@ self.addEventListener('fetch', (event) => {
   if (url.origin === location.origin) {
     const noStoreFiles = [
       '/', '/index.html', '/sw.js', '/manifest.webmanifest',
+      '/app-v164.css', '/app-v164-core.js', '/app-v164-actions.js', '/app-v164-boot.js',
+      '/legacy-v163.html',
       '/chatgpt-import.js', '/paperless-import.js', '/paperless-cleanup.js',
       '/pdf-export-plus.js', '/pdf-menu-v99.js', '/pdf-menu-v100.js'
     ];
