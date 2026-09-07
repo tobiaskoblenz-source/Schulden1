@@ -1,4 +1,4 @@
-const VERSION = 'v177-compact-mobile-overview';
+const VERSION = 'v178-app-icon';
 const CACHE_STATIC = `schulden-manager-static-${VERSION}`;
 const CACHE_RUNTIME = `schulden-manager-runtime-${VERSION}`;
 const APP_SHELL = [
@@ -13,7 +13,7 @@ const APP_SHELL = [
   '/app-v164-boot.js',
   '/app-v166-integrations.js',
   '/assets/icons/icon-192.png',
-  '/assets/icons/icon-512.png',
+  '/assets/icons/icon-512.jpg',
   '/assets/logo-schulden-manager.png'
 ];
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE_STATIC).then(cache=>cache.addAll(APP_SHELL)));self.skipWaiting()});
