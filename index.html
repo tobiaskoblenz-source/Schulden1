@@ -9,7 +9,9 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="assets/icons/icon-192.png">
 <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="app-v164.css?v=164">
+<link rel="stylesheet" href="app-v164.css?v=166">
+<link rel="stylesheet" href="app-v166-mobile.css?v=166">
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 <title>Schulden Manager</title>
 </head>
 <body>
@@ -23,51 +25,95 @@
     <button data-page="compare"><span class="ico">%</span><span>Vergleich</span></button>
     <button data-page="settings"><span class="ico">⚙</span><span>Einstellungen</span></button>
   </nav>
-  <div class="sidebarFoot"><b id="syncSide">Sync wird geprüft…</b><br>Technische Funktionen liegen gesammelt unter Einstellungen.</div>
+  <div class="sidebarFoot"><b id="syncSide">Sync wird geprüft…</b><br>Technik und Verbindungen liegen gesammelt unter Einstellungen.</div>
 </aside>
 <main class="main">
 <section class="page active" id="page-overview">
   <div class="topbar"><div><h1>Übersicht</h1><p>Nur das Wichtige auf einen Blick.</p></div><div class="topActions"><button class="btn primary" data-add>+ Neue Schuld</button></div></div>
-  <div class="hero glass"><div class="heroText"><span class="heroEyebrow">Aufgeräumtes Dashboard</span><h2>Deine Schulden, ohne Technik im Weg.</h2><p>Auf der Startseite bleiben Gesamtstand, Gläubiger und offene Fälle. Verbindungen, Tests, Backup und Systemwerkzeuge findest du unter Einstellungen.</p></div><div class="heroQuick"><div class="quickLine"><span>Datensatz</span><strong id="syncWhen">wird geladen…</strong></div><div class="quickLine"><span>Paperless</span><strong id="paperlessQuick">prüfe…</strong></div><div class="quickLine"><span>Google Drive</span><strong id="driveQuick">prüfe…</strong></div></div></div>
+  <div class="hero glass"><div class="heroText"><span class="heroEyebrow">Aufgeräumtes Dashboard</span><h2>Deine Schulden, ohne Technik im Weg.</h2><p>Gesamtstand, Gläubiger und offene Fälle. Verbindungen und Werkzeuge findest du unter Einstellungen.</p></div><div class="heroQuick"><div class="quickLine"><span>Datensatz</span><strong id="syncWhen">wird geladen…</strong></div><div class="quickLine"><span>Paperless</span><strong id="paperlessQuick">prüfe…</strong></div><div class="quickLine"><span>Google Drive</span><strong id="driveQuick">prüfe…</strong></div></div></div>
   <div class="stats"><div class="stat glass"><span>Gesamtschulden</span><strong id="statTotal">0,00 €</strong><small>alle erfassten Forderungen</small></div><div class="stat glass"><span>Offen</span><strong id="statOpen">0,00 €</strong><small>noch nicht erledigt</small></div><div class="stat glass"><span>Gläubiger</span><strong id="statCreditors">0</strong><small>nach Name zusammengefasst</small></div><div class="stat glass"><span>Erledigt</span><strong id="statClosed">0</strong><small>abgeschlossene Einträge</small></div></div>
   <div class="section glass"><div class="sectionHead"><div><h3>Gläubiger</h3><p>Name, Betrag, Status und Kategorie.</p></div><a href="#" data-page-go="creditors">Alle anzeigen →</a></div><div id="overviewTable"></div></div>
 </section>
+
 <section class="page" id="page-creditors">
   <div class="topbar"><div><h1>Gläubiger</h1><p>Eine ruhige Arbeitsansicht. Details öffnen sich rechts.</p></div><div class="topActions"><button class="btn primary" data-add>+ Neue Schuld</button></div></div>
   <div class="section glass"><div class="searchRow"><input class="search" id="creditorSearch" placeholder="Gläubiger, Aktenzeichen, Grund oder Kategorie suchen"><button class="btn primary" data-add>+ Neu</button></div><div id="creditorContent"></div></div>
 </section>
+
 <section class="page" id="page-documents">
-  <div class="topbar"><div><h1>Dokumente</h1><p>Paperless- und Datei-Verknüpfungen an einem Ort.</p></div><div class="topActions"><button class="btn" data-legacy>Paperless-Werkzeuge</button></div></div>
+  <div class="topbar"><div><h1>Dokumente</h1><p>Paperless und Import an einem Ort.</p></div></div>
   <div class="stats"><div class="stat glass"><span>Verknüpft</span><strong id="docTotal">0</strong><small>Paperless + Dateien</small></div><div class="stat glass"><span>Paperless</span><strong id="docPaperless">0</strong><small>verknüpfte Dokumente</small></div><div class="stat glass"><span>Dateien</span><strong id="docFiles">0</strong><small>Korrespondenz / Uploads</small></div><div class="stat glass"><span>Ohne Dokumente</span><strong id="docMissing">0</strong><small>Gläubiger ohne Verknüpfung</small></div></div>
+  <div class="section glass"><div class="sectionHead"><div><h3>Werkzeuge</h3><p>Keine schwebenden Buttons mehr.</p></div></div><div class="mobileFeatureRow"><button class="btn primary" id="paperlessManageBtn2">📄 Paperless</button><button class="btn" id="chatgptImportNewBtn">🤖 ChatGPT Import</button></div></div>
   <div class="section glass"><div class="sectionHead"><div><h3>Dokumentenübersicht</h3><p>Vorhandene Verknüpfungen aus deinen Schuld-Akten.</p></div></div><div id="documentsContent"></div></div>
 </section>
+
 <section class="page" id="page-compare">
   <div class="topbar"><div><h1>Vergleich</h1><p>Vergleichsrechner als eigener Bereich.</p></div></div>
   <div class="compareControls glass"><div><label for="quote">Globale Vergleichsquote</label><input id="quote" type="range" min="1" max="100" value="10"></div><div class="percentBox" id="quoteLabel">10 %</div></div>
   <div class="stats"><div class="stat glass"><span>Gesamtschulden</span><strong id="cmpTotal">0,00 €</strong><small>Basis der Berechnung</small></div><div class="stat glass"><span>Vergleich gesamt</span><strong id="cmpOffer">0,00 €</strong><small>bei gewählter Quote</small></div><div class="stat glass"><span>Mögliche Ersparnis</span><strong id="cmpSave">0,00 €</strong><small>rechnerische Differenz</small></div><div class="stat glass"><span>Quote</span><strong id="cmpQuote">10 %</strong><small>global eingestellt</small></div></div>
   <div class="section glass"><div class="sectionHead"><div><h3>Vergleich je Gläubiger</h3><p>Die Quote lässt sich sofort durchrechnen.</p></div></div><div id="compareTable"></div></div>
 </section>
+
 <section class="page" id="page-settings">
-  <div class="topbar"><div><h1>Einstellungen</h1><p>Alles, was man konfigurieren oder testen kann, an einem Ort.</p></div></div>
+  <div class="topbar"><div><h1>Einstellungen</h1><p>Alles Konfigurierbare an einem Ort.</p></div></div>
   <div class="settingsGrid">
-    <div class="settingCard glass"><div class="settingHead"><div class="settingIcon">↔</div><div><h3>Verbindungen</h3><p>Paperless, Google Drive und später n8n.</p></div></div><div class="settingRows"><div class="settingRow"><div class="left"><strong>Paperless</strong><span id="paperlessSettingText">Status wird geladen…</span></div><button class="btn" id="btnPaperlessTest">Verbindung testen</button></div><div class="settingRow"><div class="left"><strong>Paperless konfigurieren</strong><span>URL, API-Token, Tag, Diagnose und Roh-Test</span></div><button class="btn" data-legacy>Öffnen</button></div><div class="settingRow"><div class="left"><strong>Google Drive</strong><span id="driveSettingText">Status wird geprüft…</span></div><button class="btn" data-legacy>Verbinden / verwalten</button></div><div class="settingRow"><div class="left"><strong>n8n Automatisierung</strong><span>Noch nicht eingerichtet</span></div><span class="statusDot warn">später</span></div></div></div>
-    <div class="settingCard glass"><div class="settingHead"><div class="settingIcon">📄</div><div><h3>Dokumente & Paperless</h3><p>Regeln und Testwerkzeuge.</p></div></div><div class="settingRows"><div class="settingRow"><div class="left"><strong>Paperless-Tag</strong><span id="paperlessTagText">App</span></div><button class="btn" data-legacy>Ändern</button></div><div class="settingRow"><div class="left"><strong>Dokumente automatisch zuordnen</strong><span>Später über n8n im Hintergrund</span></div><div class="switch"></div></div><div class="settingRow"><div class="left"><strong>ASN verwenden</strong><span>ASN bei Dokumenten berücksichtigen</span></div><div class="switch on"></div></div><div class="settingRow"><div class="left"><strong>Paperless-Testwerkzeuge</strong><span>Tags laden, Diagnose, Roh-Test und Suche</span></div><button class="btn" data-legacy>Öffnen</button></div></div></div>
-    <div class="settingCard glass"><div class="settingHead"><div class="settingIcon">☁</div><div><h3>Google Drive & Backup</h3><p>Sicherung und Wiederherstellung.</p></div></div><div class="settingRows"><div class="settingRow"><div class="left"><strong>Google Drive</strong><span>Verbinden, speichern oder laden</span></div><button class="btn" data-legacy>Drive öffnen</button></div><div class="settingRow"><div class="left"><strong>Lokales Backup</strong><span>Alle Schuldendaten als JSON sichern</span></div><button class="btn" id="backupDownload">Backup laden</button></div><div class="settingRow"><div class="left"><strong>Backup wiederherstellen</strong><span>JSON-Sicherung importieren</span></div><button class="btn" id="backupRestoreBtn">Wiederherstellen</button><input id="backupRestore" type="file" accept="application/json,.json" hidden></div></div></div>
-    <div class="settingCard glass"><div class="settingHead"><div class="settingIcon">🏷</div><div><h3>Kategorien & Status</h3><p>Listen verwalten, die in der App verwendet werden.</p></div></div><div class="settingRows"><div class="settingRow"><div class="left"><strong>Gläubiger-Kategorien</strong><span id="categoryCount">–</span></div><button class="btn" id="categoriesBtn">Bearbeiten</button></div><div class="settingRow"><div class="left"><strong>Status</strong><span>Offen oder erledigt direkt je Schuld ändern</span></div><span class="statusDot ok">aktiv</span></div></div></div>
-    <div class="settingCard glass"><div class="settingHead"><div class="settingIcon">%</div><div><h3>Vergleich</h3><p>Vorgaben für den Vergleichsrechner.</p></div></div><div class="settingRows"><div class="settingRow"><div class="left"><strong>Standardquote</strong><span>Wird beim Öffnen verwendet</span></div><strong id="defaultQuoteText">10 %</strong></div><div class="settingRow"><div class="left"><strong>Vergleich anzeigen</strong><span>Eigener Bereich in der Navigation</span></div><div class="switch on"></div></div></div></div>
-    <div class="settingCard glass"><div class="settingHead"><div class="settingIcon">🛡</div><div><h3>Daten & Sicherheit</h3><p>Selten gebrauchte, aber wichtige Werkzeuge.</p></div></div><div class="settingRows"><div class="settingRow"><div class="left"><strong>Papierkorb</strong><span id="trashCount">0 gelöschte Einträge</span></div><button class="btn" id="trashBtn">Öffnen</button></div><div class="settingRow"><div class="left"><strong>PDF Export / Beratung</strong><span>Bestehende Spezial-PDFs bleiben erhalten</span></div><button class="btn" data-legacy>PDF-Werkzeuge</button></div><div class="settingRow dangerZone"><div class="left"><strong>Erweiterte alte Oberfläche</strong><span>Rückfallebene für Spezialfunktionen</span></div><button class="btn" data-legacy>Öffnen</button></div></div></div>
-    <div class="settingCard glass"><div class="settingHead"><div class="settingIcon">◐</div><div><h3>Anzeige</h3><p>Bewusst wenig Optionen.</p></div></div><div class="settingRows"><div class="settingRow"><div class="left"><strong>Dark Mode</strong><span>Fest aktiviert</span></div><div class="switch on"></div></div><div class="settingRow"><div class="left"><strong>Kompakte Gläubigerliste</strong><span>Technische Buttons aus der Hauptliste entfernt</span></div><div class="switch on"></div></div></div></div>
-    <div class="settingCard glass"><div class="settingHead"><div class="settingIcon">i</div><div><h3>System</h3><p>Status und technische Diagnose.</p></div></div><div class="settingRows"><div class="settingRow"><div class="left"><strong>App-Version</strong><span>Neue Hauptoberfläche</span></div><strong>v164</strong></div><div class="settingRow"><div class="left"><strong>Server-Synchronisierung</strong><span id="systemSyncText">wird geladen…</span></div><span class="statusDot" id="systemSyncDot">Status</span></div><div class="settingRow"><div class="left"><strong>Paperless-Server</strong><span id="systemPaperlessText">wird geladen…</span></div><span class="statusDot" id="systemPaperlessDot">Status</span></div></div></div>
+    <div class="settingCard glass"><div class="settingHead"><div class="settingIcon">↔</div><div><h3>Verbindungen</h3><p>Paperless, Google Drive und später n8n.</p></div></div><div class="settingRows">
+      <div class="settingRow"><div class="left"><strong>Paperless</strong><span id="paperlessSettingText">Status wird geladen…</span></div><button class="btn" id="btnPaperlessTest">Verbindung testen</button></div>
+      <div class="settingRow"><div class="left"><strong>Paperless verwalten</strong><span>URL, Tag, Suche und Verknüpfung</span></div><button class="btn" id="paperlessManageBtn">Öffnen</button></div>
+      <div class="settingRow"><div class="left"><strong>Google Drive</strong><span id="driveSettingText">Status wird geprüft…</span></div><button class="btn primary" id="driveManageBtn">Verbinden / verwalten</button></div>
+      <div class="settingRow"><div class="left"><strong>n8n Automatisierung</strong><span>Noch nicht eingerichtet</span></div><span class="statusDot warn">später</span></div>
+    </div></div>
+
+    <div class="settingCard glass"><div class="settingHead"><div class="settingIcon">📄</div><div><h3>Dokumente & Import</h3><p>Dokumente, Paperless und ChatGPT.</p></div></div><div class="settingRows">
+      <div class="settingRow"><div class="left"><strong>Paperless-Tag</strong><span id="paperlessTagText">App</span></div><button class="btn" id="paperlessManageBtn3">Verwalten</button></div>
+      <div class="settingRow"><div class="left"><strong>ChatGPT Import</strong><span>Import-Vorschläge prüfen und übernehmen</span></div><button class="btn" id="chatgptImportNewBtn2">Öffnen</button></div>
+      <div class="settingRow"><div class="left"><strong>Dokumente automatisch zuordnen</strong><span>Später über n8n im Hintergrund</span></div><div class="switch"></div></div>
+      <div class="settingRow"><div class="left"><strong>ASN verwenden</strong><span>ASN bei Dokumenten berücksichtigen</span></div><div class="switch on"></div></div>
+    </div></div>
+
+    <div class="settingCard glass"><div class="settingHead"><div class="settingIcon">☁</div><div><h3>Google Drive & Backup</h3><p>Sicherung und Wiederherstellung.</p></div></div><div class="settingRows">
+      <div class="settingRow"><div class="left"><strong>Google Drive</strong><span>Verbinden, speichern oder laden</span></div><button class="btn primary" id="driveManageBtn2">Drive öffnen</button></div>
+      <div class="settingRow"><div class="left"><strong>Lokales Backup</strong><span>Alle Schuldendaten als JSON sichern</span></div><button class="btn" id="backupDownload">Backup laden</button></div>
+      <div class="settingRow"><div class="left"><strong>Backup wiederherstellen</strong><span>JSON-Sicherung importieren</span></div><button class="btn" id="backupRestoreBtn">Wiederherstellen</button><input id="backupRestore" type="file" accept="application/json,.json" hidden></div>
+    </div></div>
+
+    <div class="settingCard glass"><div class="settingHead"><div class="settingIcon">🏷</div><div><h3>Kategorien & Status</h3><p>Listen verwalten, die in der App verwendet werden.</p></div></div><div class="settingRows">
+      <div class="settingRow"><div class="left"><strong>Gläubiger-Kategorien</strong><span id="categoryCount">–</span></div><button class="btn" id="categoriesBtn">Bearbeiten</button></div>
+      <div class="settingRow"><div class="left"><strong>Status</strong><span>Offen oder erledigt direkt je Schuld ändern</span></div><span class="statusDot ok">aktiv</span></div>
+    </div></div>
+
+    <div class="settingCard glass"><div class="settingHead"><div class="settingIcon">%</div><div><h3>Vergleich</h3><p>Vorgaben für den Vergleichsrechner.</p></div></div><div class="settingRows">
+      <div class="settingRow"><div class="left"><strong>Standardquote</strong><span>Wird beim Öffnen verwendet</span></div><strong id="defaultQuoteText">10 %</strong></div>
+      <div class="settingRow"><div class="left"><strong>Vergleich anzeigen</strong><span>Eigener Bereich in der Navigation</span></div><div class="switch on"></div></div>
+    </div></div>
+
+    <div class="settingCard glass"><div class="settingHead"><div class="settingIcon">🛡</div><div><h3>Daten & Insolvenz</h3><p>Wichtige Werkzeuge ohne alte Hauptseite.</p></div></div><div class="settingRows">
+      <div class="settingRow"><div class="left"><strong>Insolvenz-Status</strong><span>Vollständigkeit, Unterlagen und Vorbereitung</span></div><button class="btn" id="insolvencyStatusNewBtn">Öffnen</button></div>
+      <div class="settingRow"><div class="left"><strong>Papierkorb</strong><span id="trashCount">0 gelöschte Einträge</span></div><button class="btn" id="trashBtn">Öffnen</button></div>
+      <div class="settingRow"><div class="left"><strong>PDF Bericht</strong><span>Aktuelle Schuldenübersicht drucken / als PDF speichern</span></div><button class="btn" id="pdfNewBtn">PDF erstellen</button></div>
+    </div></div>
+
+    <div class="settingCard glass"><div class="settingHead"><div class="settingIcon">◐</div><div><h3>Anzeige</h3><p>Bewusst wenig Optionen.</p></div></div><div class="settingRows">
+      <div class="settingRow"><div class="left"><strong>Dark Mode</strong><span>Fest aktiviert</span></div><div class="switch on"></div></div>
+      <div class="settingRow"><div class="left"><strong>Kompakte Gläubigerliste</strong><span>Technische Buttons aus der Hauptliste entfernt</span></div><div class="switch on"></div></div>
+    </div></div>
+
+    <div class="settingCard glass"><div class="settingHead"><div class="settingIcon">i</div><div><h3>System</h3><p>Status und technische Diagnose.</p></div></div><div class="settingRows">
+      <div class="settingRow"><div class="left"><strong>App-Version</strong><span>Neue Hauptoberfläche</span></div><strong>v166</strong></div>
+      <div class="settingRow"><div class="left"><strong>Server-Synchronisierung</strong><span id="systemSyncText">wird geladen…</span></div><span class="statusDot" id="systemSyncDot">Status</span></div>
+      <div class="settingRow"><div class="left"><strong>Paperless-Server</strong><span id="systemPaperlessText">wird geladen…</span></div><span class="statusDot" id="systemPaperlessDot">Status</span></div>
+    </div></div>
   </div>
 </section>
 </main>
 </div>
-<nav class="mobileNav"><button class="active" data-page="overview"><b>⌂</b><span>Start</span></button><button data-page="creditors"><b>▣</b><span>Gläubiger</span></button><button data-page="documents"><b>⌘</b><span>Dokumente</span></button><button data-page="compare"><b>%</b><span>Vergleich</span></button><button data-page="settings"><b>⚙</b><span>Settings</span></button></nav>
+<nav class="mobileNav"><button class="active" data-page="overview"><b>⌂</b><span>Start</span></button><button data-page="creditors"><b>▣</b><span>Gläubiger</span></button><button data-page="documents"><b>⌘</b><span>Dokumente</span></button><button data-page="compare"><b>%</b><span>Vergleich</span></button><button data-page="settings"><b>⚙</b><span>Mehr</span></button></nav>
 <div class="drawerBack" id="drawerBack"></div><aside class="drawer" id="drawer"><div id="drawerContent"></div></aside>
 <div class="modalBack" id="modalBack"><div class="modal" id="modal"></div></div>
 <div class="toast" id="toast"></div>
-<script src="app-v164-core.js?v=164"></script>
-<script src="app-v164-actions.js?v=164"></script>
-<script src="app-v164-boot.js?v=164"></script>
+<script src="app-v164-core.js?v=166"></script>
+<script src="app-v164-actions.js?v=166"></script>
+<script src="app-v164-boot.js?v=166"></script>
+<script src="app-v166-integrations.js?v=166"></script>
 </body>
 </html>
