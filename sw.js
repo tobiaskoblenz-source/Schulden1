@@ -1,4 +1,4 @@
-const VERSION = 'v173-mobile-recovery';
+const VERSION = 'v174-compact-mobile-documents';
 const CACHE_STATIC = `schulden-manager-static-${VERSION}`;
 const CACHE_RUNTIME = `schulden-manager-runtime-${VERSION}`;
 const APP_SHELL = [
