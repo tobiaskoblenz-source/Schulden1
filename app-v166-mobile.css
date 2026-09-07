@@ -29,32 +29,34 @@ body{overflow-x:hidden}
   .settingRow .btn{width:100%;align-self:stretch}
   .mobileFeatureRow{display:grid;grid-template-columns:1fr;gap:8px}.mobileFeatureRow .btn{width:100%}
 
-  /* Gläubigerliste kompakter */
+  /* Gläubigerliste: volle Breite, aber deutlich niedrigere Karten */
   #page-creditors .section{padding:12px}
   #page-creditors .searchRow{gap:7px;margin-bottom:9px}
   #page-creditors .search{min-height:40px;padding:0 11px;border-radius:12px;font-size:12px}
   #page-creditors .searchRow .btn{min-height:40px;padding:0 11px;border-radius:12px;font-size:12px;white-space:nowrap}
   .creditorGrid{gap:8px}
-  .creditorCard{padding:12px;border-radius:19px}
-  .creditorTop{gap:8px;align-items:center}
-  .creditorAvatar{width:34px;height:34px;border-radius:11px;font-size:13px}
+  .creditorCard{position:relative;padding:11px 12px 10px;border-radius:18px}
+  .creditorTop{position:absolute;top:10px;right:12px;display:block;margin:0}
+  .creditorAvatar{display:none!important}
   .creditorCard .badge{padding:4px 7px;font-size:9px}
-  .creditorCard h3{margin:8px 0 2px;font-size:15px;line-height:1.2}
-  .creditorCard .total{font-size:20px;line-height:1.05;margin:6px 0 8px}
+  .creditorCard h3{margin:0 0 2px;padding-right:72px;font-size:15px;line-height:1.18;min-height:18px}
+  .creditorCard .total{font-size:20px;line-height:1.05;margin:5px 0 7px}
   .miniFacts{gap:6px}
-  .miniFact{padding:7px 9px;border-radius:11px;min-height:48px}
-  .miniFact span{font-size:9px}
-  .miniFact strong{margin-top:2px;font-size:11px}
-  .cardActions{margin-top:8px}
-  .cardActions .btn{min-height:33px;border-radius:11px;font-size:11px;padding:0 10px}
+  .miniFact{padding:6px 8px;border-radius:10px;min-height:42px}
+  .miniFact span{font-size:9px;line-height:1.1}
+  .miniFact strong{margin-top:2px;font-size:11px;line-height:1.15}
+  .cardActions{margin-top:7px}
+  .cardActions .btn{min-height:31px;border-radius:10px;font-size:11px;padding:0 10px}
 }
 @media(max-width:420px){
   .stats{grid-template-columns:1fr 1fr}
   .stat{min-width:0;padding:10px}.stat strong{font-size:21px;overflow-wrap:anywhere}
   .hero h2{font-size:20px}
   .main{padding-left:10px;padding-right:10px}
-  .creditorCard{padding:11px}
-  .creditorAvatar{width:32px;height:32px}
-  .creditorCard h3{font-size:14px}
+  .creditorCard{padding:10px 11px 9px}
+  .creditorTop{top:9px;right:11px}
+  .creditorCard h3{font-size:14px;padding-right:68px}
   .creditorCard .total{font-size:19px}
+  .miniFact{min-height:40px;padding:5px 7px}
+  .cardActions .btn{min-height:30px}
 }
