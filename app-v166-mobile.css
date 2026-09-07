@@ -1,0 +1,37 @@
+/* v166 mobile polish */
+#v132Btn,#chatgptImportBtn{display:none!important}
+body{overflow-x:hidden}
+.mobileFeatureRow{display:flex;gap:9px;flex-wrap:wrap}
+.mobileFeatureRow .btn{flex:1 1 180px}
+@media(max-width:820px){
+  .main{padding:15px 12px calc(112px + env(safe-area-inset-bottom))}
+  .topbar{margin-bottom:12px}
+  .topbar h1{font-size:31px;line-height:1.05}
+  .topbar p{font-size:13px;margin-top:6px}
+  .hero{padding:16px;border-radius:22px;gap:13px;margin-bottom:12px}
+  .heroEyebrow{display:none}
+  .hero h2{font-size:24px;line-height:1.12;margin:0 0 7px}
+  .hero p{font-size:13px;line-height:1.48}
+  .heroQuick{gap:7px}
+  .quickLine{padding:10px 12px;border-radius:13px}
+  .quickLine span{font-size:11px}.quickLine strong{font-size:12px}
+  .stats{gap:9px;margin-bottom:12px}
+  .stat{padding:14px;min-height:104px;border-radius:21px}
+  .stat span{font-size:11px}.stat strong{font-size:25px;margin-top:7px}.stat small{font-size:10.5px;line-height:1.3;margin-top:5px}
+  .section{padding:15px;border-radius:22px;margin-bottom:12px}
+  .sectionHead{margin-bottom:11px}.sectionHead h3{font-size:16px}
+  .mobileNav{left:7px;right:7px;bottom:max(7px,env(safe-area-inset-bottom));border-radius:19px;padding:6px}
+  .mobileNav button{min-height:48px;font-size:8.5px;min-width:0;padding:3px 1px}
+  .mobileNav button b{font-size:17px}
+  .drawer{padding:15px;padding-bottom:calc(30px + env(safe-area-inset-bottom))}
+  .modalBack{padding:10px}.modal{max-height:94vh;padding:15px;border-radius:22px}
+  .settingsGrid{gap:10px}.settingCard{padding:15px;border-radius:21px}.settingRow{gap:9px}
+  .settingRow .btn{width:100%;align-self:stretch}
+  .mobileFeatureRow{display:grid;grid-template-columns:1fr;gap:8px}.mobileFeatureRow .btn{width:100%}
+}
+@media(max-width:420px){
+  .stats{grid-template-columns:1fr 1fr}
+  .stat{min-width:0;padding:12px}.stat strong{font-size:23px;overflow-wrap:anywhere}
+  .hero h2{font-size:22px}
+  .main{padding-left:10px;padding-right:10px}
+}
