@@ -1,10 +1,10 @@
 {
-  "name": "schulden-v163",
-  "version": "163.0.0",
+  "name": "schulden-v166",
+  "version": "166.0.0",
   "private": true,
-  "description": "Schulden Manager PWA mit Gläubiger-Verwaltung, Paperless, ChatGPT-Import und Insolvenz-Arbeitsbereich",
+  "description": "Schulden Manager PWA mit integrierter Paperless- und Google-Drive-Anbindung",
   "scripts": {
-    "start": "node -r ./paperless-import-server.js -r ./paperless-preview-server-v149.js -r ./paperless-cleanup-server.js -r ./chatgpt-import-server.js -r ./insolvency-upgrade-server-v131.js server.js"
+    "start": "node -r ./paperless-import-server.js -r ./paperless-preview-server-v149.js -r ./paperless-cleanup-server.js server.js"
   },
   "engines": {
     "node": ">=20"
