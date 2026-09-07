@@ -1,4 +1,4 @@
-const VERSION = 'v167-compact-mobile-home';
+const VERSION = 'v168-compact-mobile-creditors';
 const CACHE_STATIC = `schulden-manager-static-${VERSION}`;
 const CACHE_RUNTIME = `schulden-manager-runtime-${VERSION}`;
 const APP_SHELL = [
