@@ -67,6 +67,25 @@ body{overflow-x:hidden}
   #page-documents .docCard strong{font-size:11.5px;line-height:1.2}
   #page-documents .docCard span{font-size:9.5px;line-height:1.25;margin-top:2px}
   #page-documents .sourcePill{font-size:8px;padding:4px 6px}
+
+  /* Mehr / Einstellungen: nur optisch kompakter, keine Funktionsänderung */
+  #page-settings .topbar{margin-bottom:9px}
+  #page-settings .topbar p{display:none}
+  #page-settings .settingsGrid{grid-template-columns:1fr;gap:8px}
+  #page-settings .settingCard{padding:11px 12px;border-radius:18px}
+  #page-settings .settingHead{gap:9px;margin-bottom:9px;align-items:center}
+  #page-settings .settingIcon{width:31px;height:31px;border-radius:10px;font-size:13px;flex:0 0 31px}
+  #page-settings .settingHead h3{font-size:13.5px;line-height:1.15}
+  #page-settings .settingHead p{font-size:9.5px;line-height:1.3;margin-top:2px}
+  #page-settings .settingRows{gap:6px}
+  #page-settings .settingRow{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px;padding:8px 9px;border-radius:11px;min-height:48px}
+  #page-settings .settingRow .left{min-width:0}
+  #page-settings .settingRow .left strong{font-size:11.5px;line-height:1.15}
+  #page-settings .settingRow .left span{font-size:9px;line-height:1.25;margin-top:2px}
+  #page-settings .settingRow>.btn{width:auto!important;max-width:148px;min-height:32px;padding:0 9px;border-radius:10px;font-size:9.5px;line-height:1.1;white-space:normal;align-self:center}
+  #page-settings .settingRow>.statusDot{font-size:9px;white-space:nowrap}
+  #page-settings .settingRow>.switch{transform:scale(.88);transform-origin:right center}
+  #page-settings .settingRow>strong{font-size:11px;white-space:nowrap}
 }
 @media(max-width:420px){
   .stats{grid-template-columns:1fr 1fr}
@@ -83,4 +102,10 @@ body{overflow-x:hidden}
   #page-documents .stat strong{font-size:18px}
   #page-documents .docCard{padding:8px 9px;grid-template-columns:32px minmax(0,1fr) auto;gap:8px}
   #page-documents .docIcon{width:32px;height:32px}
+  #page-settings .settingCard{padding:10px}
+  #page-settings .settingHead{margin-bottom:8px}
+  #page-settings .settingRow{padding:7px 8px;min-height:45px;gap:6px}
+  #page-settings .settingRow .left strong{font-size:11px}
+  #page-settings .settingRow .left span{font-size:8.5px}
+  #page-settings .settingRow>.btn{max-width:132px;min-height:30px;padding:0 7px;font-size:9px}
 }
