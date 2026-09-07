@@ -1,4 +1,4 @@
-const VERSION = 'v170-revert-narrow-creditors';
+const VERSION = 'v171-short-mobile-creditors';
 const CACHE_STATIC = `schulden-manager-static-${VERSION}`;
 const CACHE_RUNTIME = `schulden-manager-runtime-${VERSION}`;
 const APP_SHELL = [
