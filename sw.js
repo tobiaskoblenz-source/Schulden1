@@ -1,4 +1,4 @@
-const VERSION = 'v171-short-mobile-creditors';
+const VERSION = 'v172-compact-creditor-details';
 const CACHE_STATIC = `schulden-manager-static-${VERSION}`;
 const CACHE_RUNTIME = `schulden-manager-runtime-${VERSION}`;
 const APP_SHELL = [
@@ -12,6 +12,7 @@ const APP_SHELL = [
   '/app-v164-actions.js',
   '/app-v164-boot.js',
   '/app-v166-integrations.js',
+  '/app-v172-detail.js',
   '/assets/icons/icon-192.png',
   '/assets/icons/icon-512.png',
   '/assets/logo-schulden-manager.png'
@@ -20,4 +21,4 @@ self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE_STATIC
 self.addEventListener('activate',event=>{event.waitUntil((async()=>{const keys=await caches.keys();await Promise.all(keys.filter(key=>key.startsWith('schulden-manager-')&&![CACHE_STATIC,CACHE_RUNTIME].includes(key)).map(key=>caches.delete(key)));await self.clients.claim()})())});
 async function networkFirst(request){try{const fresh=await fetch(request,{cache:'no-store'});const cache=await caches.open(CACHE_RUNTIME);cache.put(request,fresh.clone());return fresh}catch(err){return(await caches.match(request))||(await caches.match('/index.html'))}}
 async function cacheFirst(request){const cached=await caches.match(request);if(cached)return cached;try{const fresh=await fetch(request);const cache=await caches.open(CACHE_RUNTIME);cache.put(request,fresh.clone());return fresh}catch(err){return caches.match('/index.html')}}
-self.addEventListener('fetch',event=>{const{request}=event;if(request.method!=='GET')return;const url=new URL(request.url);if(url.pathname.startsWith('/api/'))return;if(request.mode==='navigate'){event.respondWith(networkFirst(request));return}if(url.origin===location.origin){const noStoreFiles=['/','/index.html','/sw.js','/manifest.webmanifest','/app-v164.css','/app-v166-mobile.css','/app-v164-core.js','/app-v164-actions.js','/app-v164-boot.js','/app-v166-integrations.js'];if(noStoreFiles.includes(url.pathname)){event.respondWith(networkFirst(request));return}event.respondWith(cacheFirst(request))}});
+self.addEventListener('fetch',event=>{const{request}=event;if(request.method!=='GET')return;const url=new URL(request.url);if(url.pathname.startsWith('/api/'))return;if(request.mode==='navigate'){event.respondWith(networkFirst(request));return}if(url.origin===location.origin){const noStoreFiles=['/','/index.html','/sw.js','/manifest.webmanifest','/app-v164.css','/app-v166-mobile.css','/app-v164-core.js','/app-v164-actions.js','/app-v164-boot.js','/app-v166-integrations.js','/app-v172-detail.js'];if(noStoreFiles.includes(url.pathname)){event.respondWith(networkFirst(request));return}event.respondWith(cacheFirst(request))}});
