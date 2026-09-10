@@ -132,11 +132,28 @@ async function handle(req, res) {
   if (url.pathname === '/api/n8n/ping') {
     if (!authorized(req)) return sendJson(res, 401, { ok: false, error: 'unauthorized' });
     if (req.method !== 'GET') return sendJson(res, 405, { ok: false, error: 'method not allowed' });
-    return sendJson(res, 200, { ok: true, bridge: 'n8n', version: 2 });
+    return sendJson(res, 200, { ok: true, bridge: 'n8n', version: 3 });
   }
 
   if (url.pathname === '/api/n8n/inbox') {
     if (!authorized(req)) return sendJson(res, 401, { ok: false, error: 'unauthorized' });
+
+    if (req.method === 'GET') {
+      try {
+        // Wait for any currently queued writes so this count is definitive.
+        await inboxWriteQueue;
+        const inbox = readInbox();
+        return sendJson(res, 200, {
+          ok: true,
+          inboxCount: inbox.items.length,
+          updatedAt: inbox.updatedAt,
+          paperlessIds: inbox.items.map(x => x && x.paperlessId).filter(Number.isFinite),
+        });
+      } catch (err) {
+        return sendJson(res, 500, { ok: false, error: err.message || 'n8n inbox status error' });
+      }
+    }
+
     if (req.method !== 'POST') return sendJson(res, 405, { ok: false, error: 'method not allowed' });
 
     try {
