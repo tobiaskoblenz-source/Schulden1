@@ -6,6 +6,7 @@ const crypto = require('crypto');
 const originalCreateServer = http.createServer.bind(http);
 const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, 'data');
 const INBOX_FILE = process.env.N8N_INBOX_FILE || path.join(DATA_DIR, 'n8n-inbox.json');
+const RESET_MARKER = path.join(DATA_DIR, '.n8n-inbox-reset-schulden-app-tag-v1.json');
 const MAX_BODY = 1024 * 1024;
 const MAX_ITEMS = 1000;
 
@@ -80,6 +81,26 @@ function writeInbox(data) {
   fs.writeFileSync(tmp, JSON.stringify(data, null, 2));
   fs.renameSync(tmp, INBOX_FILE);
 }
+
+// One-time cleanup after changing n8n to only import documents carrying the
+// dedicated Paperless tag "Schulden-App". This removes only the bridge inbox;
+// it does not delete Paperless documents or debt records.
+function resetLegacyInboxOnce() {
+  try {
+    ensureInbox();
+    if (fs.existsSync(RESET_MARKER)) return;
+    const inbox = readInbox();
+    const previousCount = inbox.items.length;
+    const updatedAt = new Date().toISOString();
+    writeInbox({ updatedAt, items: [] });
+    fs.writeFileSync(RESET_MARKER, JSON.stringify({ resetAt: updatedAt, previousCount }, null, 2));
+    console.log(`[n8n] one-time inbox cleanup: ${previousCount} legacy item(s) removed`);
+  } catch (err) {
+    console.error('[n8n] one-time inbox cleanup failed:', err.message || err);
+  }
+}
+
+resetLegacyInboxOnce();
 
 function cleanText(value, max) {
   return String(value == null ? '' : value).trim().slice(0, max);
