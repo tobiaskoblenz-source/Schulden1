@@ -126,13 +126,44 @@ function saveInboxItem(item) {
   return operation;
 }
 
+function publicItem(item) {
+  const paperlessId = Number(item && item.paperlessId);
+  if (!Number.isFinite(paperlessId)) return null;
+  return {
+    paperlessId,
+    title: cleanText(item.title, 500),
+    created: cleanText(item.created, 100),
+    correspondent: cleanText(item.correspondent, 300),
+    documentType: cleanText(item.documentType, 300),
+    asn: item.asn == null ? null : cleanText(item.asn, 100),
+    receivedAt: cleanText(item.receivedAt, 100),
+  };
+}
+
 async function handle(req, res) {
   const url = new URL(req.url, 'http://localhost');
+
+  if (url.pathname === '/api/n8n/inbox-view') {
+    if (req.method !== 'GET') return sendJson(res, 405, { ok: false, error: 'method not allowed' });
+    try {
+      await inboxWriteQueue;
+      const inbox = readInbox();
+      const items = inbox.items.map(publicItem).filter(Boolean);
+      return sendJson(res, 200, {
+        ok: true,
+        inboxCount: items.length,
+        updatedAt: inbox.updatedAt,
+        items,
+      });
+    } catch (err) {
+      return sendJson(res, 500, { ok: false, error: err.message || 'n8n inbox view error' });
+    }
+  }
 
   if (url.pathname === '/api/n8n/ping') {
     if (!authorized(req)) return sendJson(res, 401, { ok: false, error: 'unauthorized' });
     if (req.method !== 'GET') return sendJson(res, 405, { ok: false, error: 'method not allowed' });
-    return sendJson(res, 200, { ok: true, bridge: 'n8n', version: 3 });
+    return sendJson(res, 200, { ok: true, bridge: 'n8n', version: 4 });
   }
 
   if (url.pathname === '/api/n8n/inbox') {
@@ -140,7 +171,6 @@ async function handle(req, res) {
 
     if (req.method === 'GET') {
       try {
-        // Wait for any currently queued writes so this count is definitive.
         await inboxWriteQueue;
         const inbox = readInbox();
         return sendJson(res, 200, {
@@ -177,7 +207,7 @@ http.createServer = function(listener) {
   return originalCreateServer(async function(req, res) {
     try {
       const url = new URL(req.url, 'http://localhost');
-      if (url.pathname === '/api/n8n/ping' || url.pathname === '/api/n8n/inbox') {
+      if (url.pathname === '/api/n8n/ping' || url.pathname === '/api/n8n/inbox' || url.pathname === '/api/n8n/inbox-view') {
         return handle(req, res);
       }
     } catch (_) {}
