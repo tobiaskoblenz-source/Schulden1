@@ -9,6 +9,10 @@ const INBOX_FILE = process.env.N8N_INBOX_FILE || path.join(DATA_DIR, 'n8n-inbox.
 const MAX_BODY = 1024 * 1024;
 const MAX_ITEMS = 1000;
 
+// n8n may send many document POSTs at the same time. Serialize file updates so
+// every request reads the result of the previous write instead of overwriting it.
+let inboxWriteQueue = Promise.resolve();
+
 function sendJson(res, status, obj) {
   if (res.headersSent) return;
   res.writeHead(status, {
@@ -100,13 +104,35 @@ function normalizePayload(payload) {
   };
 }
 
+function saveInboxItem(item) {
+  const operation = inboxWriteQueue.then(() => {
+    const inbox = readInbox();
+    const withoutSame = inbox.items.filter(x => Number(x && x.paperlessId) !== item.paperlessId);
+    const items = [item, ...withoutSame].slice(0, MAX_ITEMS);
+    const updatedAt = new Date().toISOString();
+    writeInbox({ updatedAt, items });
+    return {
+      ok: true,
+      saved: true,
+      paperlessId: item.paperlessId,
+      inboxCount: items.length,
+      updatedAt,
+    };
+  });
+
+  // Keep the queue alive even if one operation fails, while still returning the
+  // original rejection to the request that caused it.
+  inboxWriteQueue = operation.catch(() => undefined);
+  return operation;
+}
+
 async function handle(req, res) {
   const url = new URL(req.url, 'http://localhost');
 
   if (url.pathname === '/api/n8n/ping') {
     if (!authorized(req)) return sendJson(res, 401, { ok: false, error: 'unauthorized' });
     if (req.method !== 'GET') return sendJson(res, 405, { ok: false, error: 'method not allowed' });
-    return sendJson(res, 200, { ok: true, bridge: 'n8n', version: 1 });
+    return sendJson(res, 200, { ok: true, bridge: 'n8n', version: 2 });
   }
 
   if (url.pathname === '/api/n8n/inbox') {
@@ -120,19 +146,8 @@ async function handle(req, res) {
       catch (_) { return sendJson(res, 400, { ok: false, error: 'invalid json' }); }
 
       const item = normalizePayload(payload);
-      const inbox = readInbox();
-      const withoutSame = inbox.items.filter(x => Number(x && x.paperlessId) !== item.paperlessId);
-      const items = [item, ...withoutSame].slice(0, MAX_ITEMS);
-      const updatedAt = new Date().toISOString();
-      writeInbox({ updatedAt, items });
-
-      return sendJson(res, 200, {
-        ok: true,
-        saved: true,
-        paperlessId: item.paperlessId,
-        inboxCount: items.length,
-        updatedAt,
-      });
+      const result = await saveInboxItem(item);
+      return sendJson(res, 200, result);
     } catch (err) {
       return sendJson(res, err.status || 500, { ok: false, error: err.message || 'n8n bridge error' });
     }
