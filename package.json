@@ -1,10 +1,10 @@
 {
-  "name": "schulden-v169",
-  "version": "169.0.0",
+  "name": "schulden-v170",
+  "version": "170.0.0",
   "private": true,
-  "description": "Schulden Manager PWA mit getrenntem Admin- und Schuldnerberater-Zugang",
+  "description": "Schulden Manager mit Registrierung, Benutzerverwaltung und einstellbaren Beraterrechten",
   "scripts": {
-    "start": "node -r ./admin-switch-v169.js -r ./auth-gateway-v168.js -r ./n8n-bridge-server.js -r ./paperless-import-server.js -r ./paperless-preview-server-v149.js -r ./paperless-cleanup-server.js -r ./v166-tools-server.js -r ./n8n-inbox-ui-server.js server.js"
+    "start": "node -r ./n8n-bridge-server.js -r ./paperless-import-server.js -r ./paperless-preview-server-v149.js -r ./paperless-cleanup-server.js -r ./v166-tools-server.js -r ./n8n-inbox-ui-server.js -r ./user-admin-inject-v170.js -r ./advisor-api-v170.js -r ./auth-core-v170.js server.js"
   },
   "engines": {
     "node": ">=20"
