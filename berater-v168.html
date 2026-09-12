@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="theme-color" content="#07101c">
+  <title>Schulden Manager · Schuldnerberater</title>
+  <link rel="stylesheet" href="/berater-v168.css?v=168">
+</head>
+<body>
+  <div id="loginView" class="screen loginScreen">
+    <main class="loginCard glass">
+      <div class="logo">SB</div>
+      <h1>Schuldnerberater</h1>
+      <p>Geschützter Nur-Lesen-Zugang zu Schuldenübersicht und freigegebenen Dokumenten.</p>
+      <form id="loginForm">
+        <label>Benutzername<input id="loginUser" autocomplete="username" required></label>
+        <label>Passwort<input id="loginPass" type="password" autocomplete="current-password" required></label>
+        <button class="btn primary">Anmelden</button>
+        <div id="loginMsg" class="msg"></div>
+      </form>
+      <a class="adminLink" href="/login">Admin-Anmeldung</a>
+    </main>
+  </div>
+
+  <div id="appView" class="app hidden">
+    <aside class="sidebar">
+      <div class="brand"><div class="brandLogo">SB</div><div><strong>Schuldnerberater</strong><span>Nur Lesen</span></div></div>
+      <nav class="nav">
+        <button class="active" data-page="overview">Übersicht</button>
+        <button data-page="creditors">Gläubiger</button>
+        <button data-page="documents">Dokumente</button>
+      </nav>
+      <button class="btn logout" id="logoutBtn">Abmelden</button>
+    </aside>
+
+    <main class="main">
+      <section class="page active" id="page-overview">
+        <div class="topbar"><div><h1>Übersicht</h1><p>Aktueller Stand für die Schuldnerberatung.</p></div><div class="readonlyBadge">Nur Lesen</div></div>
+        <div class="stats">
+          <div class="stat glass"><span>Gesamtschulden</span><strong id="statTotal">0,00 €</strong><small>alle erfassten Forderungen</small></div>
+          <div class="stat glass"><span>Offen</span><strong id="statOpen">0,00 €</strong><small>noch nicht erledigt</small></div>
+          <div class="stat glass"><span>Gläubiger</span><strong id="statCreditors">0</strong><small>zusammengefasst</small></div>
+          <div class="stat glass"><span>Erledigt</span><strong id="statClosed">0</strong><small>abgeschlossene Einträge</small></div>
+        </div>
+        <div class="section glass"><div class="sectionHead"><div><h3>Gläubiger</h3><p>Name, Betrag, Status und Kategorie.</p></div><span id="updatedAt"></span></div><div id="overviewTable"></div></div>
+      </section>
+
+      <section class="page" id="page-creditors">
+        <div class="topbar"><div><h1>Gläubiger</h1><p>Details, Ansprechpartner, Notizen und Verlauf – ohne Änderungsmöglichkeit.</p></div><div class="readonlyBadge">Nur Lesen</div></div>
+        <div class="section glass"><input class="search" id="creditorSearch" placeholder="Gläubiger, Aktenzeichen, Grund oder Kategorie suchen"><div id="creditorContent"></div></div>
+      </section>
+
+      <section class="page" id="page-documents">
+        <div class="topbar"><div><h1>Dokumente</h1><p>Nur Dokumente, die bereits mit den Schulden verknüpft sind.</p></div><div class="readonlyBadge">Nur Lesen</div></div>
+        <div class="stats">
+          <div class="stat glass"><span>Dokumente</span><strong id="docTotal">0</strong><small>alle Verknüpfungen</small></div>
+          <div class="stat glass"><span>Paperless</span><strong id="docPaperless">0</strong><small>geschützt geöffnet</small></div>
+          <div class="stat glass"><span>Dateien</span><strong id="docFiles">0</strong><small>sonstige Dateiverweise</small></div>
+          <div class="stat glass"><span>Ohne Dokumente</span><strong id="docMissing">0</strong><small>Gläubiger ohne Verknüpfung</small></div>
+        </div>
+        <div class="section glass"><div id="documentsContent"></div></div>
+      </section>
+    </main>
+
+    <nav class="mobileNav"><button class="active" data-page="overview">Start</button><button data-page="creditors">Gläubiger</button><button data-page="documents">Dokumente</button></nav>
+  </div>
+
+  <div class="drawerBack" id="drawerBack"></div><aside class="drawer" id="drawer"><div id="drawerContent"></div></aside>
+  <div class="toast" id="toast"></div>
+  <script src="/berater-v168.js?v=168" defer></script>
+</body>
+</html>
