@@ -1,10 +1,10 @@
 {
   "name": "schulden-v170",
-  "version": "170.0.0",
+  "version": "170.0.1",
   "private": true,
   "description": "Schulden Manager mit Registrierung, Benutzerverwaltung und einstellbaren Beraterrechten",
   "scripts": {
-    "start": "node -r ./n8n-bridge-server.js -r ./paperless-import-server.js -r ./paperless-preview-server-v149.js -r ./paperless-cleanup-server.js -r ./v166-tools-server.js -r ./n8n-inbox-ui-server.js -r ./user-admin-inject-v170.js -r ./advisor-api-v170.js -r ./auth-core-v170.js server.js"
+    "start": "node -r ./auth-core-v170.js -r ./advisor-api-v170.js -r ./user-admin-inject-v170.js -r ./n8n-bridge-server.js -r ./paperless-import-server.js -r ./paperless-preview-server-v149.js -r ./paperless-cleanup-server.js -r ./v166-tools-server.js -r ./n8n-inbox-ui-server.js server.js"
   },
   "engines": {
     "node": ">=20"
